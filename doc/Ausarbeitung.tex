@@ -29,7 +29,7 @@ Was wollen wir in dem Projekt machen?
 \subsection{Ergebnis}
 Das Ergebnis vom Projekt sind 2 mobile Applikation, eine für ein Android Smartphone und eine für eine Android Wear Smartwatch. Diese beiden Apps werden Daten untereinander austauschen, jedoch keinen externen Server benötigen.
 
-\subsection{Anwendungsfall Beschreibungen}
+\subsection{Anwendungsfälle}
 Wir möchten unsere Projektidee und unsere Anforderungen in Form von Userstories und Anwendungsfällen konkretisieren. Dazu haben wir uns den fiktiven Anwender Anton ausgedacht, der sehr vergesslich aber experimentierfreudig ist. Als Technik-affiner Mensch, hat Anton natürlich eine moderne Smartwatch und ein Smartphone. Aufgrund seiner Vergesslichkeit wünscht sich Anton verlegte Gegenstände wie Schlüsselbunde leichter wiederfinden zu können. Außerdem möchte er beim Verlassen des Hauses an seine Einkaufsliste erinnert werden.
 
 Nachfolgend werden Antons Wünsche detaillierter ausgeführt.
@@ -111,7 +111,40 @@ Akzeptanzkriterien:
 \item Auf der Smartwatch werden dann diese verknüpften Notizen angezeigt.
 \end{itemize}
 
-Als Anwender Anton möchte ich die angezeigte Notiz löschen können, um diese zu entfernen.
+
+\subsection{Projektplan}
+
+In folgendem Diagramm haben wir unsere Zeitplanung für das Projekt aufgezeichnet.
+
+\begin{figure}[tbh]
+\centering
+\includegraphics[width=1.0\linewidth]{Bilder/Zeitplan-1}
+\caption{Zeitplan mit Meilensteinen}
+\label{fig:Zeitplan-1}
+\end{figure}
+
+\subsubsection{Projektphasen}
+\begin{description}
+	\item[Schnittstellen:] Definition der Schnittstellen zur Positionsbestimmung und zur Kommunikation zwischen
+	Smartphone und Smartwatch. Dadurch können gewisse Teile unabhängig voneinander entwickelt werden.
+	\item[Smartphone-App] Entwicklung der Smartphone-App zur Hinterlegung von Notizen in Räumen und bei Ereignissen.
+	\item[Smartwatch-App] Entwicklung der Smartwatch-App zur Anzeige von Notizen in Räumen und bei Ereignissen sowie
+	dem Wiederfinden von Gegenständen.
+	\item[Positionierung] Bestimmung der Position der Smartwatch anhand der Bluetooth-Signale der stationären Tags.
+	\item[Dokumentation und Präsentation] Erstellung der Dokumentation und Vorbereitung der Präsentation.
+\end{description}
+
+\subsubsection{Meilensteine}
+\begin{description}
+	\item[Schnittstellendefinition] Schnittstellen sind festegelegt.
+	\item[G-Tags und Watches sind da] Geschätzter Termin für das Eintreffen der bestellten Ware.
+	\item[Smartphone $\rightarrow$ Smartwatch] Kommunikation von der Smartphone-App mit der Smartwatch ist implementiert.
+	\item[Smartphone-App] Die Smartphone-App ist fertig (ggf. Mock-Implementierungen für die Schnittstellen)
+	\item[Positionierung] Die Positionierung auf der Smartwatch ist fertig.
+	\item[Smartwatch-App] Die Smartwatch-App ist fertig.
+	\item[Präsentation] Die Präsentation ist fertig.
+	\item[Abgabe] Die Dokumentation wurde abgegeben.
+\end{description}
 
 
 \section{Einordnung in Mobile Computing}
