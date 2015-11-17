@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="eventTypes">
+        <item>Keine</item>
+        <item>Beim Betreten</item>
+        <item>Beim Verlassen</item>
+    </string-array>
+
+</resources>
