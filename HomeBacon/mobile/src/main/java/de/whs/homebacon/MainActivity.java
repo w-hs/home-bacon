@@ -9,10 +9,15 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.Spinner;
+
+import de.whs.homebaconcore.EventType;
+import de.whs.homebaconcore.WatchConnector;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final WatchConnector watchConnector = new WatchConnectorImpl();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,21 +25,41 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        final EditText notizTextbox = (EditText) findViewById(R.id.notizText);
+        final Spinner spinner = (Spinner) findViewById(R.id.eventSpinner);
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own actionnnnnnnn", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Notiz hinterlegt", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+
+                if(spinner.getSelectedItemPosition() == 0)
+                {
+                    watchConnector.sendNote(notizTextbox.getText().toString());
+                }
+                if(spinner.getSelectedItemPosition() == 1)
+                {
+                    watchConnector.sendNoteWithEvent(notizTextbox.getText().toString(), EventType.ENTER);
+                }
+                if(spinner.getSelectedItemPosition() == 2)
+                {
+                    watchConnector.sendNoteWithEvent(notizTextbox.getText().toString(), EventType.LEAVE);
+                }
+
+                notizTextbox.setText("");
+                spinner.setSelection(0);
+
             }
         });
 
-        Spinner spinner = (Spinner) findViewById(R.id.eventSpinner);
+
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.eventTypes, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
-        
+
     }
 
 
