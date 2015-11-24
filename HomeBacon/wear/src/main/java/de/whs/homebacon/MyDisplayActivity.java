@@ -34,7 +34,7 @@ public class MyDisplayActivity extends Activity {
         values.put(DatabaseHelper.COLUMN_NOTES_NAME_TEXT, "Eine super notiz");
         values.put(DatabaseHelper.COLUMN_NOTES_NAME_TIMESTAMP,  System.currentTimeMillis());
         values.put(DatabaseHelper.COLUMN_NOTES_NAME_EVENT, "null");
-        values.put(DatabaseHelper.COLUMN_NOTES_NAME_ROOMID, "100");
+        values.put(DatabaseHelper.COLUMN_NOTES_NAME_ROOMID, 100);
 
         long newRowId;
         newRowId = db.insert(

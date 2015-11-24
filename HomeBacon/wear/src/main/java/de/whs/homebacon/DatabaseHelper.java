@@ -24,7 +24,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String TABLE_ITEMS_NAME = "item";
     public static final String COLUMN_ITEMS_NAME_BBTAG  = "bbtag";
-    public static final String COLUMN_ITEMS_NAME_DESCRIPTION = "dec";
+    public static final String COLUMN_ITEMS_NAME_DESCRIPTION = "description";
     public static final String COLUMN_ITEMS_NAME_ROOMID = "roomid";
 
 
@@ -36,7 +36,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_NOTES_NAME_TITLE         + TEXT_TYPE + COMMA_SEP +
                     COLUMN_NOTES_NAME_TEXT          + TEXT_TYPE + COMMA_SEP +
                     COLUMN_NOTES_NAME_TIMESTAMP     + TEXT_TYPE + COMMA_SEP +
-                    COLUMN_NOTES_NAME_ROOMID        + TEXT_TYPE + COMMA_SEP +
+                    COLUMN_NOTES_NAME_ROOMID        + " INTEGER" + COMMA_SEP +
                     COLUMN_NOTES_NAME_EVENT         + TEXT_TYPE +
             " )";
 
