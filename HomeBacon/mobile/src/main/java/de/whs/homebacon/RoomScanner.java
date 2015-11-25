@@ -8,9 +8,11 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
@@ -30,6 +32,7 @@ public class RoomScanner extends AppCompatActivity {
     private List<Room> mRooms = new ArrayList<>();
     private Spinner mSpinner;
     private ArrayAdapter<Room> mListAdapter;
+    private boolean isScanning = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +70,22 @@ public class RoomScanner extends AppCompatActivity {
                 android.R.layout.simple_list_item_1, mRooms);
         mSpinner.setAdapter(mListAdapter);
 
+        Button startButton = (Button) findViewById(R.id.startScanButtton);
+        startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isScanning = true;
+            }
+        });
+
+        Button stopButton = (Button) findViewById(R.id.stopScanButton);
+        stopButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isScanning = false;
+            }
+        });
+
         mBeaconScanner = new BeaconScanner(this);
         mBeaconScanner.register(new BeaconListener() {
             @Override
@@ -78,6 +97,13 @@ public class RoomScanner extends AppCompatActivity {
 
     private void onBeaconScan(BluetoothDevice device, int rssi) {
 
+        if (!isScanning)
+            return;
+
+        Room room = (Room) mSpinner.getSelectedItem();
+        Log.i("HomeBeacon", "room=" + room.getName() + ", addr=" + device.getAddress() + ", rssi="
+                + rssi);
+        mDbHelper.insertScan(mDb, room.getId(), device.getAddress(), rssi);
     }
 
 }

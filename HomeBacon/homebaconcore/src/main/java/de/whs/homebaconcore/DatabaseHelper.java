@@ -135,6 +135,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return rooms;
     }
 
+    public void insertScan(SQLiteDatabase db, long roomId, String address, int rssi) {
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.COLUMN_SCAN_NAME_BBTAG, address);
+        values.put(DatabaseHelper.COLUMN_SCAN_NAME_ROOMID, roomId);
+        values.put(DatabaseHelper.COLUMN_SCAN_NAME_RSSI, rssi);
+
+        db.insert(DatabaseHelper.TABLE_SCAN_NAME, null, values);
+    }
+
 
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_NOTES);
