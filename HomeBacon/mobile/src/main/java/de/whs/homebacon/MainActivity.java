@@ -13,6 +13,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import de.whs.homebaconcore.EventType;
+import de.whs.homebaconcore.NavigationService;
+import de.whs.homebaconcore.NavigationServiceImpl;
 import de.whs.homebaconcore.WatchConnector;
 
 public class MainActivity extends AppCompatActivity {
@@ -50,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
 
                 notizTextbox.setText("");
                 spinner.setSelection(0);
-
             }
         });
 
@@ -60,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
+        //Bluetooth
+        NavigationService navService = new NavigationServiceImpl(this);
     }
 
 
