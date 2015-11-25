@@ -26,90 +26,20 @@ import static android.support.v4.app.ActivityCompat.startActivityForResult;
  */
 public class NavigationServiceImpl implements NavigationService {
 
-    private BluetoothAdapter BTAdapter;
-    private BroadcastReceiver mReceiver;
-    private Handler mHandler = new Handler();
-
-    public static int REQUEST_BLUETOOTH = 1;
+    private BeaconScanner mBeaconScanner;
 
     public NavigationServiceImpl (final Activity activity){
-        BTAdapter = BluetoothAdapter.getDefaultAdapter();
-
-        // Phone does not support Bluetooth so let the user know and exit.
-        if (BTAdapter == null) {
-            new android.support.v7.app.AlertDialog.Builder(activity)
-                    .setTitle("Not compatible")
-                    .setMessage("Your phone does not support Bluetooth")
-                    .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            System.exit(0);
-                        }
-                    })
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .show();
-        }
-
-        if (!BTAdapter.isEnabled()) {
-            Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            activity.startActivityForResult(enableBT, REQUEST_BLUETOOTH);
-        }
-
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
+        mBeaconScanner = new BeaconScanner(activity);
+        mBeaconScanner.register(new BeaconListener() {
             @Override
-            public void run() {
-                scan();
+            public void onScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
+                onBeaconScan(device, rssi);
             }
-        },0,1000);
-
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        activity.registerReceiver(mReceiver, filter);
+        });
     }
 
-    private void scan(){
-
-        if (BTAdapter.isEnabled()) {
-            /** BTAdapter.startDiscovery();
-             mReceiver = new BroadcastReceiver() {
-             public void onReceive(Context context, Intent intent) {
-             String action = intent.getAction();
-
-             //Finding devices
-             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-             // Get the BluetoothDevice object from the Intent
-             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-             int rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MIN_VALUE);
-             // Add the name and address to an array adapter to show in a ListView
-             String msg = device.getName() + "\n" + device.getAddress() + "\n" + rssi;
-             //mArrayAdapter.add(msg);
-             Log.d("BLUETOOTH", msg);
-             }
-             }
-             }; **/
-
-            final BluetoothAdapter.LeScanCallback mLeScanCallback =  new BluetoothAdapter.LeScanCallback() {
-                @Override
-                public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
-                    String msg = device.getName() + "\n" + device.getAddress() + "\n" + rssi;
-                    Log.d("BLUETOOTH", msg);
-                }
-            };
-
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    BTAdapter.stopLeScan(mLeScanCallback);
-                }
-            },1000);
-
-            BTAdapter.startLeScan(mLeScanCallback);
-
-            /** min SDK level 21...
-             BTAdapter.getBluetoothLeScanner().startScan(new ScanCallback() {... }
-             });**/
-
-
-        };
+    private void onBeaconScan(BluetoothDevice device, int rssi) {
+        // TODO: Aktuelle Schätzung für Position updaten
     }
 
     @Override
