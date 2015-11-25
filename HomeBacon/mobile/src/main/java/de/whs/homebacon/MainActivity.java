@@ -1,14 +1,9 @@
 package de.whs.homebacon;
 
-<<<<<<< .mine
 import android.content.Intent;
-
-
-=======
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
->>>>>>> .theirs
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -127,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                 //);
 
                 //mTextView.setText(""+cursor.getString(2));
-                notizTextbox.setText(""+cursor.getString(2));
+                noticeTextbox.setText(""+cursor.getString(2));
             }
         });
 
