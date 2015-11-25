@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import de.whs.homebaconcore.DatabaseHelper;
+
 public class MyDisplayActivity extends Activity {
 
     private TextView mTextView;
@@ -47,7 +49,7 @@ public class MyDisplayActivity extends Activity {
 
 
         // Define a projection that specifies which columns from the database
-// you will actually use after this query.
+        // you will actually use after this query.
         String[] projection = {
                 DatabaseHelper.COLUMN_NOTES_NAME_NOTEID,
                 DatabaseHelper.COLUMN_NOTES_NAME_TITLE,
@@ -57,7 +59,7 @@ public class MyDisplayActivity extends Activity {
                 DatabaseHelper.COLUMN_NOTES_NAME_ROOMID
         };
 
-// How you want the results sorted in the resulting Cursor
+        // How you want the results sorted in the resulting Cursor
         String sortOrder =
                 DatabaseHelper.COLUMN_NOTES_NAME_TIMESTAMP + " DESC";
 
@@ -78,7 +80,7 @@ public class MyDisplayActivity extends Activity {
                 cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOTES_NAME_TITLE)
         );
 
-        mTextView.setText(""+cursor.getString(2));
+        mTextView.setText("" + cursor.getString(2));
 
     }
 }

@@ -1,4 +1,4 @@
-package de.whs.homebacon;
+package de.whs.homebaconcore;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -27,6 +27,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ITEMS_NAME_DESCRIPTION = "description";
     public static final String COLUMN_ITEMS_NAME_ROOMID = "roomid";
 
+    public static final String TABLE_SCAN_NAME = "beaconscan";
+    public static final String COLUMN_SCAN_NAME_BBTAG  = "bbtag";
+    public static final String COLUMN_SCAN_NAME_RSSI = "rssi";
+    public static final String COLUMN_SCAN_NAME_ROOMID = "roomid";
+
+    public static final String TABLE_ROOM_NAME = "room";
+    public static final String COLUMN_ROOM_NAME_DESCRIPTION = "description";
+    public static final String COLUMN_ROOM_NAME_ROOMID = "roomid";
+
 
     private static final String TEXT_TYPE = " TEXT";
     private static final String COMMA_SEP = ",";
@@ -44,7 +53,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + TABLE_ITEMS_NAME + " (" +
                     COLUMN_ITEMS_NAME_BBTAG           + " INTEGER PRIMARY KEY," +
                     COLUMN_ITEMS_NAME_DESCRIPTION     + TEXT_TYPE + COMMA_SEP +
-                    COLUMN_ITEMS_NAME_ROOMID          + "INTEGER" +
+                    COLUMN_ITEMS_NAME_ROOMID          + " INTEGER" +
+                    " )";
+
+
+    private static final String SQL_CREATE_SCANS =
+            "CREATE TABLE " + TABLE_SCAN_NAME + " (" +
+                    COLUMN_SCAN_NAME_BBTAG           + " INTEGER PRIMARY KEY," +
+                    COLUMN_SCAN_NAME_RSSI            + " INTEGER" + COMMA_SEP +
+                    COLUMN_SCAN_NAME_ROOMID          + " INTEGER" +
+                    " )";
+
+
+    private static final String SQL_CREATE_ROOMS =
+            "CREATE TABLE " + TABLE_ROOM_NAME + " (" +
+                    COLUMN_ROOM_NAME_ROOMID           + " INTEGER PRIMARY KEY," +
+                    COLUMN_ROOM_NAME_DESCRIPTION      + " INTEGER" +
                     " )";
 
     private static final String SQL_DELETE_NOTES =
@@ -52,6 +76,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String SQL_DELETE_ITEMS =
             "DROP TABLE IF EXISTS " + TABLE_ITEMS_NAME;
+
+    private static final String SQL_DELETE_SCANS =
+            "DROP TABLE IF EXISTS " + TABLE_SCAN_NAME;
+
+    private static final String SQL_DELETE_ROOMS =
+            "DROP TABLE IF EXISTS " + TABLE_ROOM_NAME;
 
 
     public DatabaseHelper(Context context)
@@ -64,12 +94,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.d("SQLSQLSQL________","_________________________Create");
         db.execSQL(SQL_CREATE_NOTES);
         db.execSQL(SQL_CREATE_ITEMS);
+
+        db.execSQL(SQL_CREATE_ROOMS);
+        db.execSQL(SQL_CREATE_SCANS);
     }
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
         db.execSQL(SQL_DELETE_NOTES);
         db.execSQL(SQL_DELETE_ITEMS);
+        db.execSQL(SQL_DELETE_SCANS);
+        db.execSQL(SQL_DELETE_ROOMS);
         onCreate(db);
     }
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
