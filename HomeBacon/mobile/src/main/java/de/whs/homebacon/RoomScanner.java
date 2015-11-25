@@ -1,19 +1,35 @@
 package de.whs.homebacon;
 
 import android.bluetooth.BluetoothDevice;
+import android.database.DataSetObserver;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import de.whs.homebaconcore.BeaconListener;
 import de.whs.homebaconcore.BeaconScanner;
+import de.whs.homebaconcore.DatabaseHelper;
+import de.whs.homebaconcore.Room;
 
 public class RoomScanner extends AppCompatActivity {
 
     private BeaconScanner mBeaconScanner;
+    private DatabaseHelper mDbHelper;
+    private SQLiteDatabase mDb;
+    private List<Room> mRooms = new ArrayList<>();
+    private Spinner mSpinner;
+    private ArrayAdapter<Room> mListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +47,25 @@ public class RoomScanner extends AppCompatActivity {
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        mDbHelper = new DatabaseHelper(getApplicationContext());
+
+        mDb = mDbHelper.getWritableDatabase();
+        mDbHelper.onUpgrade(mDb, 1, 1);
+
+        mRooms = mDbHelper.getAllRooms(mDb);
+        if (mRooms.size() == 0) {
+            mDbHelper.insertRoom(mDb, "Küche");
+            mDbHelper.insertRoom(mDb, "Flur");
+            mDbHelper.insertRoom(mDb, "Wohnzimmer");
+
+            mRooms = mDbHelper.getAllRooms(mDb);
+        }
+
+        mSpinner = (Spinner) findViewById(R.id.spinner);
+        mListAdapter = new ArrayAdapter<Room>(this,
+                android.R.layout.simple_list_item_1, mRooms);
+        mSpinner.setAdapter(mListAdapter);
 
         mBeaconScanner = new BeaconScanner(this);
         mBeaconScanner.register(new BeaconListener() {
