@@ -1,9 +1,12 @@
 package de.whs.homebacon;
 
 import android.bluetooth.BluetoothDevice;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.database.DataSetObserver;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +19,12 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +63,7 @@ public class RoomScanner extends AppCompatActivity {
         mDbHelper = new DatabaseHelper(getApplicationContext());
 
         mDb = mDbHelper.getWritableDatabase();
-        mDbHelper.onUpgrade(mDb, 1, 1);
+        //mDbHelper.onUpgrade(mDb, 1, 1);
 
         mRooms = mDbHelper.getAllRooms(mDb);
         if (mRooms.size() == 0) {
@@ -83,6 +92,15 @@ public class RoomScanner extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 isScanning = false;
+                File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                File destFile = new File(downloadDir, "bacon.db");
+                File srcFile = new File(getDatabaseDir());
+                try {
+                    copy(srcFile, destFile);
+                }
+                catch (Exception ex) {
+                    Log.e("HomeBeacon", ex.getMessage());
+                }
             }
         });
 
@@ -93,6 +111,31 @@ public class RoomScanner extends AppCompatActivity {
                 onBeaconScan(device, rssi);
             }
         });
+    }
+
+    private String getDatabaseDir() {
+        PackageManager m = getPackageManager();
+        String s = getPackageName();
+        try {
+            PackageInfo p = m.getPackageInfo(s, 0);
+            return p.applicationInfo.dataDir + "/databases/bacon.db";
+        } catch (PackageManager.NameNotFoundException e) {
+            return "";
+        }
+    }
+
+    private void copy(File src, File dst) throws IOException {
+        InputStream in = new FileInputStream(src);
+        OutputStream out = new FileOutputStream(dst);
+
+        // Transfer bytes from in to out
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
+        }
+        in.close();
+        out.close();
     }
 
     private void onBeaconScan(BluetoothDevice device, int rssi) {
