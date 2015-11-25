@@ -1,39 +1,58 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:orientation="vertical"
-    tools:context=".MyDisplayActivity" tools:deviceIds="wear">
+<android.support.wearable.view.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/common_google_signin_btn_icon_light_disabled"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:padding="15dp"
+    tools:context=".MyDisplayActivity"
+    tools:deviceIds="wear_round">
 
 
-    <LinearLayout
-        android:orientation="vertical"
+    <android.support.wearable.view.GridViewPager
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/pager"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center_horizontal">
+        android:layout_height="match_parent"
+        android:background="@color/blue"/>
+    <!--
+   <FrameLayout
+       android:id="@+id/frame_layout"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       app:layout_box="bottom">
 
-        <TextView android:id="@+id/text2" android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:text="@string/hello" />
-        <TextView android:id="@+id/text3" android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:text="@string/hello" />
-        <TextView android:id="@+id/text4" android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:text="@string/hello" />
-        <TextView android:id="@+id/text5" android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:text="@string/hello" />
-        <TextView android:id="@+id/text6" android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:text="@string/hello" />
+       <FrameLayout
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:padding="5dp"
+           app:layout_box="all"
+           android:id="@+id/frame_layout"
+           android:background="@color/blue">
+
+           <TextView
+               android:id="@+id/text"
+               android:gravity="center"
+               android:layout_height="wrap_content"
+               android:layout_width="match_parent"
+               android:text="TEST"
+               android:textColor="@color/black" />
 
 
-        <TextView android:id="@+id/text" android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:text="@string/hello" />
 
+           <ImageButton
+               android:background="@null"
+               android:layout_gravity="bottom|left"
+               android:layout_height="50dp"
+               android:layout_width="50dp"
+               android:src="@android:drawable/btn_star_big_on" />
 
-    </LinearLayout>
+           <ImageButton
+               android:background="@null"
+               android:layout_gravity="bottom|right"
+               android:layout_height="50dp"
+               android:layout_width="50dp"
+               android:src="@android:drawable/btn_star_big_off" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Button"
-        android:layout_gravity="center_horizontal"
-        android:id="@+id/button" />
-</LinearLayout>
+    </FrameLayout> -->
+</android.support.wearable.view.BoxInsetLayout>

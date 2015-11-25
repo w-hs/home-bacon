@@ -1,10 +1,14 @@
 package de.whs.homebacon;
 
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.wearable.view.CardFragment;
+import android.support.wearable.view.GridViewPager;
 import android.widget.TextView;
 
 import de.whs.homebaconcore.DatabaseHelper;
@@ -80,7 +84,21 @@ public class MyDisplayActivity extends Activity {
                 cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOTES_NAME_TITLE)
         );
 
-        mTextView.setText("" + cursor.getString(2));
+       // mTextView.setText("" + cursor.getString(2));
+
+
+
+
+
+        final GridViewPager pager = (GridViewPager) findViewById(R.id.pager);
+        pager.setAdapter(new SampleGridPagerAdapter(this, getFragmentManager()));
+
+
+
+
 
     }
+
+
+
 }

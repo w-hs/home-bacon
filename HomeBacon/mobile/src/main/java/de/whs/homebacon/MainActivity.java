@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         spinner.setAdapter(adapter);
 
         //Bluetooth
-        NavigationService navService = new NavigationServiceImpl(this);
+        //NavigationService navService = new NavigationServiceImpl(this);
     }
 
 
