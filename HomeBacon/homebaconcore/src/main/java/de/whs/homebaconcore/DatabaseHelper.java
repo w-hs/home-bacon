@@ -144,6 +144,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(DatabaseHelper.TABLE_SCAN_NAME, null, values);
     }
 
+    public void insertNote(SQLiteDatabase db, Note note) {
+        ContentValues values = new ContentValues();
+
+        // Genereate ID?!
+        // values.put(DatabaseHelper.COLUMN_NOTES_NAME_NOTEID, 1);
+
+
+        values.put(DatabaseHelper.COLUMN_NOTES_NAME_TITLE, note.getTitle());
+        values.put(DatabaseHelper.COLUMN_NOTES_NAME_TEXT, note.getText());
+        values.put(DatabaseHelper.COLUMN_NOTES_NAME_TIMESTAMP,  System.currentTimeMillis());
+        values.put(DatabaseHelper.COLUMN_NOTES_NAME_EVENT, "null");
+        values.put(DatabaseHelper.COLUMN_NOTES_NAME_ROOMID, 100);
+
+        long noteId = db.insert(DatabaseHelper.TABLE_NOTES_NAME, null, values);
+    }
+
 
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_NOTES);
@@ -163,6 +179,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
+    }
+
+    public void test(SQLiteDatabase db) {
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                DatabaseHelper.COLUMN_NOTES_NAME_NOTEID,
+                DatabaseHelper.COLUMN_NOTES_NAME_TITLE,
+                DatabaseHelper.COLUMN_NOTES_NAME_TEXT,
+                DatabaseHelper.COLUMN_NOTES_NAME_TIMESTAMP,
+                DatabaseHelper.COLUMN_NOTES_NAME_EVENT,
+                DatabaseHelper.COLUMN_NOTES_NAME_ROOMID
+        };
+
+        // How you want the results sorted in the resulting Cursor
+        String sortOrder =
+                DatabaseHelper.COLUMN_NOTES_NAME_TIMESTAMP + " DESC";
+
+        Cursor cursor = db.query(
+                DatabaseHelper.TABLE_NOTES_NAME, // The table to query
+                projection,                      // The columns to return
+                null,                            // The columns for the WHERE clause
+                null,                            // The values for the WHERE clause
+                null,                            // don't group the rows
+                null,                            // don't filter by row groups
+                sortOrder                        // The sort order
+        );
+
+        cursor.moveToFirst();
+        long itemId = cursor.getLong(
+                cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOTES_NAME_TITLE)
+        );
     }
 
 }
