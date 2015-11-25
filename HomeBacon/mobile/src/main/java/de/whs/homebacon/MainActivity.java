@@ -1,5 +1,6 @@
 package de.whs.homebacon;
 
+import android.content.Intent;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -24,6 +25,8 @@ import de.whs.homebaconcore.WatchConnector;
 public class MainActivity extends AppCompatActivity {
 
     private final WatchConnector watchConnector = new WatchConnectorImpl();
+    private NavigationService mNavService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final EditText notizTextbox = (EditText) findViewById(R.id.notizText);
+        final EditText noticeTextbox = (EditText) findViewById(R.id.notizText);
         final Spinner spinner = (Spinner) findViewById(R.id.eventSpinner);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -43,18 +46,18 @@ public class MainActivity extends AppCompatActivity {
 
                 if(spinner.getSelectedItemPosition() == 0)
                 {
-                    watchConnector.sendNote(notizTextbox.getText().toString());
+                    watchConnector.sendNote(noticeTextbox.getText().toString());
                 }
                 if(spinner.getSelectedItemPosition() == 1)
                 {
-                    watchConnector.sendNoteWithEvent(notizTextbox.getText().toString(), EventType.ENTER);
+                    watchConnector.sendNoteWithEvent(noticeTextbox.getText().toString(), EventType.ENTER);
                 }
                 if(spinner.getSelectedItemPosition() == 2)
                 {
-                    watchConnector.sendNoteWithEvent(notizTextbox.getText().toString(), EventType.LEAVE);
+                    watchConnector.sendNoteWithEvent(noticeTextbox.getText().toString(), EventType.LEAVE);
                 }
 
-                notizTextbox.setText("");
+                noticeTextbox.setText("");
                 spinner.setSelection(0);
 
                 DatabaseHelper mDbHelper = new DatabaseHelper(getApplicationContext());
@@ -119,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                 //);
 
                 //mTextView.setText(""+cursor.getString(2));
-                notizTextbox.setText(""+cursor.getString(2));
+                noticeTextbox.setText(""+cursor.getString(2));
             }
         });
 
@@ -130,11 +133,8 @@ public class MainActivity extends AppCompatActivity {
         spinner.setAdapter(adapter);
 
         //Bluetooth
-        //NavigationService navService = new NavigationServiceImpl(this);
+        mNavService = new NavigationServiceImpl(this);
     }
-
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -153,6 +153,10 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+        else if (id == R.id.action_measure) {
+            Intent intent = new Intent(this, RoomScanner.class);
+            startActivityForResult(intent, 0);
         }
 
         return super.onOptionsItemSelected(item);
