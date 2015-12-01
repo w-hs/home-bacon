@@ -28,7 +28,8 @@
             android:name=".RoomScanner"
             android:label="@string/title_activity_room_scanner"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.whs.homebacon.MainActivity" />
