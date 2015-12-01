@@ -10,6 +10,9 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault" >
+
+        <service android:name=".DanielsService" android:exported="false" />
+
         <activity
             android:name=".MyStubBroadcastActivity"
             android:label="MyStubBroadcastActivity" >
