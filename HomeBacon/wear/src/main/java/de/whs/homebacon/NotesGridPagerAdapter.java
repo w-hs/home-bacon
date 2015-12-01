@@ -52,6 +52,9 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
 
         }
 
+
+        //CardFragment f = CardFragment.create("sdfsdf", "dfgdfgdf dfgdfgdf gdfgdfg dfgdfgdfg dfgdfgdf gdfgdfgdfg dfgd");
+
         NoteFragment f = new NoteFragment();
         Bundle b =new Bundle();
 

@@ -57,7 +57,7 @@ public class MyDisplayActivity extends Activity {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         mDbHelper.onUpgrade(db, 1, 1);
 
-        Note note = new Note("Notiz", "Eine tolle erste Notiz");
+        Note note = new Note("Notiz", "Eine tolle erste Notiz sdfd dfg df gd fg df gdfgdf g dfg df g df g dfg dfg  dfg d fg df g df gd fg df gd fg d fg df g dfg d fg");
         Note note1 = new Note("Notiz 1", "blajdgb");
         Note note2 = new Note("Notiz 2", "ajbgj");
 
