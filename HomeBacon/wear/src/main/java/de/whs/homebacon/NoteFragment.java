@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import de.whs.homebaconcore.Note;
@@ -33,7 +34,7 @@ public class NoteFragment extends CardFragment {
         TextView value = (TextView)mRootView.findViewById(R.id.textView2);
         value.setText(note.getText());
 
-        Button button = (Button)mRootView.findViewById(R.id.button);
+        ImageButton button = (ImageButton)mRootView.findViewById(R.id.imageButton);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
