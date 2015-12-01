@@ -213,4 +213,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         );
     }
 
+    public void deleteScans(SQLiteDatabase db) {
+        db.delete(DatabaseHelper.TABLE_SCAN_NAME, null, null);
+    }
 }

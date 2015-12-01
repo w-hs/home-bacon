@@ -38,4 +38,24 @@
         android:layout_alignParentStart="true"
         android:layout_marginTop="41dp"
         android:layout_alignEnd="@+id/startScanButtton" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Lösche Messungen"
+        android:id="@+id/deleteButton"
+        android:layout_marginTop="49dp"
+        android:layout_below="@+id/stopScanButton"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Scanner: Aus"
+        android:id="@+id/scanningTextView"
+        android:layout_below="@+id/deleteButton"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="56dp" />
+
 </RelativeLayout>
