@@ -8,6 +8,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import de.whs.homebaconcore.Note;
 
 /**
@@ -16,6 +20,7 @@ import de.whs.homebaconcore.Note;
 public class NoteFragment extends CardFragment {
 
     private View mRootView;
+    private NotesGridPagerAdapter adapter;
 
     @Override
     public View onCreateContentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -24,6 +29,8 @@ public class NoteFragment extends CardFragment {
 
         Bundle bundle =getArguments();
         Note note = (Note)bundle.getSerializable("note");
+        if(note == null)
+            return mRootView;
 
         TextView title = (TextView)mRootView.findViewById(R.id.textView);
         TextView value = (TextView)mRootView.findViewById(R.id.textView2);
@@ -36,7 +43,11 @@ public class NoteFragment extends CardFragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                List<Note> list = new ArrayList<Note>(Arrays.asList(adapter.notes));
+                list.removeAll(Arrays.asList(adapter.notes[0]));
+                adapter.notes = list.toArray(adapter.notes);
 
+                adapter.notifyDataSetChanged();
             }
         });
 
@@ -44,4 +55,9 @@ public class NoteFragment extends CardFragment {
     }
 
 
+    public void setAdapter(NotesGridPagerAdapter adapter) {
+        this.adapter = adapter;
+
+
+    }
 }
