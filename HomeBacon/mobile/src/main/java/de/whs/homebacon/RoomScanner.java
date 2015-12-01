@@ -3,21 +3,21 @@ package de.whs.homebacon;
 import android.bluetooth.BluetoothDevice;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.database.DataSetObserver;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.PersistableBundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,7 +25,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import de.whs.homebaconcore.BeaconListener;
@@ -38,10 +37,11 @@ public class RoomScanner extends AppCompatActivity {
     private BeaconScanner mBeaconScanner;
     private DatabaseHelper mDbHelper;
     private SQLiteDatabase mDb;
-    private List<Room> mRooms = new ArrayList<>();
     private Spinner mSpinner;
-    private ArrayAdapter<Room> mListAdapter;
-    private boolean isScanning = false;
+    private boolean mIsScanning = false;
+    TextView mScannerView;
+    private int mScanCount;
+    private BeaconListener mListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,32 +58,37 @@ public class RoomScanner extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null)
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
 
         mDbHelper = new DatabaseHelper(getApplicationContext());
-
         mDb = mDbHelper.getWritableDatabase();
-        //mDbHelper.onUpgrade(mDb, 1, 1);
 
-        mRooms = mDbHelper.getAllRooms(mDb);
-        if (mRooms.size() == 0) {
+        List<Room> rooms = mDbHelper.getAllRooms(mDb);
+        if (rooms.size() == 0) {
             mDbHelper.insertRoom(mDb, "Küche");
             mDbHelper.insertRoom(mDb, "Flur");
             mDbHelper.insertRoom(mDb, "Wohnzimmer");
 
-            mRooms = mDbHelper.getAllRooms(mDb);
+            rooms = mDbHelper.getAllRooms(mDb);
         }
 
         mSpinner = (Spinner) findViewById(R.id.spinner);
-        mListAdapter = new ArrayAdapter<Room>(this,
-                android.R.layout.simple_list_item_1, mRooms);
-        mSpinner.setAdapter(mListAdapter);
+        ArrayAdapter<Room> listAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1, rooms);
+        mSpinner.setAdapter(listAdapter);
+        mSpinner.setSaveEnabled(true);
+
+        mScannerView = (TextView) findViewById(R.id.scanningTextView);
 
         Button startButton = (Button) findViewById(R.id.startScanButtton);
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isScanning = true;
+                mIsScanning = true;
+                mScannerView.setText("Scanner: An");
+                mScanCount = 0;
             }
         });
 
@@ -91,7 +96,8 @@ public class RoomScanner extends AppCompatActivity {
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isScanning = false;
+                mIsScanning = false;
+                mScannerView.setText("Scanner: Aus");
                 File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
                 File destFile = new File(downloadDir, "bacon.db");
                 File srcFile = new File(getDatabaseDir());
@@ -104,13 +110,50 @@ public class RoomScanner extends AppCompatActivity {
             }
         });
 
+        Button deleteButton = (Button) findViewById(R.id.deleteButton);
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDbHelper.deleteScans(mDb);
+            }
+        });
+
+        if (savedInstanceState == null) {
+            startBeaconScan();
+        } else {
+            mIsScanning = savedInstanceState.getBoolean("isScanning");
+            if (mIsScanning) {
+                mScannerView.setText("Scanner: An");
+            }
+            else {
+                mScannerView.setText("Scanner: Aus");
+            }
+            Log.i("HomeBeacon", "Scanner: " + mBeaconScanner);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        mBeaconScanner.unregister(mListener);
+        super.onDestroy();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        outState.putBoolean("isScanning", mIsScanning);
+
+        super.onSaveInstanceState(outState, outPersistentState);
+    }
+
+    private void startBeaconScan() {
         mBeaconScanner = new BeaconScanner(this);
-        mBeaconScanner.register(new BeaconListener() {
+        mListener = new BeaconListener() {
             @Override
             public void onScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
                 onBeaconScan(device, rssi);
             }
-        });
+        };
+        mBeaconScanner.register(mListener);
     }
 
     private String getDatabaseDir() {
@@ -140,12 +183,14 @@ public class RoomScanner extends AppCompatActivity {
 
     private void onBeaconScan(BluetoothDevice device, int rssi) {
 
-        if (!isScanning)
+        if (!mIsScanning)
             return;
 
         Room room = (Room) mSpinner.getSelectedItem();
         Log.i("HomeBeacon", "room=" + room.getName() + ", addr=" + device.getAddress() + ", rssi="
                 + rssi);
+        ++mScanCount;
+        mScannerView.setText("Scanner: An (" + room.getName() + ": " + mScanCount + ")");
         mDbHelper.insertScan(mDb, room.getId(), device.getAddress(), rssi);
     }
 

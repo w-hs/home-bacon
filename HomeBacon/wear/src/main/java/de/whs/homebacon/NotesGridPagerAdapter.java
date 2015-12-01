@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.content.Context;
 
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.support.wearable.view.CardFragment;
 import android.support.wearable.view.FragmentGridPagerAdapter;
 import android.util.Log;
@@ -49,7 +50,15 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
         fragment.setExpansionEnabled(true);
         // fragment.setExpansionDirection(Path.Direction.NONE);
         // fragment.setExpansionFactor(page.expansionFactor);
-        return fragment;
+
+
+        NoteFragment f = new NoteFragment();
+        Bundle b =new Bundle();
+        b.putSerializable("note",note);
+        f.setArguments(b);
+       // f.setNote(note);
+
+        return f;
     }
 
     // Obtain the background image for the row
