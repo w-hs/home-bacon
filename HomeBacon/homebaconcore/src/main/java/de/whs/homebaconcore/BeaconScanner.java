@@ -57,6 +57,9 @@ public class BeaconScanner {
     }
 
     private void onBeaconScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
+        if (!"Gigaset G-tag".equals(device.getName()))
+            return;
+
         for (BeaconListener listener : mListeners) {
             listener.onScan(device, rssi, scanRecord);
         }

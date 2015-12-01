@@ -72,12 +72,12 @@ public class MainActivity extends AppCompatActivity {
 
 
                 ContentValues values = new ContentValues();
-                values.put(DatabaseHelper.COLUMN_NOTES_NAME_NOTEID, 1);
+                values.put(DatabaseHelper.COLUMN_NOTES_NAME_NOTE_ID, 1);
                 values.put(DatabaseHelper.COLUMN_NOTES_NAME_TITLE, "Hallo");
                 values.put(DatabaseHelper.COLUMN_NOTES_NAME_TEXT, "Eine super notiz");
                 values.put(DatabaseHelper.COLUMN_NOTES_NAME_TIMESTAMP,  System.currentTimeMillis());
                 values.put(DatabaseHelper.COLUMN_NOTES_NAME_EVENT, "null");
-                values.put(DatabaseHelper.COLUMN_NOTES_NAME_ROOMID, 100);
+                values.put(DatabaseHelper.COLUMN_NOTES_NAME_ROOM_ID, 100);
 
                 long newRowId;
                 newRowId = db.insert(
@@ -92,12 +92,12 @@ public class MainActivity extends AppCompatActivity {
                 // Define a projection that specifies which columns from the database
                 // you will actually use after this query.
                 String[] projection = {
-                        DatabaseHelper.COLUMN_NOTES_NAME_NOTEID,
+                        DatabaseHelper.COLUMN_NOTES_NAME_NOTE_ID,
                         DatabaseHelper.COLUMN_NOTES_NAME_TITLE,
                         DatabaseHelper.COLUMN_NOTES_NAME_TEXT,
                         DatabaseHelper.COLUMN_NOTES_NAME_TIMESTAMP,
                         DatabaseHelper.COLUMN_NOTES_NAME_EVENT,
-                        DatabaseHelper.COLUMN_NOTES_NAME_ROOMID
+                        DatabaseHelper.COLUMN_NOTES_NAME_ROOM_ID
                 };
 
                 // How you want the results sorted in the resulting Cursor

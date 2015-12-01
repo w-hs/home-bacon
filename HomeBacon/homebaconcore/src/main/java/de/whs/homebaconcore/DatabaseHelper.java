@@ -19,26 +19,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "bacon.db";
 
     public static final String TABLE_NOTES_NAME = "notes";
-    public static final String COLUMN_NOTES_NAME_NOTEID  = "noteid";
+    public static final String COLUMN_NOTES_NAME_NOTE_ID  = "note_id";
     public static final String COLUMN_NOTES_NAME_TITLE = "title";
     public static final String COLUMN_NOTES_NAME_TEXT = "text";
     public static final String COLUMN_NOTES_NAME_TIMESTAMP = "timestamp";
-    public static final String COLUMN_NOTES_NAME_ROOMID = "roomid";
+    public static final String COLUMN_NOTES_NAME_ROOM_ID = "room_id";
     public static final String COLUMN_NOTES_NAME_EVENT = "event";
 
-    public static final String TABLE_ITEMS_NAME = "item";
-    public static final String COLUMN_ITEMS_NAME_BBTAG  = "bbtag";
+    public static final String TABLE_ITEMS_NAME = "items";
+    public static final String COLUMN_ITEMS_NAME_TAG  = "tag";
     public static final String COLUMN_ITEMS_NAME_DESCRIPTION = "description";
-    public static final String COLUMN_ITEMS_NAME_ROOMID = "roomid";
+    public static final String COLUMN_ITEMS_NAME_ROOM_ID = "room_id";
 
-    public static final String TABLE_SCAN_NAME = "beaconscan";
-    public static final String COLUMN_SCAN_NAME_BBTAG  = "bbtag";
-    public static final String COLUMN_SCAN_NAME_RSSI = "rssi";
-    public static final String COLUMN_SCAN_NAME_ROOMID = "roomid";
+    public static final String TABLE_SCAN_NAME = "scans";
+    public static final String COLUMN_SCAN_ID = "scan_id";
+    public static final String COLUMN_SCAN_NAME_ROOM_ID = "room_id";
 
-    public static final String TABLE_ROOM_NAME = "room";
+    public static final String TABLE_SCANNED_TAGS_NAME = "scanned_tags";
+    public static final String COLUMN_SCANNED_TAGS_NAME_SCAN_ID  = "scan_id";
+    public static final String COLUMN_SCANNED_TAGS_NAME_TAG  = "tag";
+    public static final String COLUMN_SCANNED_TAGS_NAME_RSSI = "rssi";
+
+    public static final String TABLE_ROOM_NAME = "rooms";
     public static final String COLUMN_ROOM_NAME_NAME = "name";
-    public static final String COLUMN_ROOM_NAME_ROOMID = "roomid";
+    public static final String COLUMN_ROOM_NAME_ROOM_ID = "room_id";
 
 
     private static final String TEXT_TYPE = " TEXT";
@@ -46,33 +50,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COMMA_SEP = ",";
     private static final String SQL_CREATE_NOTES =
             "CREATE TABLE " + TABLE_NOTES_NAME + " (" +
-                    COLUMN_NOTES_NAME_NOTEID        + INT_TYPE + " PRIMARY KEY," +
+                    COLUMN_NOTES_NAME_NOTE_ID        + INT_TYPE + " PRIMARY KEY," +
                     COLUMN_NOTES_NAME_TITLE         + TEXT_TYPE + COMMA_SEP +
                     COLUMN_NOTES_NAME_TEXT          + TEXT_TYPE + COMMA_SEP +
                     COLUMN_NOTES_NAME_TIMESTAMP     + TEXT_TYPE + COMMA_SEP +
-                    COLUMN_NOTES_NAME_ROOMID        + INT_TYPE + COMMA_SEP +
+                    COLUMN_NOTES_NAME_ROOM_ID        + INT_TYPE + COMMA_SEP +
                     COLUMN_NOTES_NAME_EVENT         + TEXT_TYPE +
             " )";
 
     private static final String SQL_CREATE_ITEMS =
             "CREATE TABLE " + TABLE_ITEMS_NAME + " (" +
-                    COLUMN_ITEMS_NAME_BBTAG           + TEXT_TYPE + " PRIMARY KEY," +
+                    COLUMN_ITEMS_NAME_TAG             + TEXT_TYPE + " PRIMARY KEY," +
                     COLUMN_ITEMS_NAME_DESCRIPTION     + TEXT_TYPE + COMMA_SEP +
-                    COLUMN_ITEMS_NAME_ROOMID          + INT_TYPE +
+                    COLUMN_ITEMS_NAME_ROOM_ID         + INT_TYPE +
                     " )";
 
 
     private static final String SQL_CREATE_SCANS =
             "CREATE TABLE " + TABLE_SCAN_NAME + " (" +
-                    COLUMN_SCAN_NAME_BBTAG           + TEXT_TYPE + COMMA_SEP +
-                    COLUMN_SCAN_NAME_RSSI            + INT_TYPE + COMMA_SEP +
-                    COLUMN_SCAN_NAME_ROOMID          + INT_TYPE +
+                    COLUMN_SCAN_ID                   + INT_TYPE + " PRIMARY KEY" + COMMA_SEP +
+                    COLUMN_SCAN_NAME_ROOM_ID          + INT_TYPE +
                     " )";
 
+    private static final String SQL_CREATE_SCANNED_TAGS =
+            "CREATE TABLE " + TABLE_SCANNED_TAGS_NAME + " (" +
+                    COLUMN_SCANNED_TAGS_NAME_SCAN_ID + INT_TYPE + COMMA_SEP +
+                    COLUMN_SCANNED_TAGS_NAME_TAG     + TEXT_TYPE + COMMA_SEP +
+                    COLUMN_SCANNED_TAGS_NAME_RSSI    + INT_TYPE +
+                    " )";
 
     private static final String SQL_CREATE_ROOMS =
             "CREATE TABLE " + TABLE_ROOM_NAME + " (" +
-                    COLUMN_ROOM_NAME_ROOMID           + INT_TYPE + " PRIMARY KEY," +
+                    COLUMN_ROOM_NAME_ROOM_ID           + INT_TYPE + " PRIMARY KEY," +
                     COLUMN_ROOM_NAME_NAME + TEXT_TYPE +
                     " )";
 
@@ -84,6 +93,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String SQL_DELETE_SCANS =
             "DROP TABLE IF EXISTS " + TABLE_SCAN_NAME;
+
+    private static final String SQL_DELETE_SCANNED_TAGS =
+            "DROP TABLE IF EXISTS " + TABLE_SCANNED_TAGS_NAME;
 
     private static final String SQL_DELETE_ROOMS =
             "DROP TABLE IF EXISTS " + TABLE_ROOM_NAME;
@@ -106,11 +118,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         List<Room> rooms = new ArrayList<>();
 
         String[] projection = {
-                DatabaseHelper.COLUMN_ROOM_NAME_ROOMID,
+                DatabaseHelper.COLUMN_ROOM_NAME_ROOM_ID,
                 DatabaseHelper.COLUMN_ROOM_NAME_NAME
         };
 
-        String sortOrder = DatabaseHelper.COLUMN_ROOM_NAME_ROOMID + " ASC";
+        String sortOrder = DatabaseHelper.COLUMN_ROOM_NAME_ROOM_ID + " ASC";
 
         Cursor cursor = db.query(
                 DatabaseHelper.TABLE_ROOM_NAME,
@@ -133,32 +145,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
 
+        cursor.close();
+
         return rooms;
     }
 
-    public void insertScan(SQLiteDatabase db, long roomId, String address, int rssi) {
+    public long insertScan(SQLiteDatabase db, long roomId) {
         ContentValues values = new ContentValues();
-        values.put(DatabaseHelper.COLUMN_SCAN_NAME_BBTAG, address);
-        values.put(DatabaseHelper.COLUMN_SCAN_NAME_ROOMID, roomId);
-        values.put(DatabaseHelper.COLUMN_SCAN_NAME_RSSI, rssi);
+        values.put(DatabaseHelper.COLUMN_SCAN_NAME_ROOM_ID, roomId);
 
-        db.insert(DatabaseHelper.TABLE_SCAN_NAME, null, values);
+        return db.insert(DatabaseHelper.TABLE_SCAN_NAME, null, values);
+    }
+
+    public void insertScannedTag(SQLiteDatabase db, long scanId, String tag, int rssi) {
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.COLUMN_SCANNED_TAGS_NAME_SCAN_ID, scanId);
+        values.put(DatabaseHelper.COLUMN_SCANNED_TAGS_NAME_TAG, tag);
+        values.put(DatabaseHelper.COLUMN_SCANNED_TAGS_NAME_RSSI, rssi);
+
+        db.insert(DatabaseHelper.TABLE_SCANNED_TAGS_NAME, null, values);
     }
 
     public void insertNote(SQLiteDatabase db, Note note) {
         ContentValues values = new ContentValues();
 
-        // Genereate ID?!
-        // values.put(DatabaseHelper.COLUMN_NOTES_NAME_NOTEID, 1);
-
-
         values.put(DatabaseHelper.COLUMN_NOTES_NAME_TITLE, note.getTitle());
         values.put(DatabaseHelper.COLUMN_NOTES_NAME_TEXT, note.getText());
         values.put(DatabaseHelper.COLUMN_NOTES_NAME_TIMESTAMP,  System.currentTimeMillis());
         values.put(DatabaseHelper.COLUMN_NOTES_NAME_EVENT, "null");
-        values.put(DatabaseHelper.COLUMN_NOTES_NAME_ROOMID, 100);
+        values.put(DatabaseHelper.COLUMN_NOTES_NAME_ROOM_ID, 100);
 
-        long noteId = db.insert(DatabaseHelper.TABLE_NOTES_NAME, null, values);
+        db.insert(DatabaseHelper.TABLE_NOTES_NAME, null, values);
     }
 
 
@@ -167,6 +184,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_ITEMS);
 
         db.execSQL(SQL_CREATE_ROOMS);
+        db.execSQL(SQL_CREATE_SCANNED_TAGS);
         db.execSQL(SQL_CREATE_SCANS);
     }
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -174,6 +192,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // to simply to discard the data and start over
         db.execSQL(SQL_DELETE_NOTES);
         db.execSQL(SQL_DELETE_ITEMS);
+        db.execSQL(SQL_DELETE_SCANNED_TAGS);
         db.execSQL(SQL_DELETE_SCANS);
         db.execSQL(SQL_DELETE_ROOMS);
         onCreate(db);
@@ -186,12 +205,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
         String[] projection = {
-                DatabaseHelper.COLUMN_NOTES_NAME_NOTEID,
+                DatabaseHelper.COLUMN_NOTES_NAME_NOTE_ID,
                 DatabaseHelper.COLUMN_NOTES_NAME_TITLE,
                 DatabaseHelper.COLUMN_NOTES_NAME_TEXT,
                 DatabaseHelper.COLUMN_NOTES_NAME_TIMESTAMP,
                 DatabaseHelper.COLUMN_NOTES_NAME_EVENT,
-                DatabaseHelper.COLUMN_NOTES_NAME_ROOMID
+                DatabaseHelper.COLUMN_NOTES_NAME_ROOM_ID
         };
 
         // How you want the results sorted in the resulting Cursor
@@ -209,9 +228,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         );
 
         cursor.moveToFirst();
-        long itemId = cursor.getLong(
+        cursor.getLong(
                 cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOTES_NAME_TITLE)
         );
+        cursor.close();
+    }
+
+    public void deleteScannedTags(SQLiteDatabase db) {
+        int deletedRows = db.delete(DatabaseHelper.TABLE_SCANNED_TAGS_NAME, "1", null);
+        Log.i("HomeBeacon", "Deleted rows: " + deletedRows);
     }
 
     public void deleteScans(SQLiteDatabase db) {
