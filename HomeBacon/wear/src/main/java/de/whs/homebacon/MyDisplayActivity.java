@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.wearable.view.GridViewPager;
 import android.util.Log;
 import android.widget.TextView;
@@ -22,9 +24,12 @@ public class MyDisplayActivity extends Activity {
     BroadcastReceiver mReceiver;
 
     private void createReceiver() {
+
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+
+                Log.w("broadcast", "receive Intent:"+ intent.getAction().toString());
                 if (mNotesAdapter == null) {
                     Log.w("broadcast", "mNotesAdapter is null!");
                     return;
@@ -39,6 +44,7 @@ public class MyDisplayActivity extends Activity {
                 }
             }
         };
+        LocalBroadcastManager.getInstance(this).registerReceiver((mReceiver), new IntentFilter(IntentIds.NewNoteId));
     }
 
     @Override
@@ -64,9 +70,11 @@ public class MyDisplayActivity extends Activity {
         final GridViewPager pager = (GridViewPager) findViewById(R.id.pager);
         pager.setAdapter(mNotesAdapter);
 
+        createReceiver();
+
         mServiceIntent = new Intent(getApplication(), DanielsService.class);
         getApplication().startService(mServiceIntent);
 
-        createReceiver();
+
     }
 }

@@ -18,10 +18,15 @@ public class DanielsService extends IntentService {
         super(name);
     }
 
+    public DanielsService( ) {
+        super("");
+    }
+
     @Override
     protected void onHandleIntent(Intent intent) {
         Timer timer = new Timer();
         final int intervallInMS = 10 * 1000;
+
         timer.schedule(new SayDaniel(getApplicationContext()), 0, intervallInMS);
     }
 

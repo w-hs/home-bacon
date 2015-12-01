@@ -21,7 +21,7 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
 
     private final List<Note> mNotes = new ArrayList<Note>();
     private final Context mContext;
-
+    private final CardFragment defaultFragment = CardFragment.create("keine notizen","");
     public NotesGridPagerAdapter(Context ctx, FragmentManager fm) {
         super(fm);
         mContext = ctx;
@@ -29,6 +29,7 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
 
     public void addNote(Note note) {
         mNotes.add(note);
+        notifyDataSetChanged();
     }
 
     public void removeNote(Note note) {
@@ -42,10 +43,15 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
     @Override
     public Fragment getFragment(int row, int col) {
         if (mNotes.size() == 0) {
-            CardFragment fragment = CardFragment.create("keine notizen","");
-            return fragment;
+
+            return defaultFragment;
         }
-        
+        else
+        {
+
+
+        }
+
         NoteFragment f = new NoteFragment();
         Bundle b =new Bundle();
 
