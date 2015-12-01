@@ -59,7 +59,7 @@ public class MyDisplayActivity extends Activity {
 
         Note note = new Note("Notiz", "Eine tolle erste Notiz sdfd dfg df gd fg df gdfgdf g dfg df g df g dfg dfg  dfg d fg df g df gd fg df gd fg d fg df g dfg d fg");
         Note note1 = new Note("Notiz 1", "blajdgb");
-        Note note2 = new Note("Notiz 2", "ajbgj");
+        Note note2 = new Note("Notiz 2", "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.");
 
         mDbHelper.insertNote(db, note);
 

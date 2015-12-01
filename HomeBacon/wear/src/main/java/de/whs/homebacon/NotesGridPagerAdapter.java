@@ -58,10 +58,10 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
     }
 
     // Obtain the background image for the row
-    @Override
-    public Drawable getBackgroundForRow(int row) {
-        return mContext.getResources().getDrawable(R.drawable.card_background);
-    }
+   // @Override
+   // public Drawable getBackgroundForRow(int row) {
+   //     return mContext.getResources().getDrawable(R.drawable.bg);
+   // }
 
     // Obtain the number of pages (vertical)
     @Override
