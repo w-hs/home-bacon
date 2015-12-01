@@ -42,16 +42,8 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
 
     @Override
     public Fragment getFragment(int row, int col) {
-        if (mNotes.size() == 0) {
-
+        if (mNotes.size() == 0)
             return defaultFragment;
-        }
-        else
-        {
-
-
-        }
-
 
         //CardFragment f = CardFragment.create("sdfsdf", "dfgdfgdf dfgdfgdf gdfgdfg dfgdfgdfg dfgdfgdf gdfgdfgdfg dfgd");
 
