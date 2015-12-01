@@ -7,14 +7,14 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.wearable.view.CardFragment;
 import android.support.wearable.view.FragmentGridPagerAdapter;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import de.whs.homebaconcore.Note;
-
-// Using it as "1D-Picker": http://developer.android.com/design/wear/structure.html
 
 public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
 
@@ -37,8 +37,12 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
 
     @Override
     public Fragment getFragment(int row, int col) {
+
+        Log.d("fragment", "GetFragment called. Row=" + row + " Col=" + col);
+
         Note note = mNotes.get(col);//notes[row][col];
         CardFragment fragment = CardFragment.create(note.getTitle(), note.getText());
+
 
         // Advanced settings (card gravity, card expansion/scrolling)
         fragment.setCardGravity(Gravity.CENTER);
