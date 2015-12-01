@@ -5,9 +5,11 @@ import android.app.FragmentManager;
 import android.content.Context;
 
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.support.wearable.view.CardFragment;
 import android.support.wearable.view.FragmentGridPagerAdapter;
 import android.view.Gravity;
+import android.view.View;
 
 import java.util.List;
 
@@ -36,7 +38,15 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
         fragment.setExpansionEnabled(true);
         // fragment.setExpansionDirection(Path.Direction.NONE);
         // fragment.setExpansionFactor(page.expansionFactor);
-        return fragment;
+
+
+        NoteFragment f = new NoteFragment();
+        Bundle b =new Bundle();
+        b.putSerializable("note",note);
+        f.setArguments(b);
+       // f.setNote(note);
+
+        return f;
     }
 
     // Obtain the background image for the row
@@ -57,9 +67,9 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
         return notes[rowNum].length;
     }
 
+
+
     // Create a static set of pages in a 2D array
     private final Note[][] notes = {
-            {new Note("1", "1"), new Note("2", "1"), new Note("3", "1")},
-            {new Note("4", "1"), new Note("5", "1"), new Note("6", "1")},
-            {new Note("7", "1"), new Note("8", "1"), new Note("9", "1")}};
+            {new Note("1", "1"), new Note("2", "1"), new Note("3", "1")}};
 }
