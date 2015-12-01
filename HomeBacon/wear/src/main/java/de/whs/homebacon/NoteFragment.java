@@ -28,7 +28,7 @@ public class NoteFragment extends CardFragment {
         mRootView = (ViewGroup) inflater.inflate(R.layout.note_fragment_view, null);
 
         Bundle bundle =getArguments();
-        Note note = (Note)bundle.getSerializable("note");
+        final Note note = (Note)bundle.getSerializable("note");
         if(note == null)
             return mRootView;
 
@@ -43,10 +43,7 @@ public class NoteFragment extends CardFragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<Note> list = new ArrayList<Note>(Arrays.asList(adapter.notes));
-                list.removeAll(Arrays.asList(adapter.notes[0]));
-                adapter.notes = list.toArray(adapter.notes);
-
+                adapter.getNotes().remove(note);
                 adapter.notifyDataSetChanged();
             }
         });

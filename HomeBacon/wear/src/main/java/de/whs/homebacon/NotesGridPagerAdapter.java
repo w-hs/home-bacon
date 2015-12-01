@@ -32,6 +32,10 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
         mNotes.add(note);
     }
 
+    public List<Note> getNotes()
+    {
+        return mNotes;
+    }
     public void addNotes(List<Note> notes) {
         mNotes.addAll(notes);
     }
@@ -54,8 +58,10 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
 
         NoteFragment f = new NoteFragment();
         Bundle b =new Bundle();
+
         b.putSerializable("note",note);
         f.setArguments(b);
+        f.setAdapter(this);
        // f.setNote(note);
 
         return f;
