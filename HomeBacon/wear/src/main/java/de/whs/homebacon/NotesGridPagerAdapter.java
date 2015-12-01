@@ -21,7 +21,6 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
 
     private final List<Note> mNotes = new ArrayList<Note>();
     private final Context mContext;
-    private List mRows;
 
     public NotesGridPagerAdapter(Context ctx, FragmentManager fm) {
         super(fm);
@@ -32,37 +31,27 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
         mNotes.add(note);
     }
 
-    public List<Note> getNotes()
-    {
-        return mNotes;
+    public void removeNote(Note note) {
+        mNotes.remove(note);
     }
+
     public void addNotes(List<Note> notes) {
         mNotes.addAll(notes);
     }
 
     @Override
     public Fragment getFragment(int row, int col) {
-
-        Log.d("fragment", "GetFragment called. Row=" + row + " Col=" + col);
-
-        Note note = mNotes.get(col);//notes[row][col];
-        CardFragment fragment = CardFragment.create(note.getTitle(), note.getText());
-
-
-        // Advanced settings (card gravity, card expansion/scrolling)
-        fragment.setCardGravity(Gravity.CENTER);
-        fragment.setExpansionEnabled(true);
-        // fragment.setExpansionDirection(Path.Direction.NONE);
-        // fragment.setExpansionFactor(page.expansionFactor);
-
-
+        if (mNotes.size() == 0) {
+            CardFragment fragment = CardFragment.create("keine notizen","");
+            return fragment;
+        }
+        
         NoteFragment f = new NoteFragment();
         Bundle b =new Bundle();
 
-        b.putSerializable("note",note);
+        b.putSerializable("note", mNotes.get(col));
         f.setArguments(b);
         f.setAdapter(this);
-       // f.setNote(note);
 
         return f;
     }
@@ -82,6 +71,6 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
     // Obtain the number of pages (horizontal)
     @Override
     public int getColumnCount(int rowNum) {
-        return mNotes.size();
+        return mNotes.size() > 0 ? mNotes.size() : 1;
     }
 }
