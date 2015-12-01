@@ -5,38 +5,55 @@ import android.app.FragmentManager;
 import android.content.Context;
 
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.support.wearable.view.CardFragment;
 import android.support.wearable.view.FragmentGridPagerAdapter;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.whs.homebaconcore.Note;
 
-
-// Using it as "1D-Picker": http://developer.android.com/design/wear/structure.html
-
 public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
 
+    private final List<Note> mNotes = new ArrayList<Note>();
     private final Context mContext;
-    private List mRows;
 
     public NotesGridPagerAdapter(Context ctx, FragmentManager fm) {
         super(fm);
         mContext = ctx;
     }
 
+    public void addNote(Note note) {
+        mNotes.add(note);
+    }
+
+    public void removeNote(Note note) {
+        mNotes.remove(note);
+    }
+
+    public void addNotes(List<Note> notes) {
+        mNotes.addAll(notes);
+    }
+
     @Override
     public Fragment getFragment(int row, int col) {
-        Note note = notes[row][col];
-        CardFragment fragment = CardFragment.create(note.getTitle(), note.getText());
+        if (mNotes.size() == 0) {
+            CardFragment fragment = CardFragment.create("keine notizen","");
+            return fragment;
+        }
+        
+        NoteFragment f = new NoteFragment();
+        Bundle b =new Bundle();
 
-        // Advanced settings (card gravity, card expansion/scrolling)
-        fragment.setCardGravity(Gravity.CENTER);
-        fragment.setExpansionEnabled(true);
-        // fragment.setExpansionDirection(Path.Direction.NONE);
-        // fragment.setExpansionFactor(page.expansionFactor);
-        return fragment;
+        b.putSerializable("note", mNotes.get(col));
+        f.setArguments(b);
+        f.setAdapter(this);
+
+        return f;
     }
 
     // Obtain the background image for the row
@@ -48,18 +65,12 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
     // Obtain the number of pages (vertical)
     @Override
     public int getRowCount() {
-        return notes.length;
+        return 1;
     }
 
     // Obtain the number of pages (horizontal)
     @Override
     public int getColumnCount(int rowNum) {
-        return notes[rowNum].length;
+        return mNotes.size() > 0 ? mNotes.size() : 1;
     }
-
-    // Create a static set of pages in a 2D array
-    private final Note[][] notes = {
-            {new Note("1", "1"), new Note("2", "1"), new Note("3", "1")},
-            {new Note("4", "1"), new Note("5", "1"), new Note("6", "1")},
-            {new Note("7", "1"), new Note("8", "1"), new Note("9", "1")}};
 }
