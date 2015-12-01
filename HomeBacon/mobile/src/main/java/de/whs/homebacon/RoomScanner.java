@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.PersistableBundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
@@ -37,7 +38,10 @@ public class RoomScanner extends AppCompatActivity {
     private DatabaseHelper mDbHelper;
     private SQLiteDatabase mDb;
     private Spinner mSpinner;
-    private boolean isScanning = false;
+    private boolean mIsScanning = false;
+    TextView mScannerView;
+    private int mScanCount;
+    private BeaconListener mListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,9 +63,7 @@ public class RoomScanner extends AppCompatActivity {
             supportActionBar.setDisplayHomeAsUpEnabled(true);
 
         mDbHelper = new DatabaseHelper(getApplicationContext());
-
         mDb = mDbHelper.getWritableDatabase();
-        //mDbHelper.onUpgrade(mDb, 1, 1);
 
         List<Room> rooms = mDbHelper.getAllRooms(mDb);
         if (rooms.size() == 0) {
@@ -76,15 +78,17 @@ public class RoomScanner extends AppCompatActivity {
         ArrayAdapter<Room> listAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1, rooms);
         mSpinner.setAdapter(listAdapter);
+        mSpinner.setSaveEnabled(true);
 
-        final TextView scannerView = (TextView) findViewById(R.id.scanningTextView);
+        mScannerView = (TextView) findViewById(R.id.scanningTextView);
 
         Button startButton = (Button) findViewById(R.id.startScanButtton);
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isScanning = true;
-                scannerView.setText("Scanner: An");
+                mIsScanning = true;
+                mScannerView.setText("Scanner: An");
+                mScanCount = 0;
             }
         });
 
@@ -92,8 +96,8 @@ public class RoomScanner extends AppCompatActivity {
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isScanning = false;
-                scannerView.setText("Scanner: Aus");
+                mIsScanning = false;
+                mScannerView.setText("Scanner: Aus");
                 File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
                 File destFile = new File(downloadDir, "bacon.db");
                 File srcFile = new File(getDatabaseDir());
@@ -114,17 +118,42 @@ public class RoomScanner extends AppCompatActivity {
             }
         });
 
-        startBeaconScan();
+        if (savedInstanceState == null) {
+            startBeaconScan();
+        } else {
+            mIsScanning = savedInstanceState.getBoolean("isScanning");
+            if (mIsScanning) {
+                mScannerView.setText("Scanner: An");
+            }
+            else {
+                mScannerView.setText("Scanner: Aus");
+            }
+            Log.i("HomeBeacon", "Scanner: " + mBeaconScanner);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        mBeaconScanner.unregister(mListener);
+        super.onDestroy();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        outState.putBoolean("isScanning", mIsScanning);
+
+        super.onSaveInstanceState(outState, outPersistentState);
     }
 
     private void startBeaconScan() {
         mBeaconScanner = new BeaconScanner(this);
-        mBeaconScanner.register(new BeaconListener() {
+        mListener = new BeaconListener() {
             @Override
             public void onScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
                 onBeaconScan(device, rssi);
             }
-        });
+        };
+        mBeaconScanner.register(mListener);
     }
 
     private String getDatabaseDir() {
@@ -154,12 +183,14 @@ public class RoomScanner extends AppCompatActivity {
 
     private void onBeaconScan(BluetoothDevice device, int rssi) {
 
-        if (!isScanning)
+        if (!mIsScanning)
             return;
 
         Room room = (Room) mSpinner.getSelectedItem();
         Log.i("HomeBeacon", "room=" + room.getName() + ", addr=" + device.getAddress() + ", rssi="
                 + rssi);
+        ++mScanCount;
+        mScannerView.setText("Scanner: An (" + room.getName() + ": " + mScanCount + ")");
         mDbHelper.insertScan(mDb, room.getId(), device.getAddress(), rssi);
     }
 

@@ -61,4 +61,8 @@ public class BeaconScanner {
             listener.onScan(device, rssi, scanRecord);
         }
     }
+
+    public void unregister(BeaconListener listener) {
+        mListeners.remove(listener);
+    }
 }
