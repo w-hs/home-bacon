@@ -21,7 +21,7 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
 
     private final List<Note> mNotes = new ArrayList<Note>();
     private final Context mContext;
-
+    private final CardFragment defaultFragment = CardFragment.create("keine notizen","");
     public NotesGridPagerAdapter(Context ctx, FragmentManager fm) {
         super(fm);
         mContext = ctx;
@@ -29,6 +29,7 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
 
     public void addNote(Note note) {
         mNotes.add(note);
+        notifyDataSetChanged();
     }
 
     public void removeNote(Note note) {
@@ -42,10 +43,18 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
     @Override
     public Fragment getFragment(int row, int col) {
         if (mNotes.size() == 0) {
-            CardFragment fragment = CardFragment.create("keine notizen","");
-            return fragment;
+
+            return defaultFragment;
         }
-        
+        else
+        {
+
+
+        }
+
+
+        //CardFragment f = CardFragment.create("sdfsdf", "dfgdfgdf dfgdfgdf gdfgdfg dfgdfgdfg dfgdfgdf gdfgdfgdfg dfgd");
+
         NoteFragment f = new NoteFragment();
         Bundle b =new Bundle();
 
@@ -57,10 +66,10 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
     }
 
     // Obtain the background image for the row
-    @Override
-    public Drawable getBackgroundForRow(int row) {
-        return mContext.getResources().getDrawable(R.drawable.card_background);
-    }
+   // @Override
+   // public Drawable getBackgroundForRow(int row) {
+   //     return mContext.getResources().getDrawable(R.drawable.bg);
+   // }
 
     // Obtain the number of pages (vertical)
     @Override

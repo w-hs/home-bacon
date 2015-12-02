@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.wearable.view.GridViewPager;
 import android.util.Log;
 import android.widget.TextView;
@@ -22,9 +24,12 @@ public class MyDisplayActivity extends Activity {
     BroadcastReceiver mReceiver;
 
     private void createReceiver() {
+
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+
+                Log.w("broadcast", "receive Intent:"+ intent.getAction().toString());
                 if (mNotesAdapter == null) {
                     Log.w("broadcast", "mNotesAdapter is null!");
                     return;
@@ -39,6 +44,7 @@ public class MyDisplayActivity extends Activity {
                 }
             }
         };
+        LocalBroadcastManager.getInstance(this).registerReceiver((mReceiver), new IntentFilter(IntentIds.NewNoteId));
     }
 
     @Override
@@ -51,9 +57,9 @@ public class MyDisplayActivity extends Activity {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         mDbHelper.onUpgrade(db, 1, 1);
 
-        Note note = new Note("Notiz", "Eine tolle erste Notiz");
+        Note note = new Note("Notiz", "Eine tolle erste Notiz sdfd dfg df gd fg df gdfgdf g dfg df g df g dfg dfg  dfg d fg df g df gd fg df gd fg d fg df g dfg d fg");
         Note note1 = new Note("Notiz 1", "blajdgb");
-        Note note2 = new Note("Notiz 2", "ajbgj");
+        Note note2 = new Note("Notiz 2", "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.");
 
         mDbHelper.insertNote(db, note);
 
@@ -64,9 +70,11 @@ public class MyDisplayActivity extends Activity {
         final GridViewPager pager = (GridViewPager) findViewById(R.id.pager);
         pager.setAdapter(mNotesAdapter);
 
+        createReceiver();
+
         mServiceIntent = new Intent(getApplication(), DanielsService.class);
         getApplication().startService(mServiceIntent);
 
-        createReceiver();
+
     }
 }
