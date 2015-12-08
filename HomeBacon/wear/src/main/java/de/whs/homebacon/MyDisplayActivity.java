@@ -37,7 +37,7 @@ public class MyDisplayActivity extends Activity {
 
                 if (intent.getAction().equals(IntentIds.NewNoteId)) {
                     Note note = (Note)intent.getSerializableExtra("note");
-                    mNotesAdapter.addNote(note);
+                    //mNotesAdapter.addNote(note);
                 }
                 else {
                     Log.w("broadcast", "intent action not match: " + intent.getAction());
@@ -69,6 +69,7 @@ public class MyDisplayActivity extends Activity {
         mNotesAdapter.addNote(note2);
         final GridViewPager pager = (GridViewPager) findViewById(R.id.pager);
         pager.setAdapter(mNotesAdapter);
+
 
         createReceiver();
 
