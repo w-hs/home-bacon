@@ -33,7 +33,7 @@ public class NoteSyncService extends WearableListenerService {
     public void onMessageReceived(MessageEvent messageEvent) {
         String p = messageEvent.getPath();
         if (p.equals("/count")) {
-            Log.d("MESSAGE","received: " + messageEvent.getData().toString());
+            Log.d("MESSAGE","received: " + new String(messageEvent.getData()));
 //            Intent startIntent = new Intent(this, MainActivity.class);
 //            startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //            startIntent.putExtra("VOICE_DATA", messageEvent.getData());
