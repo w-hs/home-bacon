@@ -25,7 +25,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.whs.homebaconcore.BeaconListener;
 import de.whs.homebaconcore.BeaconScanner;
@@ -39,9 +43,37 @@ public class RoomScanner extends AppCompatActivity {
     private SQLiteDatabase mDb;
     private Spinner mSpinner;
     private boolean mIsScanning = false;
-    TextView mScannerView;
+    private TextView mScannerView;
     private int mScanCount;
     private BeaconListener mListener;
+
+    private class Scan {
+        private int rssi;
+        private long timestamp;
+
+        public Scan(int rssi, long timestamp) {
+            this.rssi = rssi;
+            this.timestamp = timestamp;
+        }
+
+        public int getRssi() {
+            return rssi;
+        }
+
+        public void setRssi(int rssi) {
+            this.rssi = rssi;
+        }
+
+        public long getTimestamp() {
+            return timestamp;
+        }
+
+        public void setTimestamp(long timestamp) {
+            this.timestamp = timestamp;
+        }
+    }
+
+    private Map<String, Scan> scans = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +96,7 @@ public class RoomScanner extends AppCompatActivity {
 
         mDbHelper = new DatabaseHelper(getApplicationContext());
         mDb = mDbHelper.getWritableDatabase();
+        //mDbHelper.onUpgrade(mDb, 1, 1);
 
         List<Room> rooms = mDbHelper.getAllRooms(mDb);
         if (rooms.size() == 0) {
@@ -114,11 +147,12 @@ public class RoomScanner extends AppCompatActivity {
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mDbHelper.deleteScannedTags(mDb);
                 mDbHelper.deleteScans(mDb);
             }
         });
 
-        if (savedInstanceState == null) {
+        if (mBeaconScanner == null) {
             startBeaconScan();
         } else {
             mIsScanning = savedInstanceState.getBoolean("isScanning");
@@ -130,11 +164,19 @@ public class RoomScanner extends AppCompatActivity {
             }
             Log.i("HomeBeacon", "Scanner: " + mBeaconScanner);
         }
+
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                onSaveScans();
+            }
+        }, 0, 1100);
     }
 
     @Override
     protected void onDestroy() {
-        mBeaconScanner.unregister(mListener);
+        if (mBeaconScanner != null)
+            mBeaconScanner.unregister(mListener);
         super.onDestroy();
     }
 
@@ -186,12 +228,59 @@ public class RoomScanner extends AppCompatActivity {
         if (!mIsScanning)
             return;
 
-        Room room = (Room) mSpinner.getSelectedItem();
-        Log.i("HomeBeacon", "room=" + room.getName() + ", addr=" + device.getAddress() + ", rssi="
-                + rssi);
+        long timestamp = System.currentTimeMillis();
+        Scan scan = scans.get(device.getAddress());
+        if (scan == null) {
+            scans.put(device.getAddress(), new Scan(rssi, timestamp));
+        }
+        else {
+            scan.setRssi(rssi);
+            scan.setTimestamp(timestamp);
+        }
+    }
+
+    private boolean hasScans(long fadeLimit) {
+        for (Scan scan : scans.values()) {
+            if (scan.getTimestamp() > fadeLimit) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void onSaveScans() {
+        if (!mIsScanning)
+            return;
+
+        // Wenn wir länger als 2 Sekunden nichts mehr vom Beacon gehört haben,
+        // gehen wir davon aus, dass der Beacon außer Reichweite ist
+        long fadeDurationInMs = 2000;
+        long currentTime = System.currentTimeMillis();
+        long fadeLimit = currentTime - fadeDurationInMs;
+
+        if (!hasScans(fadeLimit))
+            return;
+
+        final Room room = (Room) mSpinner.getSelectedItem();
+        long scanId = mDbHelper.insertScan(mDb, room.getId());
+
         ++mScanCount;
-        mScannerView.setText("Scanner: An (" + room.getName() + ": " + mScanCount + ")");
-        mDbHelper.insertScan(mDb, room.getId(), device.getAddress(), rssi);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mScannerView.setText("Scanner: An (" + room.getName() + ": " + mScanCount + ")");
+            }
+        });
+
+        for (String address : scans.keySet()) {
+            Scan scan = scans.get(address);
+            if (scan.getTimestamp() > fadeLimit) {
+                mDbHelper.insertScannedTag(mDb, scanId, address, scan.getRssi());
+                Log.i("HomeBeacon", "room=" + room.getName() + ", addr=" + address + ", rssi="
+                        + scan.getRssi());
+            }
+        }
+
     }
 
 }
