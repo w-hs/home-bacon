@@ -46,6 +46,8 @@ public class RoomScanner extends AppCompatActivity {
     private TextView mScannerView;
     private int mScanCount;
     private BeaconListener mListener;
+    private Map<String, Integer> mTagsToIndex = new HashMap<>();
+    private TextView mProbView;
 
     private class Scan {
         private int rssi;
@@ -152,6 +154,8 @@ public class RoomScanner extends AppCompatActivity {
             }
         });
 
+        mProbView = (TextView) findViewById(R.id.probabilityText);
+
         if (mBeaconScanner == null) {
             startBeaconScan();
         } else {
@@ -171,6 +175,10 @@ public class RoomScanner extends AppCompatActivity {
                 onSaveScans();
             }
         }, 0, 1100);
+
+        mTagsToIndex.put("7C:2F:80:8D:E2:3B", 0);
+        mTagsToIndex.put("7C:2F:80:8D:E2:45", 1);
+        mTagsToIndex.put("20:C3:8F:99:C1:E7", 2);
     }
 
     @Override
@@ -224,16 +232,11 @@ public class RoomScanner extends AppCompatActivity {
     }
 
     private void onBeaconScan(BluetoothDevice device, int rssi) {
-
-        if (!mIsScanning)
-            return;
-
         long timestamp = System.currentTimeMillis();
         Scan scan = scans.get(device.getAddress());
         if (scan == null) {
             scans.put(device.getAddress(), new Scan(rssi, timestamp));
-        }
-        else {
+        } else {
             scan.setRssi(rssi);
             scan.setTimestamp(timestamp);
         }
@@ -249,9 +252,6 @@ public class RoomScanner extends AppCompatActivity {
     }
 
     private void onSaveScans() {
-        if (!mIsScanning)
-            return;
-
         // Wenn wir länger als 2 Sekunden nichts mehr vom Beacon gehört haben,
         // gehen wir davon aus, dass der Beacon außer Reichweite ist
         long fadeDurationInMs = 2000;
@@ -264,23 +264,108 @@ public class RoomScanner extends AppCompatActivity {
         final Room room = (Room) mSpinner.getSelectedItem();
         long scanId = mDbHelper.insertScan(mDb, room.getId());
 
-        ++mScanCount;
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mScannerView.setText("Scanner: An (" + room.getName() + ": " + mScanCount + ")");
-            }
-        });
+        if (mIsScanning) {
+            ++mScanCount;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mScannerView.setText("Scanner: An (" + room.getName() + ": " + mScanCount + ")");
+                }
+            });
+        }
+
+        float[] x = { 0.0f, 0.0f, 0.0f };
 
         for (String address : scans.keySet()) {
             Scan scan = scans.get(address);
             if (scan.getTimestamp() > fadeLimit) {
-                mDbHelper.insertScannedTag(mDb, scanId, address, scan.getRssi());
-                Log.i("HomeBeacon", "room=" + room.getName() + ", addr=" + address + ", rssi="
-                        + scan.getRssi());
+                if (mIsScanning) {
+                    mDbHelper.insertScannedTag(mDb, scanId, address, scan.getRssi());
+                    Log.i("HomeBeacon", "room=" + room.getName() + ", addr=" + address + ", rssi="
+                            + scan.getRssi());
+                }
+
+                Integer tagIndex = mTagsToIndex.get(address);
+                if (tagIndex != null) {
+                    float normalizedRssi = (scan.getRssi() + 100) / 60.0f;
+                    x[tagIndex] = normalizedRssi;
+                }
             }
         }
 
+        {
+            // Nutzen des Scans zur Positionierung
+            float[][] W = {
+                    { -0.96257174f,  -2.28264236f,   3.24521399f },
+                    { -1.54085743f,  -1.61166883f,   3.15252829f },
+                    { -0.95999652f,  11.77016544f, -10.81016445f }
+            };
+            float[] B = {
+                    -3.37038374f,  0.49158058f,  2.8788023f
+            };
+
+            float[] mulResult = multiply(W, x);
+            float[] addResult = add(mulResult, B);
+            final float[] y = softmax(addResult);
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    float rounded0 = Math.round(y[0] * 100);
+                    float rounded1 = Math.round(y[1] * 100);
+                    float rounded2 = Math.round(y[2] * 100);
+                    mProbView.setText("[" + rounded0 + ", " + rounded1 + ", " + rounded2 + "]");
+                }
+            });
+            //Log.i("HomeBeacon", "[" + y[0] + ", " + y[1] + ", " + y[2] + "]");
+        }
+    }
+
+    private float[] multiply(float[][] W, float[] x_) {
+        int height = W.length;
+        int width = W[0].length;
+
+        float[] result = new float[height];
+
+        for (int y = 0; y < height; ++y)
+        {
+            float sum = 0.0f;
+            for (int x = 0; x < width; ++x)
+            {
+                sum += W[y][x] * x_[x];
+            }
+            result[y] = sum;
+        }
+
+        return result;
+    }
+
+    private float[] add(float[] a, float[] b)
+    {
+        float[] result = new float[a.length];
+        for (int i = 0; i < a.length; ++i)
+        {
+            result[i] = a[i] + b[i];
+        }
+        return result;
+    }
+
+    private float[] softmax(float[] y)
+    {
+        float[] result = new float[y.length];
+
+        float sum = 0.0f;
+        for (int i = 0; i < y.length; ++i)
+        {
+            result[i] = (float)Math.exp(y[i]);
+            sum += result[i];
+        }
+        float invSum = 1.0f / sum;
+        for (int i = 0; i < y.length; ++i)
+        {
+            result[i] *= invSum;
+        }
+        return result;
     }
 
 }
