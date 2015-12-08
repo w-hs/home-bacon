@@ -22,22 +22,27 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
     private final List<Note> mNotes = new ArrayList<Note>();
     private final Context mContext;
     private final CardFragment defaultFragment = CardFragment.create("keine notizen","");
+    private final CardFragment settingsFragment = new SettingsFragment();
     public NotesGridPagerAdapter(Context ctx, FragmentManager fm) {
         super(fm);
         mContext = ctx;
+
+        mNotes.add(new Note("s",""));
     }
 
     public void addNote(Note note) {
-        mNotes.add(note);
+        mNotes.add(0,note);
         notifyDataSetChanged();
     }
 
     public void removeNote(Note note) {
+
+        if(mNotes.size()!=1)
         mNotes.remove(note);
     }
 
     public void addNotes(List<Note> notes) {
-        mNotes.addAll(notes);
+        mNotes.addAll(0,notes);
     }
 
     @Override
@@ -52,6 +57,11 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
 
         }
 
+        if(mNotes.get(col).getTitle()=="s")
+        {
+
+            return settingsFragment;
+        }
 
         //CardFragment f = CardFragment.create("sdfsdf", "dfgdfgdf dfgdfgdf gdfgdfg dfgdfgdfg dfgdfgdf gdfgdfgdfg dfgd");
 
