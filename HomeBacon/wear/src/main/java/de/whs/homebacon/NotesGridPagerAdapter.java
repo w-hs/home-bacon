@@ -5,61 +5,91 @@ import android.app.FragmentManager;
 import android.content.Context;
 
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.support.wearable.view.CardFragment;
 import android.support.wearable.view.FragmentGridPagerAdapter;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.whs.homebaconcore.Note;
 
-
-// Using it as "1D-Picker": http://developer.android.com/design/wear/structure.html
-
 public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
 
+    private final List<Note> mNotes = new ArrayList<Note>();
     private final Context mContext;
-    private List mRows;
-
+    private final CardFragment defaultFragment = CardFragment.create("keine notizen","");
+    private final CardFragment settingsFragment = new SettingsFragment();
     public NotesGridPagerAdapter(Context ctx, FragmentManager fm) {
         super(fm);
         mContext = ctx;
+
+        mNotes.add(new Note("s",""));
+    }
+
+    public void addNote(Note note) {
+        mNotes.add(0,note);
+        notifyDataSetChanged();
+    }
+
+    public void removeNote(Note note) {
+
+        if(mNotes.size()!=1)
+        mNotes.remove(note);
+    }
+
+    public void addNotes(List<Note> notes) {
+        mNotes.addAll(0,notes);
     }
 
     @Override
     public Fragment getFragment(int row, int col) {
-        Note note = notes[row][col];
-        CardFragment fragment = CardFragment.create(note.getTitle(), note.getText());
+        if (mNotes.size() == 0) {
 
-        // Advanced settings (card gravity, card expansion/scrolling)
-        fragment.setCardGravity(Gravity.CENTER);
-        fragment.setExpansionEnabled(true);
-        // fragment.setExpansionDirection(Path.Direction.NONE);
-        // fragment.setExpansionFactor(page.expansionFactor);
-        return fragment;
+            return defaultFragment;
+        }
+        else
+        {
+
+
+        }
+
+        if(mNotes.get(col).getTitle()=="s")
+        {
+
+            return settingsFragment;
+        }
+
+        //CardFragment f = CardFragment.create("sdfsdf", "dfgdfgdf dfgdfgdf gdfgdfg dfgdfgdfg dfgdfgdf gdfgdfgdfg dfgd");
+
+        NoteFragment f = new NoteFragment();
+        Bundle b =new Bundle();
+
+        b.putSerializable("note", mNotes.get(col));
+        f.setArguments(b);
+        f.setAdapter(this);
+
+        return f;
     }
 
     // Obtain the background image for the row
-    @Override
-    public Drawable getBackgroundForRow(int row) {
-        return mContext.getResources().getDrawable(R.drawable.card_background);
-    }
+   // @Override
+   // public Drawable getBackgroundForRow(int row) {
+   //     return mContext.getResources().getDrawable(R.drawable.bg);
+   // }
 
     // Obtain the number of pages (vertical)
     @Override
     public int getRowCount() {
-        return notes.length;
+        return 1;
     }
 
     // Obtain the number of pages (horizontal)
     @Override
     public int getColumnCount(int rowNum) {
-        return notes[rowNum].length;
+        return mNotes.size() > 0 ? mNotes.size() : 1;
     }
-
-    // Create a static set of pages in a 2D array
-    private final Note[][] notes = {
-            {new Note("1", "1"), new Note("2", "1"), new Note("3", "1")},
-            {new Note("4", "1"), new Note("5", "1"), new Note("6", "1")},
-            {new Note("7", "1"), new Note("8", "1"), new Note("9", "1")}};
 }

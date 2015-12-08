@@ -23,7 +23,7 @@ public class BeaconScanner {
 
         // Phone does not support Bluetooth so let the user know and exit.
         if (mBluetoothAdapter == null) {
-            new android.support.v7.app.AlertDialog.Builder(activity)
+           /* new android.support.v7.app.AlertDialog.Builder(activity)
                     .setTitle("Not compatible")
                     .setMessage("Your phone does not support Bluetooth")
                     .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
@@ -32,7 +32,7 @@ public class BeaconScanner {
                         }
                     })
                     .setIcon(android.R.drawable.ic_dialog_alert)
-                    .show();
+                    .show();*/
         }
         else {
             if (!mBluetoothAdapter.isEnabled()) {
@@ -57,8 +57,15 @@ public class BeaconScanner {
     }
 
     private void onBeaconScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
-        for (BeaconListener listener : mListeners) {
-            listener.onScan(device, rssi, scanRecord);
+        if (device.getName() == null)
+            return;
+
+        if (device.getName().equals("Gigaset G-tag") || device.getName().startsWith("BEACON"))
+        {
+            //Log.i("HomeBeacon", "Beacon: " + device.getName());
+            for (BeaconListener listener : mListeners) {
+                listener.onScan(device, rssi, scanRecord);
+            }
         }
     }
 

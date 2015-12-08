@@ -1,0 +1,1 @@
+adb pull /sdcard/Download/bacon.db bacon.db

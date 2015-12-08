@@ -1,9 +1,11 @@
 package de.whs.homebaconcore;
 
+import java.io.Serializable;
+
 /**
  * Created by Chris on 25.11.2015.
  */
-public class Note {
+public class Note implements Serializable{
     private String title;
     private String text;
 
