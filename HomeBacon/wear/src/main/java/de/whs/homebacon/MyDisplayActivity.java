@@ -1,6 +1,7 @@
 package de.whs.homebacon;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.wearable.view.GridViewPager;
@@ -16,6 +17,9 @@ public class MyDisplayActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getApplication().startService(new Intent(getApplication(),NoteSyncService.class));
+
         setContentView(R.layout.activity_display);
         mTextView = (TextView) findViewById(R.id.text);
 

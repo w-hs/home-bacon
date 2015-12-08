@@ -24,15 +24,18 @@ import de.whs.homebaconcore.WatchConnector;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final WatchConnector watchConnector = new WatchConnectorImpl();
+    private WatchConnector watchConnector;
     private NavigationService mNavService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        watchConnector = new WatchConnectorImpl(this);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+                setSupportActionBar(toolbar);
 
         final EditText noticeTextbox = (EditText) findViewById(R.id.notizText);
         final Spinner spinner = (Spinner) findViewById(R.id.eventSpinner);
@@ -160,5 +163,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        watchConnector.connect();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        watchConnector.disconnect();
     }
 }
