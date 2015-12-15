@@ -1,6 +1,7 @@
 package de.whs.homebacon;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.util.Log;
 
@@ -22,6 +23,7 @@ import com.google.android.gms.wearable.WearableListenerService;
 import java.util.List;
 
 import de.whs.homebaconcore.Constants;
+import de.whs.homebaconcore.DatabaseHelper;
 import de.whs.homebaconcore.Note;
 import de.whs.homebaconcore.Serializer;
 
@@ -31,8 +33,6 @@ import de.whs.homebaconcore.Serializer;
 public class NoteListenerService extends WearableListenerService {
 
     @Override
-    public void onDataChanged(DataEventBuffer dataEvents) {  }
-
     public void onMessageReceived(MessageEvent messageEvent) {
         String p = messageEvent.getPath();
         if (p.equals(Constants.HOME_BACON_PATH)) {
@@ -41,10 +41,9 @@ public class NoteListenerService extends WearableListenerService {
             try{
                 Note note = (Note) Serializer.deserialize(messageEvent.getData());
                 Log.d(Constants.DEBUG_TAG, note.getText());
-                Intent startIntent = new Intent(this, MyDisplayActivity.class);
-                startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startIntent.putExtra(Constants.HOME_BACON_NOTE, note);
-                startActivity(startIntent);
+                saveNoteInDb(note);
+                //sende Broadcast wenn App aktiv
+                //sonst starte App
             }
             catch(Exception e){
                 Log.e(Constants.DEBUG_TAG, "Note deserialization failed");
@@ -53,9 +52,24 @@ public class NoteListenerService extends WearableListenerService {
         }
     }
 
-    public void onPeerConnected(Node peer) { }
+    private void saveNoteInDb(Note note){
+        DatabaseHelper mDbHelper = new DatabaseHelper(this);
+        SQLiteDatabase mDb = mDbHelper.getWritableDatabase();
 
-    public void onPeerDisconnected(Node peer) {  }
+        mDbHelper.insertNote(mDb, note, 0); //TODO current room
+    }
+
+    private void startActivity(){
+        Intent startIntent = new Intent(this, MyDisplayActivity.class);
+        startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(startIntent);
+    }
+
+    private void broadcastNewNote(){
+        Intent intent = new Intent(Constants.BACON_BROADCAST_NEW_NOTE);
+        sendBroadcast(intent);
+    }
+
 }
 
 

@@ -19,12 +19,11 @@ import de.whs.homebaconcore.DatabaseHelper;
 import de.whs.homebaconcore.Note;
 import de.whs.homebaconcore.PhoneListener;
 
-public class MyDisplayActivity extends Activity implements PhoneListener {
+public class MyDisplayActivity extends Activity {
 
-    private TextView mTextView;
+    private BroadcastReceiver mReceiver;
     private NotesGridPagerAdapter mNotesAdapter;
-    private DatabaseHelper mDbHelper;
-    private SQLiteDatabase mDb;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,40 +31,43 @@ public class MyDisplayActivity extends Activity implements PhoneListener {
 
         setContentView(R.layout.activity_display);
 
-        //Start wearable/note listener service
+        //Start services
         getApplication().startService(new Intent(getApplication(), NoteListenerService.class));
 
-        //Create DatabaseHelper and db
-        mDbHelper = new DatabaseHelper(this.getApplicationContext());
-        mDb = mDbHelper.getWritableDatabase();
+        //Set broadcast receiver
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                updateCards();
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter(Constants.BACON_BROADCAST_NEW_NOTE);
+        registerReceiver(mReceiver, intentFilter);
 
         //Create noteAdapter
         mNotesAdapter = new NotesGridPagerAdapter(this, getFragmentManager());
         final GridViewPager pager = (GridViewPager) findViewById(R.id.pager);
         pager.setAdapter(mNotesAdapter);
 
-        //on new note
-        Intent intent = getIntent();
-        if (intent != null ){
-            Note note = (Note) intent.getSerializableExtra(Constants.HOME_BACON_NOTE);
-            if (note != null) this.onNote(note);
-        }
+        updateCards();
+    }
 
-        //load notes from db
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        unregisterReceiver(mReceiver);
+    }
+
+    private void updateCards(){
+        DatabaseHelper mDbHelper = new DatabaseHelper(this);
+        SQLiteDatabase mDb = mDbHelper.getReadableDatabase();
+
+        mNotesAdapter.clear();
         List<Note> notes = mDbHelper.getAllNotes(mDb,0); //TODO current room
         mNotesAdapter.addNotes(notes);
 
         mDb.close();
     }
 
-    @Override
-    public void onNote(Note note) {
-        Log.d(Constants.DEBUG_TAG, "note in MyDisplayActivity receieved - " + note.getText());
-
-        //save note in db
-        mDbHelper.insertNote(mDb, note, 0); //TODO current room
-
-        //add to adapter
-        //mNotesAdapter.addNote(note);
-    }
 }

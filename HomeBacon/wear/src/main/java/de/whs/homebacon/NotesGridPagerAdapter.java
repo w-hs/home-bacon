@@ -90,4 +90,8 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
     public int getColumnCount(int rowNum) {
         return mNotes.size() > 0 ? mNotes.size() : 1;
     }
+
+    public void clear() {
+        mNotes.clear();
+    }
 }
