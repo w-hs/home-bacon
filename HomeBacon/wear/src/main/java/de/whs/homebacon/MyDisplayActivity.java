@@ -12,73 +12,60 @@ import android.support.wearable.view.GridViewPager;
 import android.util.Log;
 import android.widget.TextView;
 
+import java.util.List;
+
+import de.whs.homebaconcore.Constants;
 import de.whs.homebaconcore.DatabaseHelper;
 import de.whs.homebaconcore.Note;
+import de.whs.homebaconcore.PhoneListener;
 
-public class MyDisplayActivity extends Activity {
+public class MyDisplayActivity extends Activity implements PhoneListener {
 
     private TextView mTextView;
-    private Intent mServiceIntent;
     private NotesGridPagerAdapter mNotesAdapter;
-
-    BroadcastReceiver mReceiver;
-
-    private void createReceiver() {
-
-        mReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-
-                Log.w("broadcast", "receive Intent:"+ intent.getAction().toString());
-                if (mNotesAdapter == null) {
-                    Log.w("broadcast", "mNotesAdapter is null!");
-                    return;
-                }
-
-                if (intent.getAction().equals(IntentIds.NewNoteId)) {
-                    Note note = (Note)intent.getSerializableExtra("note");
-                    //mNotesAdapter.addNote(note);
-                }
-                else {
-                    Log.w("broadcast", "intent action not match: " + intent.getAction());
-                }
-            }
-        };
-        LocalBroadcastManager.getInstance(this).registerReceiver((mReceiver), new IntentFilter(IntentIds.NewNoteId));
-    }
+    private DatabaseHelper mDbHelper;
+    private SQLiteDatabase mDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getApplication().startService(new Intent(getApplication(),NoteSyncService.class));
-
         setContentView(R.layout.activity_display);
-        mTextView = (TextView) findViewById(R.id.text);
 
-        DatabaseHelper mDbHelper = new DatabaseHelper(this.getApplicationContext());
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        mDbHelper.onUpgrade(db, 1, 1);
+        //Start wearable/note listener service
+        getApplication().startService(new Intent(getApplication(), NoteListenerService.class));
 
-        Note note = new Note("Notiz", "Eine tolle erste Notiz sdfd dfg df gd fg df gdfgdf g dfg df g df g dfg dfg  dfg d fg df g df gd fg df gd fg d fg df g dfg d fg");
-        Note note1 = new Note("Notiz 1", "blajdgb");
-        Note note2 = new Note("Notiz 2", "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.");
+        //Create DatabaseHelper and db
+        mDbHelper = new DatabaseHelper(this.getApplicationContext());
+        mDb = mDbHelper.getWritableDatabase();
 
-        mDbHelper.insertNote(db, note);
-
+        //Create noteAdapter
         mNotesAdapter = new NotesGridPagerAdapter(this, getFragmentManager());
-        mNotesAdapter.addNote(note);
-        mNotesAdapter.addNote(note1);
-        mNotesAdapter.addNote(note2);
         final GridViewPager pager = (GridViewPager) findViewById(R.id.pager);
         pager.setAdapter(mNotesAdapter);
 
+        //on new note
+        Intent intent = getIntent();
+        if (intent != null ){
+            Note note = (Note) intent.getSerializableExtra(Constants.HOME_BACON_NOTE);
+            if (note != null) this.onNote(note);
+        }
 
-        createReceiver();
+        //load notes from db
+        List<Note> notes = mDbHelper.getAllNotes(mDb,0); //TODO current room
+        mNotesAdapter.addNotes(notes);
 
-        mServiceIntent = new Intent(getApplication(), DanielsService.class);
-        getApplication().startService(mServiceIntent);
+        mDb.close();
+    }
 
+    @Override
+    public void onNote(Note note) {
+        Log.d(Constants.DEBUG_TAG, "note in MyDisplayActivity receieved - " + note.getText());
 
+        //save note in db
+        mDbHelper.insertNote(mDb, note, 0); //TODO current room
+
+        //add to adapter
+        //mNotesAdapter.addNote(note);
     }
 }

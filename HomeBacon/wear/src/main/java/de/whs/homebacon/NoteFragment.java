@@ -1,5 +1,7 @@
 package de.whs.homebacon;
 
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.wearable.view.CardFragment;
 import android.view.LayoutInflater;
@@ -9,6 +11,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import de.whs.homebaconcore.DatabaseHelper;
 import de.whs.homebaconcore.Note;
 
 /**
@@ -18,6 +21,11 @@ public class NoteFragment extends CardFragment {
 
     private View mRootView;
     private NotesGridPagerAdapter adapter;
+    private Context mContext;
+
+    public void setContext(Context ctx){
+        this.mContext = ctx;
+    }
 
     @Override
     public View onCreateContentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,6 +48,7 @@ public class NoteFragment extends CardFragment {
             public void onClick(View v) {
                 adapter.removeNote(note);
                 adapter.notifyDataSetChanged();
+                deleteNoteFromDB(note);
             }
         });
 
@@ -48,5 +57,12 @@ public class NoteFragment extends CardFragment {
 
     public void setAdapter(NotesGridPagerAdapter adapter) {
         this.adapter = adapter;
+    }
+
+    private void deleteNoteFromDB(Note note){
+        DatabaseHelper mDbHelper = new DatabaseHelper(mContext);
+        SQLiteDatabase mDb = mDbHelper.getWritableDatabase();
+
+        mDbHelper.deleteNote(mDb, note);
     }
 }

@@ -1,5 +1,6 @@
 package de.whs.homebacon;
 
+import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
 
@@ -21,23 +22,34 @@ import com.google.android.gms.wearable.WearableListenerService;
 import java.util.List;
 
 import de.whs.homebaconcore.Constants;
+import de.whs.homebaconcore.Note;
+import de.whs.homebaconcore.Serializer;
 
 /**
  * Created by Dennis on 01.12.2015.
  */
-public class NoteSyncService extends WearableListenerService {
+public class NoteListenerService extends WearableListenerService {
 
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {  }
 
     public void onMessageReceived(MessageEvent messageEvent) {
         String p = messageEvent.getPath();
-        if (p.equals("/count")) {
-            Log.d("MESSAGE","received: " + new String(messageEvent.getData()));
-//            Intent startIntent = new Intent(this, MainActivity.class);
-//            startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            startIntent.putExtra("VOICE_DATA", messageEvent.getData());
-//            startActivity(startIntent);
+        if (p.equals(Constants.HOME_BACON_PATH)) {
+            Log.d(Constants.DEBUG_TAG, "Note received");
+
+            try{
+                Note note = (Note) Serializer.deserialize(messageEvent.getData());
+                Log.d(Constants.DEBUG_TAG, note.getText());
+                Intent startIntent = new Intent(this, MyDisplayActivity.class);
+                startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startIntent.putExtra(Constants.HOME_BACON_NOTE, note);
+                startActivity(startIntent);
+            }
+            catch(Exception e){
+                Log.e(Constants.DEBUG_TAG, "Note deserialization failed");
+                Log.e(Constants.DEBUG_TAG, e.getMessage());
+            }
         }
     }
 
