@@ -38,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
                 setSupportActionBar(toolbar);
 
-        final EditText noticeTextbox = (EditText) findViewById(R.id.notizText);
+        final EditText noteTitleEditText = (EditText) findViewById(R.id.notizTitel);
+        final EditText noteTextEditText = (EditText)findViewById(R.id.notizText);
         final Spinner spinner = (Spinner) findViewById(R.id.eventSpinner);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -49,8 +50,8 @@ public class MainActivity extends AppCompatActivity {
 //                        .setAction("Action", null).show();
 
                 Note note = new Note();
-                note.setTitle("Titel-TODO"); //TODO
-                note.setText(noticeTextbox.getText().toString());
+                note.setTitle(noteTitleEditText.getText().toString());
+                note.setText(noteTextEditText.getText().toString());
 
                 switch (spinner.getSelectedItemPosition()){
                     case 0:
@@ -69,7 +70,8 @@ public class MainActivity extends AppCompatActivity {
                 watchConnector.sendNote(note);
 
 
-                noticeTextbox.setText("");
+                noteTextEditText.setText("");
+                noteTitleEditText.setText("");
                 spinner.setSelection(0);
 
                 DatabaseHelper mDbHelper = new DatabaseHelper(getApplicationContext());
@@ -95,11 +97,7 @@ public class MainActivity extends AppCompatActivity {
                         DatabaseHelper.TABLE_NOTES_NAME,
                         null,
                         values);
-
-
-
-
-
+                
                 // Define a projection that specifies which columns from the database
                 // you will actually use after this query.
                 String[] projection = {
@@ -132,8 +130,8 @@ public class MainActivity extends AppCompatActivity {
                //         cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOTES_NAME_TITLE)
                 //);
 
-                //mTextView.setText(""+cursor.getString(2));
-                noticeTextbox.setText(""+cursor.getString(2));
+                noteTitleEditText.setText(cursor.getString(1));
+                noteTextEditText.setText(cursor.getString(2));
             }
         });
 
