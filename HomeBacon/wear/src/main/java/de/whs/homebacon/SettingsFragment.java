@@ -176,7 +176,7 @@ public class SettingsFragment extends CardFragment {
         if (mBeaconScanner == null) {
             startBeaconScan();
         } else {
-            mIsScanning = savedInstanceState.getBoolean("isScanning");
+            mIsScanning = false; //savedInstanceState.getBoolean("isScanning");
             if (mIsScanning) {
                 mScannerView.setText("Scanner: An");
             }

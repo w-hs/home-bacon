@@ -4,13 +4,9 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.wearable.view.CardFragment;
 import android.support.wearable.view.FragmentGridPagerAdapter;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +19,7 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
     private final Context mContext;
     private final CardFragment defaultFragment = CardFragment.create("keine notizen","");
     private final CardFragment settingsFragment = new SettingsFragment();
+
     public NotesGridPagerAdapter(Context ctx, FragmentManager fm) {
         super(fm);
         mContext = ctx;
@@ -71,6 +68,7 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
         b.putSerializable("note", mNotes.get(col));
         f.setArguments(b);
         f.setAdapter(this);
+        f.setContext(mContext);
 
         return f;
     }
@@ -91,5 +89,9 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
     @Override
     public int getColumnCount(int rowNum) {
         return mNotes.size() > 0 ? mNotes.size() : 1;
+    }
+
+    public void clear() {
+        mNotes.clear();
     }
 }

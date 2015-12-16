@@ -5,8 +5,5 @@ package de.whs.homebaconcore;
  */
 public interface WatchConnector {
 
-    void sendNote(String note);
-    void sendNoteWithEvent(String note, EventType event);
-    void connect();
-    void disconnect();
+    void sendNote(Note note);
 }

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
@@ -166,16 +167,65 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(DatabaseHelper.TABLE_SCANNED_TAGS_NAME, null, values);
     }
 
-    public void insertNote(SQLiteDatabase db, Note note) {
+    public void insertNote(SQLiteDatabase db, Note note, int roomID) {
         ContentValues values = new ContentValues();
 
         values.put(DatabaseHelper.COLUMN_NOTES_NAME_TITLE, note.getTitle());
         values.put(DatabaseHelper.COLUMN_NOTES_NAME_TEXT, note.getText());
         values.put(DatabaseHelper.COLUMN_NOTES_NAME_TIMESTAMP,  System.currentTimeMillis());
-        values.put(DatabaseHelper.COLUMN_NOTES_NAME_EVENT, "null");
-        values.put(DatabaseHelper.COLUMN_NOTES_NAME_ROOM_ID, 100);
+        values.put(DatabaseHelper.COLUMN_NOTES_NAME_EVENT, note.getEventType().toString());
+        values.put(DatabaseHelper.COLUMN_NOTES_NAME_ROOM_ID, roomID);
 
         db.insert(DatabaseHelper.TABLE_NOTES_NAME, null, values);
+    }
+
+    public void deleteNote(SQLiteDatabase db, Note note){
+        db.delete(TABLE_NOTES_NAME, COLUMN_NOTES_NAME_NOTE_ID+ "=" + note.getNoteId(), null);
+    }
+
+    public List<Note> getAllNotes(SQLiteDatabase db, long roomId){
+        List<Note> notes = new ArrayList<>();
+
+        String[] projection = {
+                DatabaseHelper.COLUMN_NOTES_NAME_NOTE_ID,
+                DatabaseHelper.COLUMN_NOTES_NAME_TITLE,
+                DatabaseHelper.COLUMN_NOTES_NAME_TEXT,
+                DatabaseHelper.COLUMN_NOTES_NAME_TIMESTAMP,
+                DatabaseHelper.COLUMN_NOTES_NAME_EVENT,
+                DatabaseHelper.COLUMN_NOTES_NAME_ROOM_ID
+        };
+
+        String sortOrder = DatabaseHelper.COLUMN_NOTES_NAME_TIMESTAMP + " DESC";
+        String selection = DatabaseHelper.COLUMN_NOTES_NAME_ROOM_ID + " == " + roomId;
+
+        Cursor cursor = db.query(
+                DatabaseHelper.TABLE_NOTES_NAME,
+                projection,
+                selection,
+                null,
+                null,
+                null,
+                sortOrder
+        );
+
+        if (cursor.moveToFirst()) {
+
+            while (!cursor.isAfterLast()) {
+                int noteID = cursor.getInt(0);
+                String title = cursor.getString(1);
+                String text = cursor.getString(2);
+                long timestamp = cursor.getLong(3);
+                EventType eventType = EventType.valueOf(cursor.getString(4));
+
+                notes.add(new Note(noteID, title, text, eventType, timestamp));
+
+                cursor.moveToNext();
+            }
+        }
+
+        cursor.close();
+
+        return notes;
     }
 
 

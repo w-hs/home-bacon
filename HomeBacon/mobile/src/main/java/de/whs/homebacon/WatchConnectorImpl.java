@@ -1,8 +1,10 @@
 package de.whs.homebacon;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -15,99 +17,83 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
+import org.xmlpull.v1.XmlSerializer;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import de.whs.homebaconcore.Constants;
 import de.whs.homebaconcore.EventType;
+import de.whs.homebaconcore.Note;
+import de.whs.homebaconcore.Serializer;
 import de.whs.homebaconcore.WatchConnector;
 
 /**
  * Created by Daniel on 17.11.2015.
  */
-public class WatchConnectorImpl implements
-        DataApi.DataListener,
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        WatchConnector{
+public class WatchConnectorImpl implements WatchConnector{
 
     private GoogleApiClient mGoogleApiClient;
+    private Activity mActivity;
 
-    public WatchConnectorImpl (Context context) {
+    public WatchConnectorImpl (Activity activity) {
 
-             mGoogleApiClient = new GoogleApiClient.Builder(context)
-                    .addApi(Wearable.API)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .build();
-        }
+        mActivity= activity;
+        mGoogleApiClient = new GoogleApiClient.Builder(mActivity.getApplicationContext())
+                .addApi(Wearable.API)
+                .build();
+    }
 
 
     @Override
-    public void sendNote(final String note) {
-//        PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/count");
-//        putDataMapReq.getDataMap().putString(Constants.NOTE, note);
-//        PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
-//        PendingResult<DataApi.DataItemResult> pendingResult = Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);
+    public void sendNote(final Note note) {
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
-                for (Node node : nodes.getNodes()) {
-                    Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(),
-                            "/count", note.getBytes()).setResultCallback(
-                            new ResultCallback() {
-                                @Override
-                                public void onResult(Result result) {
-                                    if (!result.getStatus().isSuccess()) {
-                                        // Failed to send message
-                                        Log.e("MESSAGE","Send message failed");
-                                    }
-                                    else
-                                        Log.d("MESSAGE", "send successfully");
+                try {
+                    mGoogleApiClient.blockingConnect(Constants.CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
+                    NodeApi.GetConnectedNodesResult nodesResult = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+                    List<Node> nodes = nodesResult.getNodes();
+                    byte[] serializedNote = Serializer.serialize(note);
+                    if (nodes != null && nodes.size() > 0) {
+                        for (Node node : nodes) {
+                            Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(),
+                                    Constants.HOME_BACON_PATH, serializedNote).setResultCallback(
+                                    new ResultCallback() {
+                                        @Override
+                                        public void onResult(Result result) {
+                                            if (!result.getStatus().isSuccess()) {
+                                                // Failed to send message
 
-                                }
-                            });
+                                                Toast("Failed to send note to watch", Toast.LENGTH_LONG);
+                                                Log.e(Constants.DEBUG_TAG, "Send message failed");
+                                            } else
+                                                Toast("Note sent successfully", Toast.LENGTH_SHORT);
+                                                Log.d(Constants.DEBUG_TAG, "send successfully");
+                                        }
+                                    });
+                        }
+                    } else {
+                        Toast("No watch connected", Toast.LENGTH_SHORT);
+                    }
+                }
+                catch (Exception e){
+
+                }
+                finally {
+                    mGoogleApiClient.disconnect();
                 }
             }
         }).start();
     }
 
-    @Override
-    public void sendNoteWithEvent(String note, EventType event) {
-//        PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/count");
-//        putDataMapReq.getDataMap().putString(Constants.NOTEWITHEVENT, "Hallo Uhrnutzer");
-//        PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
-//        PendingResult<DataApi.DataItemResult> pendingResult = Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);
-    }
-
-    @Override
-    public void connect() {
-        Log.d("WatchConnector: ", "Try to connect");
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    public void disconnect() {
-         Log.d("WatchConnector: ", "disconnect");
-        mGoogleApiClient.disconnect();
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.d("WatchConnector: ", "Connection established");
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Log.d("WatchConnector: ", "Connection suspended - Code: " + i);
-    }
-
-    @Override
-    public void onDataChanged(DataEventBuffer dataEventBuffer) {
-        Log.d("WatchConnector: ", "Data changed");
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.d("WatchConnector: ", "Connection failed");
+    public void Toast(final String text, final int toastLength){
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(mActivity.getApplicationContext(), text, toastLength).show();
+            }
+        });
     }
 }

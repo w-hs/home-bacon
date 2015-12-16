@@ -5,5 +5,4 @@ package de.whs.homebaconcore;
  */
 public interface PhoneListener {
     void onNote(Note note);
-    void onNoteWithEvent (Note note, EventType event);
 }

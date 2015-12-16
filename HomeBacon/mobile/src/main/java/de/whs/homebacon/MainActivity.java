@@ -20,6 +20,7 @@ import de.whs.homebaconcore.DatabaseHelper;
 import de.whs.homebaconcore.EventType;
 import de.whs.homebaconcore.NavigationService;
 import de.whs.homebaconcore.NavigationServiceImpl;
+import de.whs.homebaconcore.Note;
 import de.whs.homebaconcore.WatchConnector;
 
 public class MainActivity extends AppCompatActivity {
@@ -44,21 +45,29 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Notiz hinterlegt", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+//                Snackbar.make(view, "Notiz hinterlegt", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
 
-                if(spinner.getSelectedItemPosition() == 0)
-                {
-                    watchConnector.sendNote(noticeTextbox.getText().toString());
+                Note note = new Note();
+                note.setTitle("Titel-TODO"); //TODO
+                note.setText(noticeTextbox.getText().toString());
+
+                switch (spinner.getSelectedItemPosition()){
+                    case 0:
+                        note.setEventType(EventType.NONE);
+                        break;
+
+                    case 1:
+                        note.setEventType(EventType.ENTER);
+                        break;
+
+                    case 2:
+                        note.setEventType(EventType.LEAVE);
+                        break;
                 }
-                if(spinner.getSelectedItemPosition() == 1)
-                {
-                    watchConnector.sendNoteWithEvent(noticeTextbox.getText().toString(), EventType.ENTER);
-                }
-                if(spinner.getSelectedItemPosition() == 2)
-                {
-                    watchConnector.sendNoteWithEvent(noticeTextbox.getText().toString(), EventType.LEAVE);
-                }
+
+                watchConnector.sendNote(note);
+
 
                 noticeTextbox.setText("");
                 spinner.setSelection(0);
@@ -71,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
 
                 // Cursor cursor2 = db.
                 //         rawQuery(".schema notes;",null);
-
 
 
                 ContentValues values = new ContentValues();
@@ -163,17 +171,5 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        watchConnector.connect();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        watchConnector.disconnect();
     }
 }

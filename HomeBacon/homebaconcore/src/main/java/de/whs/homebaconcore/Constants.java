@@ -5,7 +5,11 @@ package de.whs.homebaconcore;
  */
 public class Constants {
 
-    public static final String NOTE = "de.whs.homebacon.note";
-    public static final String NOTEWITHEVENT = "de.whs.homebacon.noteWithEvent";
+    public static final int CONNECTION_TIME_OUT_MS = 1000;
+    public static final String DEBUG_TAG = "HOME-BACON";
 
+    public static final String HOME_BACON_PATH = "/HOME_BACON";
+    public static final String HOME_BACON_NOTE = "NOTE";
+
+    public static final String BACON_BROADCAST_NEW_NOTE = "de.whs.homebacon.NEW_NOTE";
 }

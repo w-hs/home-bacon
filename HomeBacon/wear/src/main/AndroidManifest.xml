@@ -15,13 +15,6 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault" >
 
-        <service android:name=".DanielsService" android:exported="false" />
-
-        <activity
-            android:name=".MyStubBroadcastActivity"
-            android:label="MyStubBroadcastActivity" >
-
-        </activity>
         <activity
             android:name=".MyDisplayActivity"
             android:allowEmbedded="true"
@@ -34,16 +27,8 @@
             </intent-filter>
         </activity>
 
-      <!--  <receiver
-            android:name=".MyPostNotificationReceiver"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="de.whs.homebacon.SHOW_NOTIFICATION" />
-            </intent-filter>
-        </receiver>-->
-
         <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
-        <service android:name="de.whs.homebacon.NoteSyncService" >
+        <service android:name=".NoteListenerService" >
             <intent-filter>
                 <!-- listeners receive events that match the action and data filters -->
                 <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
