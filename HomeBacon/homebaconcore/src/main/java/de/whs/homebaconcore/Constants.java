@@ -10,6 +10,4 @@ public class Constants {
 
     public static final String HOME_BACON_PATH = "/HOME_BACON";
     public static final String HOME_BACON_NOTE = "NOTE";
-
-    public static final String BACON_BROADCAST_NEW_NOTE = "de.whs.homebacon.NEW_NOTE";
 }

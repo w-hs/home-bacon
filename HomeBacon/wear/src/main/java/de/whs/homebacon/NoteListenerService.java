@@ -42,8 +42,7 @@ public class NoteListenerService extends WearableListenerService {
                 Note note = (Note) Serializer.deserialize(messageEvent.getData());
                 Log.d(Constants.DEBUG_TAG, note.getText());
                 saveNoteInDb(note);
-                //sende Broadcast wenn App aktiv
-                //sonst starte App
+                startActivity();
             }
             catch(Exception e){
                 Log.e(Constants.DEBUG_TAG, "Note deserialization failed");
@@ -61,15 +60,11 @@ public class NoteListenerService extends WearableListenerService {
 
     private void startActivity(){
         Intent startIntent = new Intent(this, MyDisplayActivity.class);
+        startIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startIntent.addFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
         startActivity(startIntent);
     }
-
-    private void broadcastNewNote(){
-        Intent intent = new Intent(Constants.BACON_BROADCAST_NEW_NOTE);
-        sendBroadcast(intent);
-    }
-
 }
 
 
