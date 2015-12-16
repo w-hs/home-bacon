@@ -21,7 +21,6 @@ import de.whs.homebaconcore.PhoneListener;
 
 public class MyDisplayActivity extends Activity {
 
-    private BroadcastReceiver mReceiver;
     private NotesGridPagerAdapter mNotesAdapter;
 
 
@@ -34,16 +33,6 @@ public class MyDisplayActivity extends Activity {
         //Start services
         getApplication().startService(new Intent(getApplication(), NoteListenerService.class));
 
-        //Set broadcast receiver
-        mReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                updateCards();
-            }
-        };
-        IntentFilter intentFilter = new IntentFilter(Constants.BACON_BROADCAST_NEW_NOTE);
-        registerReceiver(mReceiver, intentFilter);
-
         //Create noteAdapter
         mNotesAdapter = new NotesGridPagerAdapter(this, getFragmentManager());
         final GridViewPager pager = (GridViewPager) findViewById(R.id.pager);
@@ -53,10 +42,9 @@ public class MyDisplayActivity extends Activity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        unregisterReceiver(mReceiver);
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        updateCards();
     }
 
     private void updateCards(){
@@ -66,6 +54,7 @@ public class MyDisplayActivity extends Activity {
         mNotesAdapter.clear();
         List<Note> notes = mDbHelper.getAllNotes(mDb,0); //TODO current room
         mNotesAdapter.addNotes(notes);
+        mNotesAdapter.notifyDataSetChanged();
 
         mDb.close();
     }
