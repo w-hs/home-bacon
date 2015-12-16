@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.wearable.view.GridViewPager;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.whs.homebaconcore.DatabaseHelper;
 import de.whs.homebaconcore.Note;
@@ -32,8 +34,18 @@ public class MyDisplayActivity extends Activity {
         mPager.setAdapter(mNotesAdapter);
 
         updateCards();
-        mPager.setCurrentItem(1, 0);
 
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mPager.setCurrentItem(1, 0, true);
+                    }
+                });
+            }
+        }, 500);
     }
 
     @Override
