@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import csv
+import json
 import cgitb
 import numpy
 import fileinput
@@ -13,7 +14,7 @@ def read_scans_from_stdin():
     scans = []
     for row in reader:
         scan_id = int(row[0])
-        room = int(row[1])
+        room = row[1]
         tag = row[2]
         rssi = int(row[3])
         scan = Scan(scan_id, room, tag, rssi)
@@ -31,10 +32,21 @@ def get_tags_from_scans(scans):
             index = index + 1
     
     return tags
+    
+def get_rooms_from_scans(scans):
+    rooms = {}
+    index = 0
+    
+    for scan in scans:
+        if not (scan.room in rooms):
+            rooms[scan.room] = index
+            index = index + 1
+    
+    return rooms
 
 cgitb.enable()
 
-print("Content-Type: text/plain; charset=utf-8")
+print("Content-Type: application/json; charset=utf-8")
 print("")
 
 class Scan:
@@ -51,39 +63,38 @@ class Scan:
 
 scans = read_scans_from_stdin()
 tags = get_tags_from_scans(scans)
-print("tags=" + str(tags))
+x_dim = len(tags)
+rooms = get_rooms_from_scans(scans)
+y_dim = len(rooms)
 
 rssi_array = []
 room_array = []
 
 current_scan_id = scans[0].id
-minValue = -106
-rssi_values = [minValue, minValue, minValue, minValue, minValue]
-room = 0    
+min_value = -106
+rssi_values = [min_value] * x_dim
+room_values = [0.0] * y_dim
+current_room = 0    
 for scan in scans:
     if scan.id != current_scan_id:
         rssi_array.append(rssi_values)
-        if (scan.room == 1):
-            room_array.append([1.0, 0.0, 0.0])
-        elif (scan.room == 2):
-            room_array.append([0.0, 1.0, 0.0])
-        elif (scan.room == 3):
-            room_array.append([0.0, 0.0, 1.0])
-        rssi_values = [minValue, minValue, minValue, minValue, minValue]
+        room_index = rooms[current_room]
+        room_values[room_index] = 1.0
+        room_array.append(room_values)
+        
+        rssi_values = [min_value] * x_dim
+        room_values = [0.0] * y_dim
         current_scan_id = scan.id
     
-    room = scan.room
+    current_room = scan.room
     if scan.tag in tags:
         tag_index = tags[scan.tag]
         rssi_values[tag_index] = scan.rssi
     
 rssi_array.append(rssi_values)
-if (room == 1):
-    room_array.append([1.0, 0.0, 0.0])
-elif (room == 2):
-    room_array.append([0.0, 1.0, 0.0])
-elif (room == 3):
-    room_array.append([0.0, 0.0, 1.0])
+room_index = rooms[current_room]
+room_values[room_index] = 1.0
+room_array.append(room_values)
 
 min_rssi = 0
 max_rssi = -120
@@ -100,11 +111,11 @@ def normalizeRssi(values):
 
 normalized_rssi = map(normalizeRssi, rssi_array)
 
-numSamples = len(normalized_rssi)
-trainingSampleCount = numSamples * 8 / 10
-testSampleCount = numSamples - trainingSampleCount
-indices = numpy.random.permutation(numSamples)
-training_idx, test_idx = indices[:trainingSampleCount], indices[trainingSampleCount:]
+num_samples = len(normalized_rssi)
+num_training_samples = num_samples * 8 / 10
+num_test_samples = num_samples - num_training_samples
+indices = numpy.random.permutation(num_samples)
+training_idx, test_idx = indices[:num_training_samples], indices[num_training_samples:]
 
 train_samples = [normalized_rssi[index] for index in training_idx]
 train_labels = [room_array[index] for index in training_idx]
@@ -112,9 +123,6 @@ test_samples = [normalized_rssi[index] for index in test_idx]
 test_labels = [room_array[index] for index in test_idx]
 
 with tf.Session() as sess:
-    
-    x_dim = len(tags)
-    y_dim = 3
     x = tf.placeholder(tf.float32, shape=[None, x_dim])
     y_ = tf.placeholder(tf.float32, shape=[None, y_dim])
 
@@ -124,7 +132,6 @@ with tf.Session() as sess:
     sess.run(tf.initialize_all_variables())
 
     y = tf.nn.softmax(tf.matmul(x, W) + b)
-    #y = tf.matmul(x, W) + b
 
     cross_entropy = -tf.reduce_sum(y_ * tf.log(y))
     train_step = tf.train.GradientDescentOptimizer(0.01).minimize(cross_entropy)
@@ -132,14 +139,18 @@ with tf.Session() as sess:
     for i in range(1000):
         train_step.run(feed_dict={x: train_samples, y_: train_labels}, session=sess)
     
-    outW = sess.run(W)
-    outB = sess.run(b)
-    
-    print('W=' + str(outW))
-    print('b=' + str(outB))
+    out_W = sess.run(W)
+    out_b = sess.run(b)
     
     correct_prediction = tf.equal(tf.argmax(y,1), tf.argmax(y_,1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
-    
-    acc_result = accuracy.eval(feed_dict={x: test_samples, y_: test_labels}, session=sess)
-    print('acc=' + str(acc_result))
+    out_acc = accuracy.eval(feed_dict={x: test_samples, y_: test_labels}, session=sess)
+   
+    output = {
+        'acc': numpy.asscalar(out_acc),
+        'tags': tags,
+        'rooms': rooms,
+        'W': out_W.tolist(),
+        'b': out_b.tolist()
+    }
+    print(json.dumps(output, sort_keys=True, indent=2))
