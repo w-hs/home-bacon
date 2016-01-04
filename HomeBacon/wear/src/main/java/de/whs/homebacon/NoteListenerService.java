@@ -35,7 +35,7 @@ public class NoteListenerService extends WearableListenerService {
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         String p = messageEvent.getPath();
-        if (p.equals(Constants.HOME_BACON_PATH)) {
+        if (p.equals(Constants.HOME_BACON_NOTE)) {
             Log.d(Constants.DEBUG_TAG, "Note received");
 
             try{
@@ -56,6 +56,7 @@ public class NoteListenerService extends WearableListenerService {
         SQLiteDatabase mDb = mDbHelper.getWritableDatabase();
 
         mDbHelper.insertNote(mDb, note, 0); //TODO current room
+        mDb.close();
     }
 
     private void startActivity(){

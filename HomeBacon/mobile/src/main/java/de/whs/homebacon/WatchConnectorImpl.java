@@ -59,7 +59,7 @@ public class WatchConnectorImpl implements WatchConnector{
                     if (nodes != null && nodes.size() > 0) {
                         for (Node node : nodes) {
                             Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(),
-                                    Constants.HOME_BACON_PATH, serializedNote).setResultCallback(
+                                    Constants.HOME_BACON_NOTE, serializedNote).setResultCallback(
                                     new ResultCallback() {
                                         @Override
                                         public void onResult(Result result) {
@@ -86,6 +86,16 @@ public class WatchConnectorImpl implements WatchConnector{
                 }
             }
         }).start();
+    }
+
+    @Override
+    public void startScan() {
+
+    }
+
+    @Override
+    public void stopScan() {
+
     }
 
     public void Toast(final String text, final int toastLength){

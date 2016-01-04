@@ -6,4 +6,6 @@ package de.whs.homebaconcore;
 public interface WatchConnector {
 
     void sendNote(Note note);
+    void startScan();
+    void stopScan();
 }
