@@ -33,6 +33,8 @@ import de.whs.homebaconcore.Serializer;
  */
 public class NoteListenerService extends WearableListenerService implements PhoneListener{
 
+    private RoomScanner mRoomScanner ;
+
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         String path = messageEvent.getPath();
@@ -74,6 +76,8 @@ public class NoteListenerService extends WearableListenerService implements Phon
 
         try {
             int roomId = (int) Serializer.deserialize(roomIdData);
+            mRoomScanner = new RoomScanner(this,roomId);
+            mRoomScanner.startBeaconScan();
             Log.d(Constants.DEBUG_TAG, "Start scan for roomId: " + roomId);
         }
         catch (Exception e){
@@ -84,7 +88,10 @@ public class NoteListenerService extends WearableListenerService implements Phon
 
     @Override
     public void onStopScan() {
+        Log.d(Constants.DEBUG_TAG, "Stop scan command received");
 
+        mRoomScanner.stopBeaconScan();
+        Log.d(Constants.DEBUG_TAG, "Stop scan");
     }
 
     private void saveNoteInDb(Note note){

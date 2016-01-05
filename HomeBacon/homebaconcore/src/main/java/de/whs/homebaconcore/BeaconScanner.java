@@ -38,7 +38,10 @@ public class BeaconScanner {
             if (!mBluetoothAdapter.isEnabled()) {
                 Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 int REQUEST_BLUETOOTH = 1;
-                activity.startActivityForResult(enableBT, REQUEST_BLUETOOTH);
+                if (activity == null)
+                    Log.d(Constants.DEBUG_TAG, "BT is not enabled and there is no activity to start a dialog");
+                else
+                    activity.startActivityForResult(enableBT, REQUEST_BLUETOOTH);
             }
 
             if (mBluetoothAdapter.isEnabled()) {

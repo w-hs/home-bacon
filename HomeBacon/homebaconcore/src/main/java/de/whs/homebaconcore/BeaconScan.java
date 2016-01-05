@@ -4,12 +4,22 @@ package de.whs.homebaconcore;
  * Created by pausf on 25.11.2015.
  */
 public class BeaconScan {
-    private String address;
+    private int roomId;
     private int rssi;
+    private long timestamp;
 
-    public BeaconScan(String address, int rssi) {
-        this.address = address;
+    public BeaconScan(int roomId, int rssi, long timestamp) {
+        this.roomId = roomId;
         this.rssi = rssi;
+        this.timestamp = timestamp;
+    }
+
+    public int getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(int roomId) {
+        this.roomId = roomId;
     }
 
     public int getRssi() {
@@ -20,16 +30,11 @@ public class BeaconScan {
         this.rssi = rssi;
     }
 
-    public String getAddress() {
-        return address;
+    public long getTimestamp() {
+        return timestamp;
     }
 
-    public void setAddress(String id) {
-        this.address = address;
-    }
-
-    @Override
-    public String toString() {
-        return address + ": " + rssi;
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }
