@@ -204,20 +204,11 @@ public class RoomScanner extends AppCompatActivity {
         scanToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked)
-                    startScan();
+                    watchConnector.startScan(getSelectedRoom().getId());
                 else
-                    stoppScan();
+                    watchConnector.stopScan();
             }
         });
-    }
-
-    private void startScan() {
-        final Room room = getSelectedRoom();
-        watchConnector.startScan(room.getId());
-    }
-
-    private void stoppScan() {
-        watchConnector.stopScan();
     }
 
     private void initializeRoomsSpinner() {
