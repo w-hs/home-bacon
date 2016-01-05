@@ -140,9 +140,6 @@ public class MainActivity extends AppCompatActivity {
                 R.array.eventTypes, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
-
-        //Bluetooth
-        mNavService = new NavigationServiceImpl(this);
     }
 
     @Override
