@@ -49,7 +49,6 @@ public class RoomScanner extends AppCompatActivity {
     private SQLiteDatabase mDb;
     private Spinner mSpinner;
     private boolean mIsScanning = false;
-    private TextView mScannerView;
     private int mScanCount;
     private BeaconListener mListener;
     private Map<String, Integer> mTagsToIndex = new HashMap<>();
@@ -142,15 +141,11 @@ public class RoomScanner extends AppCompatActivity {
         initializeRoomsSpinner();
         initializeScanToggleButton();
 
-
-        mScannerView = (TextView) findViewById(R.id.scanningTextView);
-
         Button startButton = (Button) findViewById(R.id.startScanButtton);
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mIsScanning = true;
-                mScannerView.setText("Scanner: An");
                 mScanCount = 0;
             }
         });
@@ -160,7 +155,6 @@ public class RoomScanner extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mIsScanning = false;
-                mScannerView.setText("Scanner: Aus");
                 File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
                 File destFile = new File(downloadDir, "bacon.db");
                 File srcFile = new File(getDatabaseDir());
@@ -187,11 +181,6 @@ public class RoomScanner extends AppCompatActivity {
             startBeaconScan();
         } else {
             mIsScanning = savedInstanceState.getBoolean("isScanning");
-            if (mIsScanning) {
-                mScannerView.setText("Scanner: An");
-            } else {
-                mScannerView.setText("Scanner: Aus");
-            }
             Log.i("HomeBeacon", "Scanner: " + mBeaconScanner);
         }
 
@@ -223,11 +212,12 @@ public class RoomScanner extends AppCompatActivity {
     }
 
     private void startScan() {
-        //watchConnector.startScan();
+        final Room room = getSelectedRoom();
+        watchConnector.startScan(room.getId());
     }
 
     private void stoppScan() {
-
+        watchConnector.stopScan();
     }
 
     private void initializeRoomsSpinner() {
@@ -249,6 +239,10 @@ public class RoomScanner extends AppCompatActivity {
             rooms = mDbHelper.getAllRooms(mDb);
         }
         return rooms;
+    }
+
+    private Room getSelectedRoom() {
+        return (Room) mSpinner.getSelectedItem();
     }
 
     private void initializeBackToHomeToolbar() {
@@ -344,12 +338,6 @@ public class RoomScanner extends AppCompatActivity {
 
         if (mIsScanning) {
             ++mScanCount;
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mScannerView.setText("Scanner: An (" + room.getName() + ": " + mScanCount + ")");
-                }
-            });
         }
 
         float[] x = {0.0f, 0.0f, 0.0f};
