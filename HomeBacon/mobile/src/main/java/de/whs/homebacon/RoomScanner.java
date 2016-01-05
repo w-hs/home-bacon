@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class RoomScanner extends AppCompatActivity {
     private SQLiteDatabase mDb;
     private Spinner mSpinner;
     private TextView mProbView;
-    private WatchConnector watchConnector;
+    private WatchConnector mWatchConnector;
     private PredictionModel mModel;
 
     @Override
@@ -50,7 +51,7 @@ public class RoomScanner extends AppCompatActivity {
         setContentView(R.layout.activity_room_scanner);
         mModel = PredictionModel.loadFromPreferences(this);
 
-        watchConnector = new WatchConnectorImpl(this);
+        mWatchConnector = new WatchConnectorImpl(this);
         mDbHelper = new DatabaseHelper(getApplicationContext());
         mDb = mDbHelper.getWritableDatabase();
 
@@ -68,14 +69,13 @@ public class RoomScanner extends AppCompatActivity {
         calculateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                String scansCSV = getScans();
-                Log.d(Constants.DEBUG_TAG, scansCSV);
+                List<String> scansCSV = getScans();
                 try {
-                    new AsyncTask<String, Void, PredictionModel>() {
+                    new AsyncTask<List<String>, Void, PredictionModel>() {
                         private Exception exception;
 
                         @Override
-                        protected PredictionModel doInBackground(String... params) {
+                        protected PredictionModel doInBackground(List<String>... params) {
                             try {
                                 return PredictionModel.getPredictionModelFor(params[0]);
                             } catch (Exception ex) {
@@ -88,6 +88,7 @@ public class RoomScanner extends AppCompatActivity {
                         protected void onPostExecute(PredictionModel model) {
                             if (this.exception == null) {
                                 model.saveToPreferences(v.getContext());
+                                mWatchConnector.sendModel(model);
 
                                 // TODO: Wirkliche Messwerte mit dem Modell zur Vorhersage nutzen
                                 Log.e("HomeBeacon", "Accuracy = " + Float.toString(model.getAccuracy()));
@@ -109,16 +110,14 @@ public class RoomScanner extends AppCompatActivity {
         });
     }
 
-    private String getScans() {
+    private List<String> getScans() {
         List<BeaconScan> scans = mDbHelper.getScans(mDb);
-        StringBuilder sb = new StringBuilder();
-        sb.append("scan_id,room_id,tag,rssi\n");
+        List<String> lines = new ArrayList<>();
+        lines.add("scan_id,room_id,tag,rssi\n");
         for (BeaconScan scan : scans){
-            sb.append(scan.getAsCSV());
-            sb.append("\n");
+            lines.add(scan.getAsCSV() + "\n");
         }
-        String s =  sb.toString();
-        return s;
+        return lines;
     }
 
     private void initializeDeleteButton() {
@@ -147,9 +146,9 @@ public class RoomScanner extends AppCompatActivity {
         scanToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked)
-                    watchConnector.startScan(getSelectedRoom().getId());
+                    mWatchConnector.startScan(getSelectedRoom().getId());
                 else
-                    watchConnector.stopScan();
+                    mWatchConnector.stopScan();
             }
         });
     }

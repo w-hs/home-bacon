@@ -19,6 +19,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -806,7 +807,7 @@ public class PredictionModel implements Serializable {
         }
     }
 
-    public static PredictionModel getPredictionModelFor(String csvData) throws IOException, JSONException {
+    public static PredictionModel getPredictionModelFor(List<String> csvData) throws IOException, JSONException {
         URL url = new URL("http://87.106.16.104/cgi-bin/learn-scans.py");
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
         connection.setRequestMethod("POST");
@@ -815,7 +816,10 @@ public class PredictionModel implements Serializable {
         connection.setDoInput(true);
 
         DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
-        outputStream.writeUTF(csvData);
+        for (String line : csvData) {
+            byte[] utf8Bytes = line.getBytes("utf-8");
+            outputStream.write(utf8Bytes);
+        }
         outputStream.flush();
         outputStream.close();
 

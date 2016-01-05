@@ -29,6 +29,7 @@ import de.whs.homebaconcore.DatabaseHelper;
 import de.whs.homebaconcore.Note;
 import de.whs.homebaconcore.PhoneConnector;
 import de.whs.homebaconcore.PhoneListener;
+import de.whs.homebaconcore.PredictionModel;
 import de.whs.homebaconcore.Serializer;
 
 /**
@@ -54,6 +55,22 @@ public class MessageListenerService extends WearableListenerService implements P
             case Constants.HOME_BACON_SCAN_STOP:
                 onStopScan();
                 break;
+
+            case Constants.HOME_BACON_SEND_MODEL:
+                onSendModel(messageEvent.getData());
+                break;
+        }
+    }
+
+    @Override
+    public void onSendModel(byte[] data) {
+        try{
+            PredictionModel model = (PredictionModel) Serializer.deserialize(data);
+            model.saveToPreferences(this.getApplicationContext());
+        }
+        catch(Exception e){
+            Log.e(Constants.DEBUG_TAG, "PredictionModel deserialization failed");
+            Log.e(Constants.DEBUG_TAG, e.getMessage());
         }
     }
 
