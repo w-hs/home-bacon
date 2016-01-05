@@ -7,8 +7,6 @@ import android.os.Bundle;
 import android.support.wearable.view.GridViewPager;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import de.whs.homebaconcore.DatabaseHelper;
 import de.whs.homebaconcore.Note;
@@ -26,7 +24,7 @@ public class MyDisplayActivity extends Activity {
         setContentView(R.layout.activity_display);
 
         //Start services
-        getApplication().startService(new Intent(getApplication(), NoteListenerService.class));
+        getApplication().startService(new Intent(getApplication(), MessageListenerService.class));
 
         //Create noteAdapter
         mNotesAdapter = new NotesGridPagerAdapter(this, getFragmentManager());

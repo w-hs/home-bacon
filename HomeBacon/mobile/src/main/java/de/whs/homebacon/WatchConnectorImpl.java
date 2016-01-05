@@ -68,9 +68,10 @@ public class WatchConnectorImpl implements WatchConnector{
 
                                                 Toast("Failed to send note to watch", Toast.LENGTH_LONG);
                                                 Log.e(Constants.DEBUG_TAG, "Send message failed");
-                                            } else
+                                            } else {
                                                 Toast("Note sent successfully", Toast.LENGTH_SHORT);
                                                 Log.d(Constants.DEBUG_TAG, "send successfully");
+                                            }
                                         }
                                     });
                         }
