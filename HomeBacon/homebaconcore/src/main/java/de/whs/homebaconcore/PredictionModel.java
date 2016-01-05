@@ -17,6 +17,8 @@ import java.util.Map;
 
 /**
  * Created by pausf on 05.01.2016.
+ *
+ * Vorhersage-Modell für Messwerte von Bluetooth-Tags.
  */
 public class PredictionModel {
 
@@ -765,11 +767,6 @@ public class PredictionModel {
                 "313,1,7C:2F:80:99:DE:CD,-80\n";
     }
 
-    public static PredictionModel testPredictionModel() throws IOException, JSONException {
-        String testData = getTestData();
-        return getPredictionModelFor(testData);
-    }
-
     public static PredictionModel getPredictionModelFor(String csvData) throws IOException, JSONException {
         URL url = new URL("http://87.106.16.104/cgi-bin/learn-scans.py");
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
@@ -786,7 +783,7 @@ public class PredictionModel {
         InputStream inputStream = connection.getInputStream();
         BufferedReader inputReader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
-        StringBuffer response = new StringBuffer();
+        StringBuilder response = new StringBuilder();
         while ((line = inputReader.readLine()) != null) {
             response.append(line);
             response.append('\r');
@@ -816,7 +813,6 @@ public class PredictionModel {
         JSONArray WArray = object.getJSONArray("W");
         int width = WArray.length();
         int height = WArray.getJSONArray(0).length();
-        // TODO: Prüfen, wie rum die Daten in die Matrix sollen
         float[][] W = new float[height][width];
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
@@ -873,8 +869,7 @@ public class PredictionModel {
     private float normalize(int rssi) {
         float rssiRange = maxRssi - minRssi;
         float rssiNormalizer = 1.0f / rssiRange;
-        float normalized = rssiNormalizer * (rssi - minRssi);
-        return normalized;
+        return rssiNormalizer * (rssi - minRssi);
     }
 
     private float[] multiply(float[][] W, float[] x_) {
@@ -921,14 +916,6 @@ public class PredictionModel {
         return accuracy;
     }
 
-    public float[][] getW() {
-        return W;
-    }
-
-    public float[] getB() {
-        return b;
-    }
-
     public Map<String, Integer> getRooms() {
         return rooms;
     }
@@ -949,24 +936,8 @@ public class PredictionModel {
         this.b = b;
     }
 
-    public void setRooms(Map<String, Integer> rooms) {
-        this.rooms = rooms;
-    }
-
-    public void setTags(Map<String, Integer> tags) {
-        this.tags = tags;
-    }
-
-    public float getMinRssi() {
-        return minRssi;
-    }
-
     public void setMinRssi(float minRssi) {
         this.minRssi = minRssi;
-    }
-
-    public float getMaxRssi() {
-        return maxRssi;
     }
 
     public void setMaxRssi(float maxRssi) {
