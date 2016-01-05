@@ -25,30 +25,66 @@ import java.util.List;
 import de.whs.homebaconcore.Constants;
 import de.whs.homebaconcore.DatabaseHelper;
 import de.whs.homebaconcore.Note;
+import de.whs.homebaconcore.PhoneListener;
 import de.whs.homebaconcore.Serializer;
 
 /**
  * Created by Dennis on 01.12.2015.
  */
-public class NoteListenerService extends WearableListenerService {
+public class NoteListenerService extends WearableListenerService implements PhoneListener{
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
-        String p = messageEvent.getPath();
-        if (p.equals(Constants.HOME_BACON_NOTE)) {
-            Log.d(Constants.DEBUG_TAG, "Note received");
+        String path = messageEvent.getPath();
 
-            try{
-                Note note = (Note) Serializer.deserialize(messageEvent.getData());
-                Log.d(Constants.DEBUG_TAG, note.getText());
-                saveNoteInDb(note);
-                startActivity();
-            }
-            catch(Exception e){
-                Log.e(Constants.DEBUG_TAG, "Note deserialization failed");
-                Log.e(Constants.DEBUG_TAG, e.getMessage());
-            }
+        switch (path){
+            case Constants.HOME_BACON_NOTE:
+                onNote(messageEvent.getData());
+                break;
+
+            case Constants.HOME_BACON_SCAN_START:
+                onStartScan(messageEvent.getData());
+                break;
+
+            case Constants.HOME_BACON_SCAN_STOP:
+                onStopScan();
+                break;
         }
+    }
+
+    @Override
+    public void onNote(byte[] noteData) {
+        Log.d(Constants.DEBUG_TAG, "Note received");
+
+        try{
+            Note note = (Note) Serializer.deserialize(noteData);
+            Log.d(Constants.DEBUG_TAG, note.getText());
+            saveNoteInDb(note);
+            startActivity();
+        }
+        catch(Exception e){
+            Log.e(Constants.DEBUG_TAG, "Note deserialization failed");
+            Log.e(Constants.DEBUG_TAG, e.getMessage());
+        }
+    }
+
+    @Override
+    public void onStartScan(byte[] roomIdData) {
+        Log.d(Constants.DEBUG_TAG, "Start scan command received");
+
+        try {
+            int roomId = (int) Serializer.deserialize(roomIdData);
+            Log.d(Constants.DEBUG_TAG, "Start scan for roomId: " + roomId);
+        }
+        catch (Exception e){
+            Log.e(Constants.DEBUG_TAG, "Room deserialization failed");
+            Log.e(Constants.DEBUG_TAG, e.getMessage());
+        }
+    }
+
+    @Override
+    public void onStopScan() {
+
     }
 
     private void saveNoteInDb(Note note){
@@ -66,6 +102,8 @@ public class NoteListenerService extends WearableListenerService {
         startIntent.addFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
         startActivity(startIntent);
     }
+
+
 }
 
 

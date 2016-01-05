@@ -34,18 +34,6 @@ public class MyDisplayActivity extends Activity {
         mPager.setAdapter(mNotesAdapter);
 
         updateCards();
-
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mPager.setCurrentItem(1, 0, true);
-                    }
-                });
-            }
-        }, 500);
     }
 
     @Override
