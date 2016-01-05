@@ -21,13 +21,15 @@ import java.util.Map;
 public class PredictionModel {
 
     private float accuracy;
+    private float minRssi = -106.0f;
+    private float maxRssi = -40.0f;
     private float[][] W;
     private float[] b;
     private Map<String, Integer> rooms = new HashMap<>();
     private Map<String, Integer> tags = new HashMap<>();
 
     public static String getTestData() {
-        return             "scan_id,room_id,tag,rssi\n" +
+        return  "scan_id,room_id,tag,rssi\n" +
                 "1,3,7C:2F:80:99:DE:B1,-83\n" +
                 "2,3,7C:2F:80:99:DE:B1,-85\n" +
                 "3,3,7C:2F:80:99:DE:B1,-85\n" +
@@ -809,13 +811,13 @@ public class PredictionModel {
         result.setB(b);
 
         JSONArray WArray = object.getJSONArray("W");
-        int height = WArray.length();
-        int width = WArray.getJSONArray(0).length();
+        int width = WArray.length();
+        int height = WArray.getJSONArray(0).length();
         // TODO: Prüfen, wie rum die Daten in die Matrix sollen
         float[][] W = new float[height][width];
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
-                W[y][x] = (float)WArray.getJSONArray(y).getDouble(x);
+                W[y][x] = (float)WArray.getJSONArray(x).getDouble(y);
             }
         }
         result.setW(W);
@@ -828,7 +830,7 @@ public class PredictionModel {
             result.getRooms().put(roomName, roomIndex);
         }
 
-        JSONObject tagsObject = object.getJSONObject("rooms");
+        JSONObject tagsObject = object.getJSONObject("tags");
         Iterator<String> tagKeys = tagsObject.keys();
         while(tagKeys.hasNext()) {
             String tagAddress = tagKeys.next();
@@ -842,10 +844,73 @@ public class PredictionModel {
     // Eingabe: Eine Messung aus n Paaren von Bluetooth-Adresse und Messwert
     // Ausgabe: Eine Vorhersage aus m Paaren von Raumname und W'keit
     public Map<String, Float> predict(Map<String, BeaconScan> scans) {
+        // Eingabevektor x auf Basis der Scanwerte ermittlen und normalisieren
+        float[] x = new float[tags.size()];
+        for (String address : tags.keySet()) {
+            BeaconScan scan = scans.get(address);
+            if (scan != null) {
+                Integer tagIndex = tags.get(address);
+                float normalizedRssi = normalize(scan.getRssi());
+                x[tagIndex] = normalizedRssi;
+            }
+        }
+
+        float[] mulResult = multiply(W, x);
+        float[] addResult = add(mulResult, b);
+        float[] y = softmax(addResult);
+
         Map<String, Float> result = new HashMap<>();
+        for (String room : rooms.keySet()) {
+            Integer roomIndex = rooms.get(room);
+            result.put(room, y[roomIndex]);
+        }
+        return result;
+    }
 
+    private float normalize(int rssi) {
+        float rssiRange = maxRssi - minRssi;
+        float rssiNormalizer = 1.0f / rssiRange;
+        float normalized = rssiNormalizer * (rssi - minRssi);
+        return normalized;
+    }
 
+    private float[] multiply(float[][] W, float[] x_) {
+        int height = W.length;
+        int width = W[0].length;
 
+        float[] result = new float[height];
+
+        for (int y = 0; y < height; ++y) {
+            float sum = 0.0f;
+            for (int x = 0; x < width; ++x) {
+                sum += W[y][x] * x_[x];
+            }
+            result[y] = sum;
+        }
+
+        return result;
+    }
+
+    private float[] add(float[] a, float[] b) {
+        float[] result = new float[a.length];
+        for (int i = 0; i < a.length; ++i) {
+            result[i] = a[i] + b[i];
+        }
+        return result;
+    }
+
+    private float[] softmax(float[] y) {
+        float[] result = new float[y.length];
+
+        float sum = 0.0f;
+        for (int i = 0; i < y.length; ++i) {
+            result[i] = (float) Math.exp(y[i]);
+            sum += result[i];
+        }
+        float invSum = 1.0f / sum;
+        for (int i = 0; i < y.length; ++i) {
+            result[i] *= invSum;
+        }
         return result;
     }
 
