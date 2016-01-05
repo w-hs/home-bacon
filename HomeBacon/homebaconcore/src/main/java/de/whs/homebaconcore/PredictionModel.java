@@ -839,8 +839,9 @@ public class PredictionModel {
         return result;
     }
 
-    public Map<String, Float> predict(float[] x)
-    {
+    // Eingabe: Eine Messung aus n Paaren von Bluetooth-Adresse und Messwert
+    // Ausgabe: Eine Vorhersage aus m Paaren von Raumname und W'keit
+    public Map<String, Float> predict(Map<String, BeaconScan> scans) {
         Map<String, Float> result = new HashMap<>();
 
 
