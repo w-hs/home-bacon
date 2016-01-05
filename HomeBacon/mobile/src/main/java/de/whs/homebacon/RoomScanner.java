@@ -42,11 +42,13 @@ public class RoomScanner extends AppCompatActivity {
     private Spinner mSpinner;
     private TextView mProbView;
     private WatchConnector watchConnector;
+    private PredictionModel mModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_room_scanner);
+        mModel = PredictionModel.loadFromPreferences(this);
 
         watchConnector = new WatchConnectorImpl(this);
         mDbHelper = new DatabaseHelper(getApplicationContext());
@@ -59,20 +61,15 @@ public class RoomScanner extends AppCompatActivity {
         initializeCalculateButton();
 
         mProbView = (TextView) findViewById(R.id.probabilityText);
-/*
-        mTagsToIndex.put("7C:2F:80:8D:E2:3B", 0);
-        mTagsToIndex.put("7C:2F:80:8D:E2:45", 1);
-        mTagsToIndex.put("20:C3:8F:99:C1:E7", 2);
-*/
     }
 
     private void initializeCalculateButton() {
         Button calculateButton = (Button) findViewById(R.id.calculateButton);
         calculateButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Log.d(Constants.DEBUG_TAG, getScans());
-                // TODO Berechnung starten...
+            public void onClick(final View v) {
+                String scansCSV = getScans();
+                Log.d(Constants.DEBUG_TAG, scansCSV);
                 try {
                     new AsyncTask<String, Void, PredictionModel>() {
                         private Exception exception;
@@ -90,6 +87,9 @@ public class RoomScanner extends AppCompatActivity {
                         @Override
                         protected void onPostExecute(PredictionModel model) {
                             if (this.exception == null) {
+                                model.saveToPreferences(v.getContext());
+
+                                // TODO: Wirkliche Messwerte mit dem Modell zur Vorhersage nutzen
                                 Log.e("HomeBeacon", "Accuracy = " + Float.toString(model.getAccuracy()));
                                 Map<String, BeaconScan> test = new HashMap<>();
                                 test.put("7C:2F:80:99:DE:CD", new BeaconScan(3, -98, 0));
@@ -101,7 +101,7 @@ public class RoomScanner extends AppCompatActivity {
                                 Log.e("HomeBeacon", this.exception.getMessage());
                             }
                         }
-                    }.execute(PredictionModel.getTestData());
+                    }.execute(scansCSV);
                 } catch (Exception ex) {
                     Log.e("HomeBeacon", ex.getMessage());
                 }

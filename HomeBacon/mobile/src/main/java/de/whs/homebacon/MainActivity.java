@@ -47,9 +47,6 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Notiz hinterlegt", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-
                 Note note = new Note();
                 note.setTitle(noteTitleEditText.getText().toString());
                 note.setText(noteTextEditText.getText().toString());
@@ -69,70 +66,6 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 watchConnector.sendNote(note);
-
-
-                noteTextEditText.setText("");
-                noteTitleEditText.setText("");
-                spinner.setSelection(0);
-
-                DatabaseHelper mDbHelper = new DatabaseHelper(getApplicationContext());
-
-                // Gets the data repository in write mode
-                SQLiteDatabase db = mDbHelper.getWritableDatabase();
-                mDbHelper.onUpgrade(db, 1, 1);
-
-                // Cursor cursor2 = db.
-                //         rawQuery(".schema notes;",null);
-
-
-                ContentValues values = new ContentValues();
-                values.put(DatabaseHelper.COLUMN_NOTES_NAME_NOTE_ID, 1);
-                values.put(DatabaseHelper.COLUMN_NOTES_NAME_TITLE, "Hallo");
-                values.put(DatabaseHelper.COLUMN_NOTES_NAME_TEXT, "Eine super notiz");
-                values.put(DatabaseHelper.COLUMN_NOTES_NAME_TIMESTAMP,  System.currentTimeMillis());
-                values.put(DatabaseHelper.COLUMN_NOTES_NAME_EVENT, "null");
-                values.put(DatabaseHelper.COLUMN_NOTES_NAME_ROOM_ID, 100);
-
-                long newRowId;
-                newRowId = db.insert(
-                        DatabaseHelper.TABLE_NOTES_NAME,
-                        null,
-                        values);
-                
-                // Define a projection that specifies which columns from the database
-                // you will actually use after this query.
-                String[] projection = {
-                        DatabaseHelper.COLUMN_NOTES_NAME_NOTE_ID,
-                        DatabaseHelper.COLUMN_NOTES_NAME_TITLE,
-                        DatabaseHelper.COLUMN_NOTES_NAME_TEXT,
-                        DatabaseHelper.COLUMN_NOTES_NAME_TIMESTAMP,
-                        DatabaseHelper.COLUMN_NOTES_NAME_EVENT,
-                        DatabaseHelper.COLUMN_NOTES_NAME_ROOM_ID
-                };
-
-                // How you want the results sorted in the resulting Cursor
-                String sortOrder =
-                        DatabaseHelper.COLUMN_NOTES_NAME_TIMESTAMP + " DESC";
-
-                Cursor cursor = db.query(
-                        DatabaseHelper.TABLE_NOTES_NAME, // The table to query
-                        projection,                      // The columns to return
-                        null,                            // The columns for the WHERE clause
-                        null,                            // The values for the WHERE clause
-                        null,                            // don't group the rows
-                        null,                            // don't filter by row groups
-                        sortOrder                        // The sort order
-                );
-
-
-
-                cursor.moveToFirst();
-              //  long itemId = cursor.getLong(
-               //         cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOTES_NAME_TITLE)
-                //);
-
-                noteTitleEditText.setText(cursor.getString(1));
-                noteTextEditText.setText(cursor.getString(2));
             }
         });
 
@@ -141,9 +74,6 @@ public class MainActivity extends AppCompatActivity {
                 R.array.eventTypes, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
-
-        //Bluetooth
-        mNavService = new NavigationServiceImpl(this);
     }
 
     @Override
