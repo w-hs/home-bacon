@@ -4,11 +4,10 @@ import android.bluetooth.BluetoothDevice;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.PersistableBundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,8 +15,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.ToggleButton;
+
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,6 +41,7 @@ import de.whs.homebaconcore.BeaconScanner;
 import de.whs.homebaconcore.DatabaseHelper;
 import de.whs.homebaconcore.PredictionModel;
 import de.whs.homebaconcore.Room;
+import de.whs.homebaconcore.WatchConnector;
 
 public class RoomScanner extends AppCompatActivity {
 
@@ -44,11 +50,56 @@ public class RoomScanner extends AppCompatActivity {
     private SQLiteDatabase mDb;
     private Spinner mSpinner;
     private boolean mIsScanning = false;
-    private TextView mScannerView;
     private int mScanCount;
     private BeaconListener mListener;
     private Map<String, Integer> mTagsToIndex = new HashMap<>();
     private TextView mProbView;
+    private WatchConnector watchConnector;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "RoomScanner Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://de.whs.homebacon/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "RoomScanner Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://de.whs.homebacon/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
+    }
 
     private class Scan {
         private int rssi;
@@ -82,48 +133,20 @@ public class RoomScanner extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_room_scanner);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-        ActionBar supportActionBar = getSupportActionBar();
-        if (supportActionBar != null)
-            supportActionBar.setDisplayHomeAsUpEnabled(true);
-
+        watchConnector = new WatchConnectorImpl(this);
         mDbHelper = new DatabaseHelper(getApplicationContext());
         mDb = mDbHelper.getWritableDatabase();
-        //mDbHelper.onUpgrade(mDb, 1, 1);
 
-        List<Room> rooms = mDbHelper.getAllRooms(mDb);
-        if (rooms.size() == 0) {
-            mDbHelper.insertRoom(mDb, "Küche");
-            mDbHelper.insertRoom(mDb, "Flur");
-            mDbHelper.insertRoom(mDb, "Wohnzimmer");
-
-            rooms = mDbHelper.getAllRooms(mDb);
-        }
-
-        mSpinner = (Spinner) findViewById(R.id.spinner);
-        ArrayAdapter<Room> listAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, rooms);
-        mSpinner.setAdapter(listAdapter);
-        mSpinner.setSaveEnabled(true);
-
-        mScannerView = (TextView) findViewById(R.id.scanningTextView);
+        initializeBackToHomeToolbar();
+        initializeRoomsSpinner();
+        initializeScanToggleButton();
 
         Button startButton = (Button) findViewById(R.id.startScanButtton);
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mIsScanning = true;
-                mScannerView.setText("Scanner: An");
                 mScanCount = 0;
             }
         });
@@ -133,14 +156,12 @@ public class RoomScanner extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mIsScanning = false;
-                mScannerView.setText("Scanner: Aus");
                 File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
                 File destFile = new File(downloadDir, "bacon.db");
                 File srcFile = new File(getDatabaseDir());
                 try {
                     copy(srcFile, destFile);
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     Log.e("HomeBeacon", ex.getMessage());
                 }
                 try {
@@ -169,12 +190,6 @@ public class RoomScanner extends AppCompatActivity {
             startBeaconScan();
         } else {
             mIsScanning = savedInstanceState.getBoolean("isScanning");
-            if (mIsScanning) {
-                mScannerView.setText("Scanner: An");
-            }
-            else {
-                mScannerView.setText("Scanner: Aus");
-            }
             Log.i("HomeBeacon", "Scanner: " + mBeaconScanner);
         }
 
@@ -188,6 +203,54 @@ public class RoomScanner extends AppCompatActivity {
         mTagsToIndex.put("7C:2F:80:8D:E2:3B", 0);
         mTagsToIndex.put("7C:2F:80:8D:E2:45", 1);
         mTagsToIndex.put("20:C3:8F:99:C1:E7", 2);
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+    }
+
+    private void initializeScanToggleButton() {
+        ToggleButton scanToggleButton = (ToggleButton) findViewById(R.id.scanToggleButton);
+        scanToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked)
+                    watchConnector.startScan(getSelectedRoom().getId());
+                else
+                    watchConnector.stopScan();
+            }
+        });
+    }
+
+    private void initializeRoomsSpinner() {
+        List<Room> rooms = getRoomsFromDatabase();
+        mSpinner = (Spinner) findViewById(R.id.spinner);
+        ArrayAdapter<Room> listAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1, rooms);
+        mSpinner.setAdapter(listAdapter);
+        mSpinner.setSaveEnabled(true);
+    }
+
+    private List<Room> getRoomsFromDatabase() {
+        List<Room> rooms = mDbHelper.getAllRooms(mDb);
+        if (rooms.size() == 0) {
+            mDbHelper.insertRoom(mDb, "Küche");
+            mDbHelper.insertRoom(mDb, "Flur");
+            mDbHelper.insertRoom(mDb, "Wohnzimmer");
+
+            rooms = mDbHelper.getAllRooms(mDb);
+        }
+        return rooms;
+    }
+
+    private Room getSelectedRoom() {
+        return (Room) mSpinner.getSelectedItem();
+    }
+
+    private void initializeBackToHomeToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null)
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
@@ -275,15 +338,9 @@ public class RoomScanner extends AppCompatActivity {
 
         if (mIsScanning) {
             ++mScanCount;
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mScannerView.setText("Scanner: An (" + room.getName() + ": " + mScanCount + ")");
-                }
-            });
         }
 
-        float[] x = { 0.0f, 0.0f, 0.0f };
+        float[] x = {0.0f, 0.0f, 0.0f};
 
         for (String address : scans.keySet()) {
             Scan scan = scans.get(address);
@@ -305,12 +362,12 @@ public class RoomScanner extends AppCompatActivity {
         {
             // Nutzen des Scans zur Positionierung
             float[][] W = {
-                    { -0.96257174f,  -2.28264236f,   3.24521399f },
-                    { -1.54085743f,  -1.61166883f,   3.15252829f },
-                    { -0.95999652f,  11.77016544f, -10.81016445f }
+                    {-0.96257174f, -2.28264236f, 3.24521399f},
+                    {-1.54085743f, -1.61166883f, 3.15252829f},
+                    {-0.95999652f, 11.77016544f, -10.81016445f}
             };
             float[] B = {
-                    -3.37038374f,  0.49158058f,  2.8788023f
+                    -3.37038374f, 0.49158058f, 2.8788023f
             };
 
             float[] mulResult = multiply(W, x);
@@ -336,11 +393,9 @@ public class RoomScanner extends AppCompatActivity {
 
         float[] result = new float[height];
 
-        for (int y = 0; y < height; ++y)
-        {
+        for (int y = 0; y < height; ++y) {
             float sum = 0.0f;
-            for (int x = 0; x < width; ++x)
-            {
+            for (int x = 0; x < width; ++x) {
                 sum += W[y][x] * x_[x];
             }
             result[y] = sum;
@@ -349,32 +404,26 @@ public class RoomScanner extends AppCompatActivity {
         return result;
     }
 
-    private float[] add(float[] a, float[] b)
-    {
+    private float[] add(float[] a, float[] b) {
         float[] result = new float[a.length];
-        for (int i = 0; i < a.length; ++i)
-        {
+        for (int i = 0; i < a.length; ++i) {
             result[i] = a[i] + b[i];
         }
         return result;
     }
 
-    private float[] softmax(float[] y)
-    {
+    private float[] softmax(float[] y) {
         float[] result = new float[y.length];
 
         float sum = 0.0f;
-        for (int i = 0; i < y.length; ++i)
-        {
-            result[i] = (float)Math.exp(y[i]);
+        for (int i = 0; i < y.length; ++i) {
+            result[i] = (float) Math.exp(y[i]);
             sum += result[i];
         }
         float invSum = 1.0f / sum;
-        for (int i = 0; i < y.length; ++i)
-        {
+        for (int i = 0; i < y.length; ++i) {
             result[i] *= invSum;
         }
         return result;
     }
-
 }

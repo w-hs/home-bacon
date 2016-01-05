@@ -89,7 +89,7 @@ public class WatchConnectorImpl implements WatchConnector{
     }
 
     @Override
-    public void startScan(final int roomId) {
+    public void startScan(final long roomId) {
         new Thread(new Runnable() {
             @Override
             public void run() {
