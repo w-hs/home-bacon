@@ -17,17 +17,21 @@ import java.util.Map;
 
 /**
  * Created by pausf on 05.01.2016.
+ *
+ * Vorhersage-Modell für Messwerte von Bluetooth-Tags.
  */
 public class PredictionModel {
 
     private float accuracy;
+    private float minRssi = -106.0f;
+    private float maxRssi = -40.0f;
     private float[][] W;
     private float[] b;
     private Map<String, Integer> rooms = new HashMap<>();
     private Map<String, Integer> tags = new HashMap<>();
 
     public static String getTestData() {
-        return             "scan_id,room_id,tag,rssi\n" +
+        return  "scan_id,room_id,tag,rssi\n" +
                 "1,3,7C:2F:80:99:DE:B1,-83\n" +
                 "2,3,7C:2F:80:99:DE:B1,-85\n" +
                 "3,3,7C:2F:80:99:DE:B1,-85\n" +
@@ -763,11 +767,6 @@ public class PredictionModel {
                 "313,1,7C:2F:80:99:DE:CD,-80\n";
     }
 
-    public static PredictionModel testPredictionModel() throws IOException, JSONException {
-        String testData = getTestData();
-        return getPredictionModelFor(testData);
-    }
-
     public static PredictionModel getPredictionModelFor(String csvData) throws IOException, JSONException {
         URL url = new URL("http://87.106.16.104/cgi-bin/learn-scans.py");
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
@@ -784,7 +783,7 @@ public class PredictionModel {
         InputStream inputStream = connection.getInputStream();
         BufferedReader inputReader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
-        StringBuffer response = new StringBuffer();
+        StringBuilder response = new StringBuilder();
         while ((line = inputReader.readLine()) != null) {
             response.append(line);
             response.append('\r');
@@ -801,6 +800,9 @@ public class PredictionModel {
         JSONObject object = new JSONObject(jsonString);
 
         result.setAccuracy((float) object.getDouble("acc"));
+        result.setMinRssi((float) object.getDouble("min_rssi"));
+        result.setMaxRssi((float) object.getDouble("max_rssi"));
+
         JSONArray bArray = object.getJSONArray("b");
         float[] b = new float[bArray.length()];
         for (int i = 0; i < bArray.length(); ++i) {
@@ -809,13 +811,12 @@ public class PredictionModel {
         result.setB(b);
 
         JSONArray WArray = object.getJSONArray("W");
-        int height = WArray.length();
-        int width = WArray.getJSONArray(0).length();
-        // TODO: Prüfen, wie rum die Daten in die Matrix sollen
+        int width = WArray.length();
+        int height = WArray.getJSONArray(0).length();
         float[][] W = new float[height][width];
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
-                W[y][x] = (float)WArray.getJSONArray(y).getDouble(x);
+                W[y][x] = (float)WArray.getJSONArray(x).getDouble(y);
             }
         }
         result.setW(W);
@@ -828,7 +829,7 @@ public class PredictionModel {
             result.getRooms().put(roomName, roomIndex);
         }
 
-        JSONObject tagsObject = object.getJSONObject("rooms");
+        JSONObject tagsObject = object.getJSONObject("tags");
         Iterator<String> tagKeys = tagsObject.keys();
         while(tagKeys.hasNext()) {
             String tagAddress = tagKeys.next();
@@ -842,23 +843,77 @@ public class PredictionModel {
     // Eingabe: Eine Messung aus n Paaren von Bluetooth-Adresse und Messwert
     // Ausgabe: Eine Vorhersage aus m Paaren von Raumname und W'keit
     public Map<String, Float> predict(Map<String, BeaconScan> scans) {
+        // Eingabevektor x auf Basis der Scanwerte ermittlen und normalisieren
+        float[] x = new float[tags.size()];
+        for (String address : tags.keySet()) {
+            BeaconScan scan = scans.get(address);
+            if (scan != null) {
+                Integer tagIndex = tags.get(address);
+                float normalizedRssi = normalize(scan.getRssi());
+                x[tagIndex] = normalizedRssi;
+            }
+        }
+
+        float[] mulResult = multiply(W, x);
+        float[] addResult = add(mulResult, b);
+        float[] y = softmax(addResult);
+
         Map<String, Float> result = new HashMap<>();
+        for (String room : rooms.keySet()) {
+            Integer roomIndex = rooms.get(room);
+            result.put(room, y[roomIndex]);
+        }
+        return result;
+    }
 
+    private float normalize(int rssi) {
+        float rssiRange = maxRssi - minRssi;
+        float rssiNormalizer = 1.0f / rssiRange;
+        return rssiNormalizer * (rssi - minRssi);
+    }
 
+    private float[] multiply(float[][] W, float[] x_) {
+        int height = W.length;
+        int width = W[0].length;
 
+        float[] result = new float[height];
+
+        for (int y = 0; y < height; ++y) {
+            float sum = 0.0f;
+            for (int x = 0; x < width; ++x) {
+                sum += W[y][x] * x_[x];
+            }
+            result[y] = sum;
+        }
+
+        return result;
+    }
+
+    private float[] add(float[] a, float[] b) {
+        float[] result = new float[a.length];
+        for (int i = 0; i < a.length; ++i) {
+            result[i] = a[i] + b[i];
+        }
+        return result;
+    }
+
+    private float[] softmax(float[] y) {
+        float[] result = new float[y.length];
+
+        float sum = 0.0f;
+        for (int i = 0; i < y.length; ++i) {
+            result[i] = (float) Math.exp(y[i]);
+            sum += result[i];
+        }
+        float invSum = 1.0f / sum;
+        for (int i = 0; i < y.length; ++i) {
+            result[i] *= invSum;
+        }
         return result;
     }
 
     public float getAccuracy() {
         return accuracy;
-    }
-
-    public float[][] getW() {
-        return W;
-    }
-
-    public float[] getB() {
-        return b;
     }
 
     public Map<String, Integer> getRooms() {
@@ -881,11 +936,11 @@ public class PredictionModel {
         this.b = b;
     }
 
-    public void setRooms(Map<String, Integer> rooms) {
-        this.rooms = rooms;
+    public void setMinRssi(float minRssi) {
+        this.minRssi = minRssi;
     }
 
-    public void setTags(Map<String, Integer> tags) {
-        this.tags = tags;
+    public void setMaxRssi(float maxRssi) {
+        this.maxRssi = maxRssi;
     }
 }

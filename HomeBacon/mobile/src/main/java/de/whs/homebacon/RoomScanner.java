@@ -24,7 +24,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.whs.homebaconcore.BeaconScan;
 import de.whs.homebaconcore.Constants;
@@ -71,14 +73,6 @@ public class RoomScanner extends AppCompatActivity {
             public void onClick(View v) {
                 Log.d(Constants.DEBUG_TAG, getScans());
                 // TODO Berechnung starten...
-                File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                File destFile = new File(downloadDir, "bacon.db");
-                File srcFile = new File(getDatabaseDir());
-                try {
-                    copy(srcFile, destFile);
-                } catch (Exception ex) {
-                    Log.e("HomeBeacon", ex.getMessage());
-                }
                 try {
                     new AsyncTask<String, Void, PredictionModel>() {
                         private Exception exception;
@@ -97,7 +91,13 @@ public class RoomScanner extends AppCompatActivity {
                         protected void onPostExecute(PredictionModel model) {
                             if (this.exception == null) {
                                 Log.e("HomeBeacon", "Accuracy = " + Float.toString(model.getAccuracy()));
-                            } else {
+                                Map<String, BeaconScan> test = new HashMap<>();
+                                test.put("7C:2F:80:99:DE:CD", new BeaconScan(3, -98, 0));
+                                test.put("7C:2F:80:99:DE:25", new BeaconScan(3, -88, 0));
+                                test.put("7C:2F:80:99:DE:B1", new BeaconScan(3, -90, 0));
+                                model.predict(test);
+                            }
+                            else {
                                 Log.e("HomeBeacon", this.exception.getMessage());
                             }
                         }
@@ -212,116 +212,4 @@ public class RoomScanner extends AppCompatActivity {
         in.close();
         out.close();
     }
-
-    /*
-    // TODO: Code noch nötig?
-    private void onSaveScans() {
-        // Wenn wir länger als 2 Sekunden nichts mehr vom Beacon gehört haben,
-        // gehen wir davon aus, dass der Beacon außer Reichweite ist
-        long fadeDurationInMs = 2000;
-        long currentTime = System.currentTimeMillis();
-        long fadeLimit = currentTime - fadeDurationInMs;
-
-        if (!hasScans(fadeLimit))
-            return;
-
-        final Room room = (Room) mSpinner.getSelectedItem();
-        long scanId = mDbHelper.insertScan(mDb, room.getId());
-
-        float[] x = {0.0f, 0.0f, 0.0f};
-
-        for (String address : scans.keySet()) {
-            Scan scan = scans.get(address);
-            if (scan.getTimestamp() > fadeLimit) {
-                if (mIsScanning) {
-                    mDbHelper.insertScannedTag(mDb, scanId, address, scan.getRssi());
-                    Log.i("HomeBeacon", "room=" + room.getName() + ", addr=" + address + ", rssi="
-                            + scan.getRssi());
-                }
-
-                Integer tagIndex = mTagsToIndex.get(address);
-                if (tagIndex != null) {
-                    float normalizedRssi = (scan.getRssi() + 100) / 60.0f;
-                    x[tagIndex] = normalizedRssi;
-                }
-            }
-        }
-
-        {
-            // Nutzen des Scans zur Positionierung
-            float[][] W = {
-                    {-0.96257174f, -2.28264236f, 3.24521399f},
-                    {-1.54085743f, -1.61166883f, 3.15252829f},
-                    {-0.95999652f, 11.77016544f, -10.81016445f}
-            };
-            float[] B = {
-                    -3.37038374f, 0.49158058f, 2.8788023f
-            };
-
-            float[] mulResult = multiply(W, x);
-            float[] addResult = add(mulResult, B);
-            final float[] y = softmax(addResult);
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    float rounded0 = Math.round(y[0] * 100);
-                    float rounded1 = Math.round(y[1] * 100);
-                    float rounded2 = Math.round(y[2] * 100);
-                    mProbView.setText("[" + rounded0 + ", " + rounded1 + ", " + rounded2 + "]");
-                }
-            });
-            //Log.i("HomeBeacon", "[" + y[0] + ", " + y[1] + ", " + y[2] + "]");
-        }
-    }
-
-    private boolean hasScans(long fadeLimit) {
-        for (Scan scan : scans.values()) {
-            if (scan.getTimestamp() > fadeLimit) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private float[] multiply(float[][] W, float[] x_) {
-        int height = W.length;
-        int width = W[0].length;
-
-        float[] result = new float[height];
-
-        for (int y = 0; y < height; ++y) {
-            float sum = 0.0f;
-            for (int x = 0; x < width; ++x) {
-                sum += W[y][x] * x_[x];
-            }
-            result[y] = sum;
-        }
-
-        return result;
-    }
-
-    private float[] add(float[] a, float[] b) {
-        float[] result = new float[a.length];
-        for (int i = 0; i < a.length; ++i) {
-            result[i] = a[i] + b[i];
-        }
-        return result;
-    }
-
-    private float[] softmax(float[] y) {
-        float[] result = new float[y.length];
-
-        float sum = 0.0f;
-        for (int i = 0; i < y.length; ++i) {
-            result[i] = (float) Math.exp(y[i]);
-            sum += result[i];
-        }
-        float invSum = 1.0f / sum;
-        for (int i = 0; i < y.length; ++i) {
-            result[i] *= invSum;
-        }
-        return result;
-    }
-    */
 }
