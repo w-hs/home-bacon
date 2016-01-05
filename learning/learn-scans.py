@@ -151,6 +151,8 @@ with tf.Session() as sess:
         'tags': tags,
         'rooms': rooms,
         'W': out_W.tolist(),
-        'b': out_b.tolist()
+        'b': out_b.tolist(),
+        'min_rssi': min_rssi,
+        'max_rssi': max_rssi
     }
     print(json.dumps(output, sort_keys=True, indent=2))

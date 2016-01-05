@@ -803,6 +803,9 @@ public class PredictionModel {
         JSONObject object = new JSONObject(jsonString);
 
         result.setAccuracy((float) object.getDouble("acc"));
+        result.setMinRssi((float) object.getDouble("min_rssi"));
+        result.setMaxRssi((float) object.getDouble("max_rssi"));
+
         JSONArray bArray = object.getJSONArray("b");
         float[] b = new float[bArray.length()];
         for (int i = 0; i < bArray.length(); ++i) {
@@ -952,5 +955,21 @@ public class PredictionModel {
 
     public void setTags(Map<String, Integer> tags) {
         this.tags = tags;
+    }
+
+    public float getMinRssi() {
+        return minRssi;
+    }
+
+    public void setMinRssi(float minRssi) {
+        this.minRssi = minRssi;
+    }
+
+    public float getMaxRssi() {
+        return maxRssi;
+    }
+
+    public void setMaxRssi(float maxRssi) {
+        this.maxRssi = maxRssi;
     }
 }
