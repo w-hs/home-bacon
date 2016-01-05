@@ -35,12 +35,21 @@
         android:layout_below="@+id/startScanButtton"
         android:layout_alignParentStart="true" />
 
+    <ToggleButton
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textOn="Scan stoppen"
+        android:textOff="Scan starten"
+        android:id="@+id/scanToggleButton"
+        android:layout_below="@+id/stopScanButton"
+        android:layout_alignParentEnd="true" />
+
     <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Lösche Messungen"
+        android:text="Scan löschen"
         android:id="@+id/deleteButton"
-        android:layout_below="@+id/stopScanButton"
+        android:layout_below="@+id/scanToggleButton"
         android:layout_alignParentEnd="true" />
 
     <TextView
