@@ -71,14 +71,6 @@ public class RoomScanner extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // TODO Berechnung starten...
-                File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                File destFile = new File(downloadDir, "bacon.db");
-                File srcFile = new File(getDatabaseDir());
-                try {
-                    copy(srcFile, destFile);
-                } catch (Exception ex) {
-                    Log.e("HomeBeacon", ex.getMessage());
-                }
                 try {
                     new AsyncTask<String, Void, PredictionModel>() {
                         private Exception exception;
@@ -208,22 +200,4 @@ public class RoomScanner extends AppCompatActivity {
         in.close();
         out.close();
     }
-
-    /*
-    // TODO: Code noch nötig?
-            final float[] y = softmax(addResult);
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    float rounded0 = Math.round(y[0] * 100);
-                    float rounded1 = Math.round(y[1] * 100);
-                    float rounded2 = Math.round(y[2] * 100);
-                    mProbView.setText("[" + rounded0 + ", " + rounded1 + ", " + rounded2 + "]");
-                }
-            });
-            //Log.i("HomeBeacon", "[" + y[0] + ", " + y[1] + ", " + y[2] + "]");
-        }
-    }
-    */
 }
