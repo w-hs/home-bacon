@@ -19,37 +19,13 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true" />
 
-    <Button
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Starte Scan"
-        android:id="@+id/startScanButtton"
-        android:layout_below="@+id/spinner"
-        android:layout_alignParentStart="true" />
-
-    <Button
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Stoppe Scan"
-        android:id="@+id/stopScanButton"
-        android:layout_below="@+id/startScanButtton"
-        android:layout_alignParentStart="true" />
-
     <ToggleButton
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textOn="Scan stoppen"
         android:textOff="Scan starten"
         android:id="@+id/scanToggleButton"
-        android:layout_below="@+id/stopScanButton"
-        android:layout_alignParentEnd="true" />
-
-    <Button
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Scan löschen"
-        android:id="@+id/deleteButton"
-        android:layout_below="@+id/scanToggleButton"
+        android:layout_below="@+id/spinner"
         android:layout_alignParentEnd="true" />
 
     <TextView
@@ -58,6 +34,22 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="0%"
         android:id="@+id/probabilityText"
+        android:layout_below="@+id/scanToggleButton"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Scan löschen"
+        android:id="@+id/deleteButton"
+        android:layout_below="@+id/probabilityText"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Berechnen"
+        android:id="@+id/calculateButton"
         android:layout_below="@+id/deleteButton"
         android:layout_alignParentStart="true" />
 
