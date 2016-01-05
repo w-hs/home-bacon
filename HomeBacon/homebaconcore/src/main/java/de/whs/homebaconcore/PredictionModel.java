@@ -839,6 +839,15 @@ public class PredictionModel {
         return result;
     }
 
+    public Map<String, Float> predict(float[] x)
+    {
+        Map<String, Float> result = new HashMap<>();
+
+
+
+        return result;
+    }
+
     public float getAccuracy() {
         return accuracy;
     }
