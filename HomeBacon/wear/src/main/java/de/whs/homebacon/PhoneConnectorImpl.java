@@ -61,11 +61,11 @@ public class PhoneConnectorImpl implements PhoneConnector {
                                     });
                         }
                     } else {
-                        Log.d(Constants.DEBUG_TAG, "nothing connected");
+                        Log.d(Constants.DEBUG_TAG, "no device connected");
                     }
                 }
                 catch (Exception e){
-
+                    Log.e(Constants.DEBUG_TAG, e.getMessage());
                 }
                 finally {
                     mGoogleApiClient.disconnect();

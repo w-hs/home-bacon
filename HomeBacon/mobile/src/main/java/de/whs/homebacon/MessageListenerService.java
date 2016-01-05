@@ -54,7 +54,15 @@ public class MessageListenerService extends WearableListenerService implements W
         DatabaseHelper mDbHelper = new DatabaseHelper(this);
         SQLiteDatabase mDb = mDbHelper.getWritableDatabase();
 
-        //TODO insert scans in DB
+        int watchScanId = -1;
+        long phoneScanId = 0;
+        for(BeaconScan scan : scans){
+            if (watchScanId != scan.getScanId()){
+                watchScanId = (int) scan.getScanId();
+                phoneScanId = mDbHelper.insertScan(mDb, scan.getRoomId());
+            }
+            mDbHelper.insertScannedTag(mDb, phoneScanId, scan.getAddress(), scan.getRssi());
+        }
         mDb.close();
     }
 }

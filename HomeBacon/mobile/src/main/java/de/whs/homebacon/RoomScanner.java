@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import de.whs.homebaconcore.BeaconScan;
+import de.whs.homebaconcore.Constants;
 import de.whs.homebaconcore.DatabaseHelper;
 import de.whs.homebaconcore.PredictionModel;
 import de.whs.homebaconcore.Room;
@@ -67,6 +69,7 @@ public class RoomScanner extends AppCompatActivity {
         calculateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(Constants.DEBUG_TAG, getScans());
                 // TODO Berechnung starten...
                 File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
                 File destFile = new File(downloadDir, "bacon.db");
@@ -84,29 +87,38 @@ public class RoomScanner extends AppCompatActivity {
                         protected PredictionModel doInBackground(String... params) {
                             try {
                                 return PredictionModel.getPredictionModelFor(params[0]);
-                            }
-                            catch (Exception ex) {
+                            } catch (Exception ex) {
                                 this.exception = ex;
                                 return null;
                             }
                         }
 
                         @Override
-                        protected  void onPostExecute(PredictionModel model) {
+                        protected void onPostExecute(PredictionModel model) {
                             if (this.exception == null) {
                                 Log.e("HomeBeacon", "Accuracy = " + Float.toString(model.getAccuracy()));
-                            }
-                            else {
+                            } else {
                                 Log.e("HomeBeacon", this.exception.getMessage());
                             }
                         }
                     }.execute(PredictionModel.getTestData());
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     Log.e("HomeBeacon", ex.getMessage());
                 }
             }
         });
+    }
+
+    private String getScans() {
+        List<BeaconScan> scans = mDbHelper.getScans(mDb);
+        StringBuilder sb = new StringBuilder();
+        sb.append("scan_id,room_id,tag,rssi\n");
+        for (BeaconScan scan : scans){
+            sb.append(scan.getAsCSV());
+            sb.append("\n");
+        }
+        String s =  sb.toString();
+        return s;
     }
 
     private void initializeDeleteButton() {

@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import de.whs.homebaconcore.BeaconListener;
 import de.whs.homebaconcore.BeaconScan;
@@ -20,7 +22,7 @@ import de.whs.homebaconcore.DatabaseHelper;
  * Created by Dennis on 05.01.2016.
  */
 public class RoomScanner implements BeaconListener{
-    private Map<String, BeaconScan> scans = new HashMap<>();
+    private ConcurrentMap<String, BeaconScan> scans = new ConcurrentHashMap<>();
     private Context mContext;
     private  BeaconScanner mBeaconScanner;
     private int mRoomId;
