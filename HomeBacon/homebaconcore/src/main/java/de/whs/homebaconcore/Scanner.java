@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Created by pausf on 05.01.2016.
@@ -16,8 +18,8 @@ import java.util.TimerTask;
  * Bestimmung der Position.
  */
 public class Scanner implements BeaconListener {
-    private Map<String, BeaconScan> scans = new HashMap<>();
-    private  BeaconScanner mBeaconScanner;
+    private ConcurrentMap<String, BeaconScan> scans = new ConcurrentHashMap<>();
+    private BeaconScanner mBeaconScanner;
     private Timer mTimer = new Timer();
     private int mRoomId;
     private List<ScanListener> mListeners = new ArrayList<>();
