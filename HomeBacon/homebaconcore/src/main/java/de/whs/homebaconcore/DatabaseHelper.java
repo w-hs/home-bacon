@@ -285,11 +285,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void deleteScannedTagsAndScans(SQLiteDatabase database, long roomId) {
-        String sql = "DELETE FROM scanned_tags WHERE scan_id=(SELECT scan_id FROM scans WHERE room_id=" + roomId;
-        database.rawQuery(sql, null);
+        try {
 
-        sql = "DELETE FROM scans where room_id=" + roomId;
-        database.rawQuery(sql, null);
+            String sql = "DELETE FROM scanned_tags WHERE scan_id IN (SELECT scan_id FROM scans WHERE room_id=" + roomId + ")";
+            database.execSQL(sql, new Object[0]);
+
+            sql = "DELETE FROM scans where room_id=" + roomId;
+            database.execSQL(sql, new Object[0]);
+        }
+        catch (Exception e){
+            Log.e(Constants.DEBUG_TAG,e.getMessage());
+        }
     }
 
     public void deleteScannedTags(SQLiteDatabase db) {
