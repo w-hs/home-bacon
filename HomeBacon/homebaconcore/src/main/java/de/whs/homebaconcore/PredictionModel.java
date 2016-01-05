@@ -1,5 +1,10 @@
 package de.whs.homebaconcore;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Base64;
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,6 +14,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -20,7 +26,7 @@ import java.util.Map;
  *
  * Vorhersage-Modell für Messwerte von Bluetooth-Tags.
  */
-public class PredictionModel {
+public class PredictionModel implements Serializable {
 
     private float accuracy;
     private float minRssi = -106.0f;
@@ -765,6 +771,39 @@ public class PredictionModel {
                 "313,1,7C:2F:80:99:DE:25,-97\n" +
                 "313,1,7C:2F:80:99:DE:70,-72\n" +
                 "313,1,7C:2F:80:99:DE:CD,-80\n";
+    }
+
+    public static PredictionModel loadFromPreferences(Context context) {
+        try {
+            SharedPreferences prefs = context.getSharedPreferences("ModelPrefs", Context.MODE_PRIVATE);
+            String modelBase64 = prefs.getString("Model", null);
+
+            if (modelBase64 != null) {
+                byte[] modelBytes =  Base64.decode(modelBase64, Base64.DEFAULT);
+                Object modelObject = Serializer.deserialize(modelBytes);
+                return (PredictionModel)modelObject;
+            }
+        }
+        catch (Exception ex) {
+            Log.e(Constants.DEBUG_TAG, "Could not load prediction model from preferences");
+            Log.e(Constants.DEBUG_TAG, ex.getMessage());
+        }
+        return null;
+    }
+
+    public void saveToPreferences(Context context) {
+        try {
+            SharedPreferences prefs = context.getSharedPreferences("ModelPrefs", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+            byte[] modelBytes = Serializer.serialize(this);
+            String modelBase64 = Base64.encodeToString(modelBytes, Base64.DEFAULT);
+            editor.putString("Model", modelBase64);
+            editor.commit();
+        }
+        catch (Exception ex) {
+            Log.e(Constants.DEBUG_TAG, "Could not save prediction model to preferences");
+            Log.e(Constants.DEBUG_TAG, ex.getMessage());
+        }
     }
 
     public static PredictionModel getPredictionModelFor(String csvData) throws IOException, JSONException {
