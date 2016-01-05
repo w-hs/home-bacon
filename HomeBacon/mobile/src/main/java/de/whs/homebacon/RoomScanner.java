@@ -34,6 +34,7 @@ import java.util.TimerTask;
 import de.whs.homebaconcore.BeaconListener;
 import de.whs.homebaconcore.BeaconScanner;
 import de.whs.homebaconcore.DatabaseHelper;
+import de.whs.homebaconcore.PredictionModel;
 import de.whs.homebaconcore.Room;
 
 public class RoomScanner extends AppCompatActivity {
@@ -142,6 +143,14 @@ public class RoomScanner extends AppCompatActivity {
                 catch (Exception ex) {
                     Log.e("HomeBeacon", ex.getMessage());
                 }
+                try {
+                    PredictionModel model = PredictionModel.testPredictionModel();
+                    Log.e("HomeBeacon", "Accuracy = " + Float.toString(model.getAccuracy()));
+                }
+                catch (Exception ex) {
+                    Log.e("HomeBeacon", ex.getMessage());
+                }
+
             }
         });
 
