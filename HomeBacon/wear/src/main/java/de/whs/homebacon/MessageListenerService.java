@@ -93,7 +93,8 @@ public class MessageListenerService extends WearableListenerService implements P
     public void onStopScan() {
         Log.d(Constants.DEBUG_TAG, "Stop scan command received");
 
-        mRoomScanner.stopBeaconScan();
+        if (mRoomScanner != null)
+            mRoomScanner.stopBeaconScan();
         Log.d(Constants.DEBUG_TAG, "Scan stopped");
 
         DatabaseHelper mDbHelper = new DatabaseHelper(this);
@@ -103,6 +104,12 @@ public class MessageListenerService extends WearableListenerService implements P
 
         PhoneConnector phone = new PhoneConnectorImpl(this);
         phone.sendScanResults(scans);
+
+        mDbHelper.deleteScannedTags(mDb);
+        mDbHelper.deleteScans(mDb);
+
+        mDb.close();
+        mDbHelper.close();
     }
 
     private void saveNoteInDb(Note note){
