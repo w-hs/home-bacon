@@ -5,6 +5,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.PersistableBundle;
@@ -165,8 +166,30 @@ public class RoomScanner extends AppCompatActivity {
                     Log.e("HomeBeacon", ex.getMessage());
                 }
                 try {
-                    PredictionModel model = PredictionModel.testPredictionModel();
-                    Log.e("HomeBeacon", "Accuracy = " + Float.toString(model.getAccuracy()));
+                    new AsyncTask<String, Void, PredictionModel>() {
+                        private Exception exception;
+
+                        @Override
+                        protected PredictionModel doInBackground(String... params) {
+                            try {
+                                return PredictionModel.getPredictionModelFor(params[0]);
+                            }
+                            catch (Exception ex) {
+                                this.exception = ex;
+                                return null;
+                            }
+                        }
+
+                        @Override
+                        protected  void onPostExecute(PredictionModel model) {
+                            if (this.exception == null) {
+                                Log.e("HomeBeacon", "Accuracy = " + Float.toString(model.getAccuracy()));
+                            }
+                            else {
+                                Log.e("HomeBeacon", this.exception.getMessage());
+                            }
+                        }
+                    }.execute(PredictionModel.getTestData());
                 }
                 catch (Exception ex) {
                     Log.e("HomeBeacon", ex.getMessage());
