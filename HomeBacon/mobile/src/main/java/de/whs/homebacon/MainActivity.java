@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         watchConnector = new WatchConnectorImpl(this);
+        getApplication().startService(new Intent(getApplication(), MessageListenerService.class));
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

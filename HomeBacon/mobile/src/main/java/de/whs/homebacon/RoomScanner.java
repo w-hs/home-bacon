@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.whs.homebaconcore.BeaconScan;
+import de.whs.homebaconcore.Constants;
 import de.whs.homebaconcore.DatabaseHelper;
 import de.whs.homebaconcore.PredictionModel;
 import de.whs.homebaconcore.Room;
@@ -70,6 +71,7 @@ public class RoomScanner extends AppCompatActivity {
         calculateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(Constants.DEBUG_TAG, getScans());
                 // TODO Berechnung starten...
                 try {
                     new AsyncTask<String, Void, PredictionModel>() {
@@ -79,15 +81,14 @@ public class RoomScanner extends AppCompatActivity {
                         protected PredictionModel doInBackground(String... params) {
                             try {
                                 return PredictionModel.getPredictionModelFor(params[0]);
-                            }
-                            catch (Exception ex) {
+                            } catch (Exception ex) {
                                 this.exception = ex;
                                 return null;
                             }
                         }
 
                         @Override
-                        protected  void onPostExecute(PredictionModel model) {
+                        protected void onPostExecute(PredictionModel model) {
                             if (this.exception == null) {
                                 Log.e("HomeBeacon", "Accuracy = " + Float.toString(model.getAccuracy()));
                                 Map<String, BeaconScan> test = new HashMap<>();
@@ -101,12 +102,23 @@ public class RoomScanner extends AppCompatActivity {
                             }
                         }
                     }.execute(PredictionModel.getTestData());
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     Log.e("HomeBeacon", ex.getMessage());
                 }
             }
         });
+    }
+
+    private String getScans() {
+        List<BeaconScan> scans = mDbHelper.getScans(mDb);
+        StringBuilder sb = new StringBuilder();
+        sb.append("scan_id,room_id,tag,rssi\n");
+        for (BeaconScan scan : scans){
+            sb.append(scan.getAsCSV());
+            sb.append("\n");
+        }
+        String s =  sb.toString();
+        return s;
     }
 
     private void initializeDeleteButton() {

@@ -20,11 +20,14 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import de.whs.homebaconcore.BeaconScan;
 import de.whs.homebaconcore.Constants;
 import de.whs.homebaconcore.DatabaseHelper;
 import de.whs.homebaconcore.Note;
+import de.whs.homebaconcore.PhoneConnector;
 import de.whs.homebaconcore.PhoneListener;
 import de.whs.homebaconcore.Serializer;
 
@@ -75,7 +78,7 @@ public class MessageListenerService extends WearableListenerService implements P
         Log.d(Constants.DEBUG_TAG, "Start scan command received");
 
         try {
-            int roomId = (int) Serializer.deserialize(roomIdData);
+            int roomId = (int)(long) Serializer.deserialize(roomIdData);
             mRoomScanner = new RoomScanner(this,roomId);
             mRoomScanner.startBeaconScan();
             Log.d(Constants.DEBUG_TAG, "Start scan for roomId: " + roomId);
@@ -93,7 +96,13 @@ public class MessageListenerService extends WearableListenerService implements P
         mRoomScanner.stopBeaconScan();
         Log.d(Constants.DEBUG_TAG, "Scan stopped");
 
-        //TODO load scans from db and send via PhoneConnector
+        DatabaseHelper mDbHelper = new DatabaseHelper(this);
+        SQLiteDatabase mDb = mDbHelper.getReadableDatabase();
+
+        List<BeaconScan> scans = mDbHelper.getScans(mDb);
+
+        PhoneConnector phone = new PhoneConnectorImpl(this);
+        phone.sendScanResults(scans);
     }
 
     private void saveNoteInDb(Note note){
