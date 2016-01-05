@@ -284,6 +284,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
     }
 
+    public void deleteScannedTagsAndScans(SQLiteDatabase database, long roomId) {
+        String sql = "DELETE FROM scanned_tags WHERE scan_id=(SELECT scan_id FROM scans WHERE room_id=" + roomId;
+        database.rawQuery(sql, null);
+
+        sql = "DELETE FROM scans where room_id=" + roomId;
+        database.rawQuery(sql, null);
+    }
+
     public void deleteScannedTags(SQLiteDatabase db) {
         int deletedRows = db.delete(DatabaseHelper.TABLE_SCANNED_TAGS_NAME, "1", null);
         Log.i("HomeBeacon", "Deleted rows: " + deletedRows);

@@ -126,8 +126,7 @@ public class RoomScanner extends AppCompatActivity {
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mDbHelper.deleteScannedTags(mDb);
-                mDbHelper.deleteScans(mDb);
+                mDbHelper.deleteScannedTagsAndScans(mDb, getSelectedRoom().getId());
             }
         });
     }
