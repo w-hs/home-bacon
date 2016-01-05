@@ -31,7 +31,7 @@ import de.whs.homebaconcore.Serializer;
 /**
  * Created by Dennis on 01.12.2015.
  */
-public class NoteListenerService extends WearableListenerService implements PhoneListener{
+public class MessageListenerService extends WearableListenerService implements PhoneListener{
 
     private RoomScanner mRoomScanner ;
 
@@ -91,7 +91,9 @@ public class NoteListenerService extends WearableListenerService implements Phon
         Log.d(Constants.DEBUG_TAG, "Stop scan command received");
 
         mRoomScanner.stopBeaconScan();
-        Log.d(Constants.DEBUG_TAG, "Stop scan");
+        Log.d(Constants.DEBUG_TAG, "Scan stopped");
+
+        //TODO load scans from db and send via PhoneConnector
     }
 
     private void saveNoteInDb(Note note){
