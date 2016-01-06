@@ -26,7 +26,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".RoomScanner"
+            android:name=".RoomScannerActivity"
             android:label="@string/title_activity_room_scanner"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar"

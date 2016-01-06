@@ -36,7 +36,7 @@ import de.whs.homebaconcore.PredictionModel;
 import de.whs.homebaconcore.Room;
 import de.whs.homebaconcore.WatchConnector;
 
-public class RoomScanner extends AppCompatActivity {
+public class RoomScannerActivity extends AppCompatActivity {
 
     private DatabaseHelper mDbHelper;
     private SQLiteDatabase mDb;

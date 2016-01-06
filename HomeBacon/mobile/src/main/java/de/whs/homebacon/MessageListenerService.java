@@ -1,6 +1,5 @@
 package de.whs.homebacon;
 
-import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -12,8 +11,6 @@ import java.util.List;
 import de.whs.homebaconcore.BeaconScan;
 import de.whs.homebaconcore.Constants;
 import de.whs.homebaconcore.DatabaseHelper;
-import de.whs.homebaconcore.Note;
-import de.whs.homebaconcore.PhoneListener;
 import de.whs.homebaconcore.Serializer;
 import de.whs.homebaconcore.WatchListener;
 
@@ -22,7 +19,7 @@ import de.whs.homebaconcore.WatchListener;
  */
 public class MessageListenerService extends WearableListenerService implements WatchListener{
 
-    private RoomScanner mRoomScanner ;
+    private RoomScannerActivity mRoomScanner ;
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
