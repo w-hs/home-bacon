@@ -24,7 +24,7 @@ public class MyDisplayActivity extends Activity {
         setContentView(R.layout.activity_display);
 
         //Start services
-        getApplication().startService(new Intent(getApplication(), NoteListenerService.class));
+        getApplication().startService(new Intent(getApplication(), MessageListenerService.class));
 
         //Create noteAdapter
         mNotesAdapter = new NotesGridPagerAdapter(this, getFragmentManager());
@@ -32,8 +32,6 @@ public class MyDisplayActivity extends Activity {
         mPager.setAdapter(mNotesAdapter);
 
         updateCards();
-        mPager.setCurrentItem(1, 0);
-
     }
 
     @Override

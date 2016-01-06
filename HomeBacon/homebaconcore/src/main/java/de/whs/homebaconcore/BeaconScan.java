@@ -1,15 +1,35 @@
 package de.whs.homebaconcore;
 
+import java.io.Serializable;
+
 /**
  * Created by pausf on 25.11.2015.
  */
-public class BeaconScan {
-    private String address;
+public class BeaconScan implements Serializable {
     private int rssi;
+    private int roomId;
+    private long timestamp;
+    private String address;
+    private long scanId;
 
-    public BeaconScan(String address, int rssi) {
+    public BeaconScan(int rssi, long timestamp) {
+        this.rssi = rssi;
+        this.timestamp = timestamp;
+    }
+
+    public BeaconScan(long scanId, int roomId, String address, int rssi) {
+        this.scanId = scanId;
+        this.roomId = roomId;
         this.address = address;
         this.rssi = rssi;
+    }
+
+    public int getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(int roomId) {
+        this.roomId = roomId;
     }
 
     public int getRssi() {
@@ -20,16 +40,31 @@ public class BeaconScan {
         this.rssi = rssi;
     }
 
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public long getScanId() {
+        return scanId;
+    }
+
     public String getAddress() {
         return address;
     }
 
-    public void setAddress(String id) {
+    public void setAddress(String address) {
         this.address = address;
     }
 
-    @Override
-    public String toString() {
-        return address + ": " + rssi;
+    public void setScanId(long scanId) {
+        this.scanId = scanId;
+    }
+
+    public String getAsCSV(){
+        return scanId + "," + roomId + "," + address + "," + rssi;
     }
 }

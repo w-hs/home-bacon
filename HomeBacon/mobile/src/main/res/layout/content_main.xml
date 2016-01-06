@@ -12,10 +12,20 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/notizText"
+        android:id="@+id/notizTitel"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:hint="Titel"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/notizText"
+        android:layout_below="@+id/notizTitel"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:hint="Notiz" />
 
     <Spinner
         android:layout_width="wrap_content"
@@ -23,4 +33,5 @@
         android:id="@+id/eventSpinner"
         android:layout_below="@+id/notizText"
         android:layout_alignParentStart="true" />
+
 </RelativeLayout>

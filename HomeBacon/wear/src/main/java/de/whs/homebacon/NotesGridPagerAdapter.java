@@ -40,38 +40,28 @@ public class NotesGridPagerAdapter extends FragmentGridPagerAdapter {
 
     @Override
     public Fragment getFragment(int row, int col) throws IndexOutOfBoundsException {
-
-        //row = 0 -> settings fragment
-        if (row==0){
-            return new SettingsFragment();
+        //no notes -> No notes card
+        if (mNotes.size() == 0) {
+            return CardFragment.create("Keine \n Notizen","");
         }
+        //notes -> note cards
+        else {
+            NoteFragment f = new NoteFragment();
+            Bundle b =new Bundle();
 
-        //row = 1 -> note fragments
-        if (row == 1) {
-            //no notes -> No
-            if (mNotes.size() == 0) {
-                return CardFragment.create("Keine Notizen","");
-            }
-            else {
-                NoteFragment f = new NoteFragment();
-                Bundle b =new Bundle();
+            b.putSerializable("note", mNotes.get(col));
+            f.setArguments(b);
+            f.setAdapter(this);
+            f.setContext(mContext);
 
-                b.putSerializable("note", mNotes.get(col));
-                f.setArguments(b);
-                f.setAdapter(this);
-                f.setContext(mContext);
-
-                return f;
-            }
+            return f;
         }
-
-        throw new IndexOutOfBoundsException("Fragment row " + row + " or col " + col + " is not available");
     }
 
     // Obtain the number of pages (vertical)
     @Override
     public int getRowCount() {
-        return 2;
+        return 1;
     }
 
     // Obtain the number of pages (horizontal)

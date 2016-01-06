@@ -180,7 +180,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void deleteNote(SQLiteDatabase db, Note note){
-        db.delete(TABLE_NOTES_NAME, COLUMN_NOTES_NAME_NOTE_ID+ "=" + note.getNoteId(), null);
+        db.delete(TABLE_NOTES_NAME, COLUMN_NOTES_NAME_NOTE_ID + "=" + note.getNoteId(), null);
     }
 
     public List<Note> getAllNotes(SQLiteDatabase db, long roomId){
@@ -284,6 +284,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
     }
 
+    public void deleteScannedTagsAndScans(SQLiteDatabase database, long roomId) {
+        try {
+
+            String sql = "DELETE FROM scanned_tags WHERE scan_id IN (SELECT scan_id FROM scans WHERE room_id=" + roomId + ")";
+            database.execSQL(sql, new Object[0]);
+
+            sql = "DELETE FROM scans where room_id=" + roomId;
+            database.execSQL(sql, new Object[0]);
+        }
+        catch (Exception e){
+            Log.e(Constants.DEBUG_TAG,e.getMessage());
+        }
+    }
+
     public void deleteScannedTags(SQLiteDatabase db) {
         int deletedRows = db.delete(DatabaseHelper.TABLE_SCANNED_TAGS_NAME, "1", null);
         Log.i("HomeBeacon", "Deleted rows: " + deletedRows);
@@ -292,5 +306,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void deleteScans(SQLiteDatabase db) {
         int deletedRows = db.delete(DatabaseHelper.TABLE_SCAN_NAME, "1", null);
         Log.i("HomeBeacon", "Deleted rows: " + deletedRows);
+    }
+
+    public List<BeaconScan> getScans(SQLiteDatabase db) {
+
+        List<BeaconScan> scans = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT s.scan_id, s.room_id, t.tag, t.rssi " +
+                "FROM scans s " +
+                "INNER JOIN scanned_tags t ON (s.scan_id = t.scan_id) " +
+                "ORDER BY s.scan_id", null);
+
+
+        if (cursor.moveToFirst()) {
+
+            while (!cursor.isAfterLast()) {
+                long scanId = cursor.getLong(0);
+                int roomId = cursor.getInt(1);
+                String address = cursor.getString(2);
+                int rssi = cursor.getInt(3);
+
+                scans.add(new BeaconScan(scanId, roomId, address, rssi));
+                cursor.moveToNext();
+            }
+        }
+
+        cursor.close();
+
+        return scans;
     }
 }

@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import de.whs.homebaconcore.Constants;
 import de.whs.homebaconcore.EventType;
 import de.whs.homebaconcore.Note;
+import de.whs.homebaconcore.PredictionModel;
 import de.whs.homebaconcore.Serializer;
 import de.whs.homebaconcore.WatchConnector;
 
@@ -59,7 +60,7 @@ public class WatchConnectorImpl implements WatchConnector{
                     if (nodes != null && nodes.size() > 0) {
                         for (Node node : nodes) {
                             Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(),
-                                    Constants.HOME_BACON_PATH, serializedNote).setResultCallback(
+                                    Constants.HOME_BACON_NOTE, serializedNote).setResultCallback(
                                     new ResultCallback() {
                                         @Override
                                         public void onResult(Result result) {
@@ -68,9 +69,132 @@ public class WatchConnectorImpl implements WatchConnector{
 
                                                 Toast("Failed to send note to watch", Toast.LENGTH_LONG);
                                                 Log.e(Constants.DEBUG_TAG, "Send message failed");
-                                            } else
+                                            } else {
                                                 Toast("Note sent successfully", Toast.LENGTH_SHORT);
                                                 Log.d(Constants.DEBUG_TAG, "send successfully");
+                                            }
+                                        }
+                                    });
+                        }
+                    } else {
+                        Toast("No watch connected", Toast.LENGTH_SHORT);
+                    }
+                }
+                catch (Exception e){
+
+                }
+                finally {
+                    mGoogleApiClient.disconnect();
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    public void startScan(final long roomId) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mGoogleApiClient.blockingConnect(Constants.CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
+                    NodeApi.GetConnectedNodesResult nodesResult = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+                    List<Node> nodes = nodesResult.getNodes();
+                    byte[] serializedRoomId = Serializer.serialize(roomId);
+                    if (nodes != null && nodes.size() > 0) {
+                        for (Node node : nodes) {
+                            Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(),
+                                    Constants.HOME_BACON_SCAN_START, serializedRoomId).setResultCallback(
+                                    new ResultCallback() {
+                                        @Override
+                                        public void onResult(Result result) {
+                                            if (!result.getStatus().isSuccess()) {
+                                                // Failed to send message
+                                                Toast("Failed to start scan", Toast.LENGTH_LONG);
+                                                Log.e(Constants.DEBUG_TAG, "Start scan failed");
+                                            } else
+                                                Toast("Scan started successfully", Toast.LENGTH_SHORT);
+                                            Log.d(Constants.DEBUG_TAG, "scan started successfully");
+                                        }
+                                    });
+                        }
+                    } else {
+                        Toast("No watch connected", Toast.LENGTH_SHORT);
+                    }
+                }
+                catch (Exception e){
+
+                }
+                finally {
+                    mGoogleApiClient.disconnect();
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    public void stopScan() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mGoogleApiClient.blockingConnect(Constants.CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
+                    NodeApi.GetConnectedNodesResult nodesResult = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+                    List<Node> nodes = nodesResult.getNodes();
+                    if (nodes != null && nodes.size() > 0) {
+                        for (Node node : nodes) {
+                            Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(),
+                                    Constants.HOME_BACON_SCAN_STOP, null).setResultCallback(
+                                    new ResultCallback() {
+                                        @Override
+                                        public void onResult(Result result) {
+                                            if (!result.getStatus().isSuccess()) {
+                                                // Failed to send message
+                                                Toast("Failed to stop scan", Toast.LENGTH_LONG);
+                                                Log.e(Constants.DEBUG_TAG, "Stop scan failed");
+                                            } else
+                                                Toast("Scan stopped successfully", Toast.LENGTH_SHORT);
+                                            Log.d(Constants.DEBUG_TAG, "scan stopped successfully");
+                                        }
+                                    });
+                        }
+                    } else {
+                        Toast("No watch connected", Toast.LENGTH_SHORT);
+                    }
+                }
+                catch (Exception e){
+
+                }
+                finally {
+                    mGoogleApiClient.disconnect();
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    public void sendModel(final PredictionModel model) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mGoogleApiClient.blockingConnect(Constants.CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
+                    NodeApi.GetConnectedNodesResult nodesResult = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+                    List<Node> nodes = nodesResult.getNodes();
+                    byte[] serializedModel = Serializer.serialize(model);
+                    if (nodes != null && nodes.size() > 0) {
+                        for (Node node : nodes) {
+                            Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(),
+                                    Constants.HOME_BACON_SEND_MODEL, serializedModel).setResultCallback(
+                                    new ResultCallback() {
+                                        @Override
+                                        public void onResult(Result result) {
+                                            if (!result.getStatus().isSuccess()) {
+                                                // Failed to send message
+                                                Toast("Failed to stop scan", Toast.LENGTH_LONG);
+                                                Log.e(Constants.DEBUG_TAG, "Stop scan failed");
+                                            } else
+                                                Toast("Scan stopped successfully", Toast.LENGTH_SHORT);
+                                            Log.d(Constants.DEBUG_TAG, "scan stopped successfully");
                                         }
                                     });
                         }

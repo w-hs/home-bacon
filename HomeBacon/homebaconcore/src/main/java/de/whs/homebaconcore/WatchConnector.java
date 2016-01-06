@@ -6,4 +6,7 @@ package de.whs.homebaconcore;
 public interface WatchConnector {
 
     void sendNote(Note note);
+    void startScan(long roomId);
+    void stopScan();
+    void sendModel(PredictionModel model);
 }

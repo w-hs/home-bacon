@@ -38,7 +38,10 @@ public class BeaconScanner {
             if (!mBluetoothAdapter.isEnabled()) {
                 Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 int REQUEST_BLUETOOTH = 1;
-                activity.startActivityForResult(enableBT, REQUEST_BLUETOOTH);
+                if (activity == null)
+                    Log.d(Constants.DEBUG_TAG, "BT is not enabled and there is no activity to start a dialog");
+                else
+                    activity.startActivityForResult(enableBT, REQUEST_BLUETOOTH);
             }
 
             if (mBluetoothAdapter.isEnabled()) {
@@ -56,20 +59,19 @@ public class BeaconScanner {
         mListeners.add(listener);
     }
 
+    public void unregister(BeaconListener listener) {
+        mListeners.remove(listener);
+    }
+
     private void onBeaconScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
         if (device.getName() == null)
             return;
 
         if (device.getName().equals("Gigaset G-tag") || device.getName().startsWith("BEACON"))
         {
-            //Log.i("HomeBeacon", "Beacon: " + device.getName());
             for (BeaconListener listener : mListeners) {
                 listener.onScan(device, rssi, scanRecord);
             }
         }
-    }
-
-    public void unregister(BeaconListener listener) {
-        mListeners.remove(listener);
     }
 }
