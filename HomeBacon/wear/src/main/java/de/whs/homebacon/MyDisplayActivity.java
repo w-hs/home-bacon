@@ -5,9 +5,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.wearable.view.GridViewPager;
+import android.util.Base64;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +20,7 @@ import de.whs.homebaconcore.Constants;
 import de.whs.homebaconcore.DatabaseHelper;
 import de.whs.homebaconcore.EventType;
 import de.whs.homebaconcore.Note;
+import de.whs.homebaconcore.Serializer;
 
 public class MyDisplayActivity extends Activity {
 
@@ -40,7 +45,7 @@ public class MyDisplayActivity extends Activity {
         String event = getIntent().getStringExtra(Constants.EVENT);
         updateCards(event);
 
-        //update notes in current room 
+        //update notes in current room
         registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -87,11 +92,28 @@ public class MyDisplayActivity extends Activity {
     }
 
     private int getOldRoom() {
-        return 0;
+        try {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
+            int oldRoomId = prefs.getInt(Constants.HOME_BACON_OLD_ROOM, -1);
+            return oldRoomId;
+        }
+        catch (Exception ex) {
+            Log.e(Constants.DEBUG_TAG, "Could not load old room id from preferences");
+            Log.e(Constants.DEBUG_TAG, ex.getMessage());
+        }
+        return -1;
     }
 
     private int getCurrentRoom() {
-//TODO
-        return 0;
+        try {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
+            int oldRoomId = prefs.getInt(Constants.HOME_BACON_NEW_ROOM, -1);
+            return oldRoomId;
+        }
+        catch (Exception ex) {
+            Log.e(Constants.DEBUG_TAG, "Could not load new / current room id from preferences");
+            Log.e(Constants.DEBUG_TAG, ex.getMessage());
+        }
+        return -1;
     }
 }

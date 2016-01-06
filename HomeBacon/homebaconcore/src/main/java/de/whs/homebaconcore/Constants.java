@@ -22,4 +22,6 @@ public class Constants {
     public static final String ENTER_LEAVE = "EnterLeave";
     public static final String CURRENT_ROOM = "CurrentRoom";
     public static final String HOME_BACON_ROOM_CHANGED = "HOME_BACON_ROOM_CHANGED";
+    public static final String HOME_BACON_OLD_ROOM = "HOME_BACON_OLD_ROOM";
+    public static final String HOME_BACON_NEW_ROOM = "HOME_BACON_NEW_ROOM";
 }

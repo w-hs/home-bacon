@@ -1,7 +1,10 @@
 package de.whs.homebacon;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.preference.PreferenceManager;
+import android.util.Base64;
 import android.util.Log;
 
 import com.google.android.gms.wearable.MessageEvent;
@@ -201,7 +204,17 @@ public class MessageListenerService extends WearableListenerService implements P
     }
 
     private void updateRoomPrefs(int oldRoomId, int newRoomId) {
-
+       try{
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt(Constants.HOME_BACON_OLD_ROOM, oldRoomId);
+            editor.putInt(Constants.HOME_BACON_NEW_ROOM, newRoomId);
+            editor.commit();
+        }
+        catch (Exception ex) {
+            Log.e(Constants.DEBUG_TAG, "Could not save room change to preferences");
+            Log.e(Constants.DEBUG_TAG, ex.getMessage());
+        }
     }
 }
 
