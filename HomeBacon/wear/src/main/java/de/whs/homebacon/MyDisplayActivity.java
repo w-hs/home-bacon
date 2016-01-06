@@ -12,6 +12,7 @@ import android.preference.PreferenceManager;
 import android.support.wearable.view.GridViewPager;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -82,6 +83,12 @@ public class MyDisplayActivity extends Activity {
             event = Constants.CURRENT_ROOM;
         DatabaseHelper mDbHelper = new DatabaseHelper(this);
         SQLiteDatabase mDb = mDbHelper.getReadableDatabase();
+
+        //TODO test
+        int oldRoomIdx = Preferences.getOldRoom(this);
+        int newRoomIdx = Preferences.getCurrentRoom(this);
+        Toast.makeText(this, "Room changed from: " + oldRoomIdx + " to: " + newRoomIdx, Toast.LENGTH_LONG).show();
+
 
         try{
             List<Note> notes = new ArrayList<>();
