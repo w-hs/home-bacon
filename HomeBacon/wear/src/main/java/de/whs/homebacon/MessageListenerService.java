@@ -178,11 +178,15 @@ public class MessageListenerService extends WearableListenerService implements P
 
     @Override
     public void onChange(int oldRoomId, int newRoomId) {
-        //events leave and enter starten neue Activity mit entsprechenden Notes gemeinsam
         DatabaseHelper mDbHelper = new DatabaseHelper(this);
         SQLiteDatabase mDb = mDbHelper.getReadableDatabase();
         try {
             updateRoomPrefs(oldRoomId, newRoomId);
+
+            //basic notes
+            Intent intent = new Intent(Constants.HOME_BACON_ROOM_CHANGED);
+            intent.putExtra(Constants.EVENT, Constants.CURRENT_ROOM);
+            sendBroadcast(intent);
 
             //Event notes
             List<Note> eventNotes = mDbHelper.getAllNotes(mDb, oldRoomId, EventType.LEAVE.toString());
@@ -190,12 +194,6 @@ public class MessageListenerService extends WearableListenerService implements P
             if (eventNotes.size() > 0){
                 startActivityWithEventNotes();
             }
-
-            //basic notes
-            Intent intent = new Intent(Constants.HOME_BACON_ROOM_CHANGED);
-            intent.putExtra(Constants.EVENT, Constants.CURRENT_ROOM);
-            sendBroadcast(intent);
-
         }
         finally {
             mDb.close();
