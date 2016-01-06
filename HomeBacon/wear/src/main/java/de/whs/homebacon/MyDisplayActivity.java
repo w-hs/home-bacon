@@ -13,6 +13,7 @@ import android.support.wearable.view.GridViewPager;
 import android.util.Base64;
 import android.util.Log;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,6 +78,8 @@ public class MyDisplayActivity extends Activity {
     }
 
     private void updateCards(String event){
+        if (event == null)
+            event = Constants.CURRENT_ROOM;
         DatabaseHelper mDbHelper = new DatabaseHelper(this);
         SQLiteDatabase mDb = mDbHelper.getReadableDatabase();
 
@@ -90,12 +93,13 @@ public class MyDisplayActivity extends Activity {
                     notes.addAll(mDbHelper.getAllNotes(mDb, newRoomId, EventType.ENTER.toString()));
                     break;
 
-                default:
-                    //case Constants.CURRENT_ROOM:
+                case Constants.CURRENT_ROOM:
                     int roomId = Preferences.getCurrentRoom(this);
                     notes.addAll(mDbHelper.getAllNotes(mDb, roomId, EventType.NONE.toString()));
                     break;
 
+                default:
+                    throw new InvalidParameterException("event");
             }
 
             mNotesAdapter.clear();
