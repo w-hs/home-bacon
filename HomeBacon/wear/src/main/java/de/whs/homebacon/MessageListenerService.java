@@ -118,12 +118,11 @@ public class MessageListenerService extends WearableListenerService implements P
     public void onStopScan() {
         Log.d(Constants.DEBUG_TAG, "Stop scan command received");
 
-        if (mRoomScanner == null) {
+        if (mRoomScanner != null) {
             mRoomScanner.stopBeaconScan();
             mScanner.unregister(mRoomScanner);
             Log.d(Constants.DEBUG_TAG, "Scan stopped");
         }
-
 
         DatabaseHelper dbHelper = null;
         SQLiteDatabase db = null;
