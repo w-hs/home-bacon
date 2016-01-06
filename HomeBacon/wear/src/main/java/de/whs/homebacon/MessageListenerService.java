@@ -1,7 +1,10 @@
 package de.whs.homebacon;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.preference.PreferenceManager;
+import android.util.Base64;
 import android.util.Log;
 
 import com.google.android.gms.wearable.MessageEvent;
@@ -12,6 +15,7 @@ import java.util.List;
 import de.whs.homebaconcore.BeaconScan;
 import de.whs.homebaconcore.Constants;
 import de.whs.homebaconcore.DatabaseHelper;
+import de.whs.homebaconcore.EventType;
 import de.whs.homebaconcore.Note;
 import de.whs.homebaconcore.PhoneConnector;
 import de.whs.homebaconcore.PhoneListener;
@@ -159,13 +163,55 @@ public class MessageListenerService extends WearableListenerService implements P
         startIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startIntent.addFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
+        startIntent.putExtra(Constants.EVENT, Constants.CURRENT_ROOM);
+        startActivity(startIntent);
+    }
+
+    private void startActivityWithEventNotes(){
+        Intent startIntent = new Intent(this, MyDisplayActivity.class);
+        startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startIntent.putExtra(Constants.EVENT, Constants.ENTER_LEAVE);
         startActivity(startIntent);
     }
 
 
     @Override
     public void onChange(int oldRoomId, int newRoomId) {
+        DatabaseHelper mDbHelper = new DatabaseHelper(this);
+        SQLiteDatabase mDb = mDbHelper.getReadableDatabase();
+        try {
+            updateRoomPrefs(oldRoomId, newRoomId);
 
+            //basic notes
+            Intent intent = new Intent(Constants.HOME_BACON_ROOM_CHANGED);
+            intent.putExtra(Constants.EVENT, Constants.CURRENT_ROOM);
+            sendBroadcast(intent);
+
+            //Event notes
+            List<Note> eventNotes = mDbHelper.getAllNotes(mDb, oldRoomId, EventType.LEAVE.toString());
+            eventNotes.addAll(mDbHelper.getAllNotes(mDb, newRoomId, EventType.ENTER.toString()));
+            if (eventNotes.size() > 0){
+                startActivityWithEventNotes();
+            }
+        }
+        finally {
+            mDb.close();
+        }
+
+    }
+
+    private void updateRoomPrefs(int oldRoomId, int newRoomId) {
+       try{
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt(Constants.HOME_BACON_OLD_ROOM, oldRoomId);
+            editor.putInt(Constants.HOME_BACON_NEW_ROOM, newRoomId);
+            editor.commit();
+        }
+        catch (Exception ex) {
+            Log.e(Constants.DEBUG_TAG, "Could not save room change to preferences");
+            Log.e(Constants.DEBUG_TAG, ex.getMessage());
+        }
     }
 }
 
