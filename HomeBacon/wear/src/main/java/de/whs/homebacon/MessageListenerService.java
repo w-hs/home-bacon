@@ -39,6 +39,7 @@ public class MessageListenerService extends WearableListenerService implements P
         try {
             PredictionModel model = PredictionModel.loadFromPreferences(this);
             mRoomDetector = new RoomDetector(model);
+            mRoomDetector.register(this);
             mScanner = new Scanner();
             mScanner.register(mRoomDetector);
             mScanner.start();
@@ -154,7 +155,7 @@ public class MessageListenerService extends WearableListenerService implements P
         DatabaseHelper mDbHelper = new DatabaseHelper(this);
         SQLiteDatabase mDb = mDbHelper.getWritableDatabase();
 
-        mDbHelper.insertNote(mDb, note, 0); //TODO current room
+        mDbHelper.insertNote(mDb, note, Preferences.getCurrentRoom(this));
         mDb.close();
     }
 

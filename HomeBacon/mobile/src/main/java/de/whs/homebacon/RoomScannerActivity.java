@@ -91,14 +91,6 @@ public class RoomScannerActivity extends AppCompatActivity {
                             if (this.exception == null) {
                                 model.saveToPreferences(v.getContext());
                                 mWatchConnector.sendModel(model);
-
-                                // TODO: Wirkliche Messwerte mit dem Modell zur Vorhersage nutzen
-                                Log.e("HomeBeacon", "Accuracy = " + Float.toString(model.getAccuracy()));
-                                Map<String, BeaconScan> test = new HashMap<>();
-                                test.put("7C:2F:80:99:DE:CD", new BeaconScan(-98, 0));
-                                test.put("7C:2F:80:99:DE:25", new BeaconScan(-88, 0));
-                                test.put("7C:2F:80:99:DE:B1", new BeaconScan(-90, 0));
-                                model.predict(test);
                             }
                             else {
                                 Log.e("HomeBeacon", this.exception.getMessage());

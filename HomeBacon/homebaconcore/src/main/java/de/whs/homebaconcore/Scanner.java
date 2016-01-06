@@ -40,7 +40,6 @@ public class Scanner implements BeaconListener {
     public void stop() {
         mBeaconScanner.unregister(this);
         mTimer.cancel();
-        //mBeaconScanner.stopBeaconScan(); //TODO
     }
 
     public void register(ScanListener listener) {

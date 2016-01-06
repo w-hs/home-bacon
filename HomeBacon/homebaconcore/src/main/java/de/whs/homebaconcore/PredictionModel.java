@@ -29,6 +29,7 @@ import java.util.Map;
  * Vorhersage-Modell für Messwerte von Bluetooth-Tags.
  */
 public class PredictionModel implements Serializable {
+    private static final long serialVersionUID = 4520404624482712866L;
 
     private float accuracy;
     private float minRssi = -106.0f;

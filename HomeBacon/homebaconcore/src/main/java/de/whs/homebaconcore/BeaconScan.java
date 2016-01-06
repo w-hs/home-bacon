@@ -6,6 +6,8 @@ import java.io.Serializable;
  * Created by pausf on 25.11.2015.
  */
 public class BeaconScan implements Serializable {
+    private static final long serialVersionUID = 6054670842889923506L;
+
     private int rssi;
     private int roomId;
     private long timestamp;
