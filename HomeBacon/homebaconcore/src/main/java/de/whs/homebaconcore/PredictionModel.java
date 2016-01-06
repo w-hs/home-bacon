@@ -2,6 +2,7 @@ package de.whs.homebaconcore;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
 
@@ -776,7 +777,7 @@ public class PredictionModel implements Serializable {
 
     public static PredictionModel loadFromPreferences(Context context) {
         try {
-            SharedPreferences prefs = context.getSharedPreferences("ModelPrefs", Context.MODE_PRIVATE);
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             String modelBase64 = prefs.getString("Model", null);
 
             if (modelBase64 != null) {
@@ -788,13 +789,14 @@ public class PredictionModel implements Serializable {
         catch (Exception ex) {
             Log.e(Constants.DEBUG_TAG, "Could not load prediction model from preferences");
             Log.e(Constants.DEBUG_TAG, ex.getMessage());
+            ex.printStackTrace();
         }
         return null;
     }
 
     public void saveToPreferences(Context context) {
         try {
-            SharedPreferences prefs = context.getSharedPreferences("ModelPrefs", Context.MODE_PRIVATE);
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             SharedPreferences.Editor editor = prefs.edit();
             byte[] modelBytes = Serializer.serialize(this);
             String modelBase64 = Base64.encodeToString(modelBytes, Base64.DEFAULT);

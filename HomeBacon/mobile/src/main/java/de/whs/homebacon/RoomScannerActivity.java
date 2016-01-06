@@ -70,6 +70,8 @@ public class RoomScannerActivity extends AppCompatActivity {
             @Override
             public void onClick(final View v) {
                 List<String> scansCSV = getScans();
+                if (scansCSV.size() <= 1)
+                    return;
                 try {
                     new AsyncTask<List<String>, Void, PredictionModel>() {
                         private Exception exception;
