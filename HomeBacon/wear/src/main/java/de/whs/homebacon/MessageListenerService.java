@@ -28,11 +28,21 @@ public class MessageListenerService extends WearableListenerService implements P
     private RoomDetector mRoomDetector;
     private Scanner mScanner;
 
-    public MessageListenerService() {
-        PredictionModel model = PredictionModel.loadFromPreferences(getApplicationContext());
-        mRoomDetector = new RoomDetector(model);
-        mScanner = new Scanner();
-        mScanner.start();
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        try {
+            PredictionModel model = PredictionModel.loadFromPreferences(this);
+            mRoomDetector = new RoomDetector(model);
+            mScanner = new Scanner();
+            mScanner.register(mRoomDetector);
+            mScanner.start();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            throw ex;
+        }
     }
 
     @Override
@@ -63,6 +73,7 @@ public class MessageListenerService extends WearableListenerService implements P
         try{
             PredictionModel model = (PredictionModel) Serializer.deserialize(data);
             model.saveToPreferences(this.getApplicationContext());
+            mRoomDetector.setModel(model);
         }
         catch(Exception e){
             Log.e(Constants.DEBUG_TAG, "PredictionModel deserialization failed");

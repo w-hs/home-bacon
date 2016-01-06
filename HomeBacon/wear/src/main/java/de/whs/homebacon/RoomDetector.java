@@ -26,9 +26,13 @@ public class RoomDetector implements ScanListener {
         mModel = model;
     }
 
+    public void setModel(PredictionModel mModel) {
+        this.mModel = mModel;
+    }
+
     @Override
     public void onScan(Map<String, BeaconScan> scan) {
-        if (scan.isEmpty())
+        if (mModel == null || scan.isEmpty())
             return;
 
         Map<String, Float> predictions = mModel.predict(scan);
