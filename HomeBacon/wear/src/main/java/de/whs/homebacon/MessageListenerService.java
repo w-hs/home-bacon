@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
@@ -37,6 +38,7 @@ public class MessageListenerService extends WearableListenerService implements P
         super.onCreate();
 
         try {
+
             PredictionModel model = PredictionModel.loadFromPreferences(this);
             mRoomDetector = new RoomDetector(model);
             mRoomDetector.register(this);
@@ -178,6 +180,7 @@ public class MessageListenerService extends WearableListenerService implements P
 
     @Override
     public void onChange(int oldRoomId, int newRoomId) {
+        Toast.makeText(this,"Room changed from: " + oldRoomId + " to: " + newRoomId,Toast.LENGTH_LONG).show();
         DatabaseHelper mDbHelper = new DatabaseHelper(this);
         SQLiteDatabase mDb = mDbHelper.getReadableDatabase();
         try {
