@@ -11,15 +11,31 @@ import java.io.ObjectOutputStream;
 
 public class Serializer {
     public static byte[] serialize(Object obj) throws IOException {
-        ByteArrayOutputStream b = new ByteArrayOutputStream();
-        ObjectOutputStream o = new ObjectOutputStream(b);
-        o.writeObject(obj);
-        return b.toByteArray();
+        ByteArrayOutputStream b = null;
+        ObjectOutputStream o = null;
+                try {
+                    b= new ByteArrayOutputStream();
+                    o = new ObjectOutputStream(b);
+                    o.writeObject(obj);
+                    return b.toByteArray();
+                }
+                finally {
+                    if ( o != null) o.close();
+                    if (b != null) b.close();
+                }
     }
 
     public static Object deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
-        ByteArrayInputStream b = new ByteArrayInputStream(bytes);
-        ObjectInputStream o = new ObjectInputStream(b);
-        return o.readObject();
+        ByteArrayInputStream b = null;
+        ObjectInputStream o = null;
+        try {
+            b = new ByteArrayInputStream(bytes);
+            o = new ObjectInputStream(b);
+            return o.readObject();
+        }
+        finally {
+            if (o != null) o.close();
+            if (b != null) b.close();
+        }
     }
 }
