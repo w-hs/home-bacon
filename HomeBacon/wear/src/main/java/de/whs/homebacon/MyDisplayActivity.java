@@ -32,27 +32,33 @@ public class MyDisplayActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_display);
+        try{
+            setContentView(R.layout.activity_display);
 
-        //Start services
-        getApplication().startService(new Intent(getApplication(), MessageListenerService.class));
+            //Start services
+            getApplication().startService(new Intent(getApplication(), MessageListenerService.class));
 
-        //Create noteAdapter
-        mNotesAdapter = new NotesGridPagerAdapter(this, getFragmentManager());
-        mPager = (GridViewPager) findViewById(R.id.pager);
-        mPager.setAdapter(mNotesAdapter);
+            //Create noteAdapter
+            mNotesAdapter = new NotesGridPagerAdapter(this, getFragmentManager());
+            mPager = (GridViewPager) findViewById(R.id.pager);
+            mPager.setAdapter(mNotesAdapter);
 
-        String event = getIntent().getStringExtra(Constants.EVENT);
-        updateCards(event);
+            Intent intent = getIntent();
+            String event = intent.getStringExtra(Constants.EVENT);
+            updateCards(event);
 
-        //update notes in current room
-        registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String event = intent.getStringExtra(Constants.EVENT);
-                updateCards(event);
-            }
-        }, new IntentFilter(Constants.HOME_BACON_ROOM_CHANGED));
+            //update notes in current room
+            registerReceiver(new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    String event = intent.getStringExtra(Constants.EVENT);
+                    updateCards(event);
+                }
+            }, new IntentFilter(Constants.HOME_BACON_ROOM_CHANGED));
+        }
+        catch (Exception e){
+            Log.e(Constants.DEBUG_TAG, e.getMessage());
+        }
     }
 
     @Override
@@ -70,17 +76,19 @@ public class MyDisplayActivity extends Activity {
         try{
             List<Note> notes = new ArrayList<>();
             switch (event){
-                case Constants.CURRENT_ROOM:
-                    int roomId = getCurrentRoom();
-                    notes.addAll(mDbHelper.getAllNotes(mDb,roomId, EventType.NONE.toString()));
-                    break;
-
                 case Constants.ENTER_LEAVE:
                     int oldRoomId = getOldRoom();
                     int newRoomId = getCurrentRoom();
                     notes.addAll(mDbHelper.getAllNotes(mDb,oldRoomId, EventType.LEAVE.toString()));
                     notes.addAll(mDbHelper.getAllNotes(mDb, newRoomId, EventType.ENTER.toString()));
                     break;
+
+                default:
+                    //case Constants.CURRENT_ROOM:
+                    int roomId = getCurrentRoom();
+                    notes.addAll(mDbHelper.getAllNotes(mDb,roomId, EventType.NONE.toString()));
+                    break;
+
             }
 
             mNotesAdapter.clear();
