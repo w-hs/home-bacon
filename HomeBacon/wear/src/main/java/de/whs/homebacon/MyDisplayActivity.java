@@ -87,7 +87,7 @@ public class MyDisplayActivity extends Activity {
         //TODO test
         int oldRoomIdx = Preferences.getOldRoom(this);
         int newRoomIdx = Preferences.getCurrentRoom(this);
-        Toast.makeText(this, "Room changed from: " + oldRoomIdx + " to: " + newRoomIdx, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Room changed from: " + oldRoomIdx + " to: " + newRoomIdx, Toast.LENGTH_SHORT).show();
 
 
         try{

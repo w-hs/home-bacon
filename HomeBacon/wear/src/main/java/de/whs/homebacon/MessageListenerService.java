@@ -180,7 +180,6 @@ public class MessageListenerService extends WearableListenerService implements P
 
     @Override
     public void onChange(int oldRoomId, int newRoomId) {
-        //Toast.makeText(this,"Room changed from: " + oldRoomId + " to: " + newRoomId,Toast.LENGTH_LONG).show();
         DatabaseHelper mDbHelper = new DatabaseHelper(this);
         SQLiteDatabase mDb = mDbHelper.getReadableDatabase();
         try {
