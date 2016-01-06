@@ -241,8 +241,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         };
 
         String sortOrder = DatabaseHelper.COLUMN_NOTES_NAME_TIMESTAMP + " DESC";
-        String selection = DatabaseHelper.COLUMN_NOTES_NAME_ROOM_ID + " == " + roomId + " AND " +
-                DatabaseHelper.COLUMN_NOTES_NAME_EVENT + " == " + event;
+        String selection = DatabaseHelper.COLUMN_NOTES_NAME_ROOM_ID + " = " + roomId + " AND " +
+                DatabaseHelper.COLUMN_NOTES_NAME_EVENT + " = '" + event + "'";
 
         Cursor cursor = db.query(
                 DatabaseHelper.TABLE_NOTES_NAME,
