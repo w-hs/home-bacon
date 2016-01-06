@@ -145,7 +145,7 @@ public class MessageListenerService extends WearableListenerService implements P
 
     @Override
     public void onChange(int oldRoomId, int newRoomId) {
-        
+
     }
 }
 
