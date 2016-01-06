@@ -72,6 +72,7 @@ public class MyDisplayActivity extends Activity {
     private void updateCards(String event){
         DatabaseHelper mDbHelper = new DatabaseHelper(this);
         SQLiteDatabase mDb = mDbHelper.getReadableDatabase();
+        mDbHelper.onUpgrade(mDb, 1, 1);
 
         try{
             List<Note> notes = new ArrayList<>();
