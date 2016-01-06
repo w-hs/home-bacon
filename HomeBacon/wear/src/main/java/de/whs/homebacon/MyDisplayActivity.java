@@ -79,21 +79,21 @@ public class MyDisplayActivity extends Activity {
     private void updateCards(String event){
         DatabaseHelper mDbHelper = new DatabaseHelper(this);
         SQLiteDatabase mDb = mDbHelper.getReadableDatabase();
-        
+
         try{
             List<Note> notes = new ArrayList<>();
             switch (event){
                 case Constants.ENTER_LEAVE:
-                    int oldRoomId = getOldRoom();
-                    int newRoomId = getCurrentRoom();
+                    int oldRoomId = Preferences.getOldRoom(this);
+                    int newRoomId = Preferences.getCurrentRoom(this);
                     notes.addAll(mDbHelper.getAllNotes(mDb,oldRoomId, EventType.LEAVE.toString()));
                     notes.addAll(mDbHelper.getAllNotes(mDb, newRoomId, EventType.ENTER.toString()));
                     break;
 
                 default:
                     //case Constants.CURRENT_ROOM:
-                    int roomId = getCurrentRoom();
-                    notes.addAll(mDbHelper.getAllNotes(mDb,roomId, EventType.NONE.toString()));
+                    int roomId = Preferences.getCurrentRoom(this);
+                    notes.addAll(mDbHelper.getAllNotes(mDb, roomId, EventType.NONE.toString()));
                     break;
 
             }
@@ -104,31 +104,5 @@ public class MyDisplayActivity extends Activity {
         finally {
             mDb.close();
         }
-    }
-
-    private int getOldRoom() {
-        try {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
-            int oldRoomId = prefs.getInt(Constants.HOME_BACON_OLD_ROOM, -1);
-            return oldRoomId;
-        }
-        catch (Exception ex) {
-            Log.e(Constants.DEBUG_TAG, "Could not load old room id from preferences");
-            Log.e(Constants.DEBUG_TAG, ex.getMessage());
-        }
-        return -1;
-    }
-
-    private int getCurrentRoom() {
-        try {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
-            int oldRoomId = prefs.getInt(Constants.HOME_BACON_NEW_ROOM, -1);
-            return oldRoomId;
-        }
-        catch (Exception ex) {
-            Log.e(Constants.DEBUG_TAG, "Could not load new / current room id from preferences");
-            Log.e(Constants.DEBUG_TAG, ex.getMessage());
-        }
-        return -1;
     }
 }
