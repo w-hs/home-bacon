@@ -26,7 +26,7 @@ public class MyDisplayActivity extends Activity {
 
     private GridViewPager mPager;
     private NotesGridPagerAdapter mNotesAdapter;
-
+    private BroadcastReceiver mBroadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,17 +48,24 @@ public class MyDisplayActivity extends Activity {
             updateCards(event);
 
             //update notes in current room
-            registerReceiver(new BroadcastReceiver() {
+            mBroadcastReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     String event = intent.getStringExtra(Constants.EVENT);
                     updateCards(event);
                 }
-            }, new IntentFilter(Constants.HOME_BACON_ROOM_CHANGED));
+            };
+            registerReceiver(mBroadcastReceiver, new IntentFilter(Constants.HOME_BACON_ROOM_CHANGED));
         }
         catch (Exception e){
             Log.e(Constants.DEBUG_TAG, e.getMessage());
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mBroadcastReceiver);
     }
 
     @Override
