@@ -6,14 +6,13 @@ import java.io.Serializable;
  * Created by pausf on 25.11.2015.
  */
 public class BeaconScan implements Serializable {
-    private int roomId;
     private int rssi;
+    private int roomId;
     private long timestamp;
     private String address;
     private long scanId;
 
-    public BeaconScan(int roomId, int rssi, long timestamp) {
-        this.roomId = roomId;
+    public BeaconScan(int rssi, long timestamp) {
         this.rssi = rssi;
         this.timestamp = timestamp;
     }

@@ -21,11 +21,9 @@ public class Scanner implements BeaconListener {
     private ConcurrentMap<String, BeaconScan> scans = new ConcurrentHashMap<>();
     private BeaconScanner mBeaconScanner;
     private Timer mTimer = new Timer();
-    private int mRoomId;
     private List<ScanListener> mListeners = new ArrayList<>();
 
-    public Scanner(int roomId) {
-        mRoomId = roomId;
+    public Scanner() {
     }
 
     public void start() {
@@ -58,7 +56,7 @@ public class Scanner implements BeaconListener {
         long timestamp = System.currentTimeMillis();
         BeaconScan scan = scans.get(device.getAddress());
         if (scan == null) {
-            scans.put(device.getAddress(), new BeaconScan(mRoomId, rssi, timestamp));
+            scans.put(device.getAddress(), new BeaconScan(rssi, timestamp));
         }
         else {
             scan.setRssi(rssi);

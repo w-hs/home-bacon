@@ -2,25 +2,11 @@ package de.whs.homebacon;
 
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Handler;
 import android.util.Log;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.data.FreezableUtils;
-import com.google.android.gms.wearable.DataEvent;
-import com.google.android.gms.wearable.DataEventBuffer;
-import com.google.android.gms.wearable.DataItem;
-import com.google.android.gms.wearable.DataItemBuffer;
-import com.google.android.gms.wearable.DataMap;
-import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageEvent;
-import com.google.android.gms.wearable.Node;
-import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.whs.homebaconcore.BeaconScan;
@@ -30,14 +16,24 @@ import de.whs.homebaconcore.Note;
 import de.whs.homebaconcore.PhoneConnector;
 import de.whs.homebaconcore.PhoneListener;
 import de.whs.homebaconcore.PredictionModel;
+import de.whs.homebaconcore.Scanner;
 import de.whs.homebaconcore.Serializer;
 
 /**
  * Created by Dennis on 01.12.2015.
  */
-public class MessageListenerService extends WearableListenerService implements PhoneListener{
+public class MessageListenerService extends WearableListenerService implements PhoneListener, RoomChangeListener{
 
-    private RoomScanner mRoomScanner ;
+    private ScanSaver mRoomScanner;
+    private RoomDetector mRoomDetector;
+    private Scanner mScanner;
+
+    public MessageListenerService() {
+        PredictionModel model = PredictionModel.loadFromPreferences(getApplicationContext());
+        mRoomDetector = new RoomDetector(model);
+        mScanner = new Scanner();
+        mScanner.start();
+    }
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
@@ -96,8 +92,9 @@ public class MessageListenerService extends WearableListenerService implements P
 
         try {
             int roomId = (int)(long) Serializer.deserialize(roomIdData);
-            mRoomScanner = new RoomScanner(this,roomId);
+            mRoomScanner = new ScanSaver(this, roomId);
             mRoomScanner.startBeaconScan();
+            mScanner.register(mRoomScanner);
             Log.d(Constants.DEBUG_TAG, "Start scan for roomId: " + roomId);
         }
         catch (Exception e){
@@ -110,8 +107,8 @@ public class MessageListenerService extends WearableListenerService implements P
     public void onStopScan() {
         Log.d(Constants.DEBUG_TAG, "Stop scan command received");
 
-        if (mRoomScanner != null)
-            mRoomScanner.stopBeaconScan();
+        mRoomScanner.stopBeaconScan();
+        mScanner.unregister(mRoomScanner);
         Log.d(Constants.DEBUG_TAG, "Scan stopped");
 
         DatabaseHelper mDbHelper = new DatabaseHelper(this);
@@ -146,6 +143,10 @@ public class MessageListenerService extends WearableListenerService implements P
     }
 
 
+    @Override
+    public void onChange(int oldRoomId, int newRoomId) {
+        
+    }
 }
 
 

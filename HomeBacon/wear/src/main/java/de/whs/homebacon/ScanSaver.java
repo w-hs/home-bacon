@@ -16,14 +16,13 @@ import de.whs.homebaconcore.Scanner;
  *
  * Speichert Messwerte für einen bestimmten Raum in der Datenbank.
  */
-public class RoomScanner implements ScanListener {
-    private Scanner mScanner;
+public class ScanSaver implements ScanListener {
     private Context mContext;
     private int mRoomId;
     private DatabaseHelper mDbHelper;
     private SQLiteDatabase mDb;
 
-    public RoomScanner (Context context, int roomId){
+    public ScanSaver(Context context, int roomId){
         mContext = context;
         mRoomId  = roomId;
     }
@@ -31,16 +30,9 @@ public class RoomScanner implements ScanListener {
     public void startBeaconScan() {
         mDbHelper = new DatabaseHelper(mContext);
         mDb = mDbHelper.getWritableDatabase();
-
-        mScanner = new Scanner(mRoomId);
-        mScanner.register(this);
-        mScanner.start();
     }
 
     public void stopBeaconScan() {
-        mScanner.unregister(this);
-        mScanner.stop();
-
         mDb.close();
         mDbHelper.close();
     }
