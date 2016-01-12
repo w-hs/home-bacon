@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.wearable.view.GridViewPager;
 import android.util.Base64;
@@ -87,8 +88,12 @@ public class MyDisplayActivity extends Activity {
         //TODO test
         int oldRoomIdx = Preferences.getOldRoom(this);
         int newRoomIdx = Preferences.getCurrentRoom(this);
-        Toast.makeText(this, "Room changed from: " + oldRoomIdx + " to: " + newRoomIdx, Toast.LENGTH_SHORT).show();
-
+        //Toast.makeText(this, "Room changed from: " + oldRoomIdx + " to: " + newRoomIdx, Toast.LENGTH_SHORT).show();
+        Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        long[] vibrationPattern = {0, 500, 50, 300};
+        //-1 - don't repeat
+        final int indexInPatternToRepeat = 3;
+        vibrator.vibrate(vibrationPattern, indexInPatternToRepeat);
 
         try{
             List<Note> notes = new ArrayList<>();
