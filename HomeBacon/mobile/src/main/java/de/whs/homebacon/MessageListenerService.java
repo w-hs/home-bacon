@@ -2,6 +2,7 @@ package de.whs.homebacon;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
@@ -40,6 +41,7 @@ public class MessageListenerService extends WearableListenerService implements W
             List<BeaconScan> scanResults = (List<BeaconScan>) Serializer.deserialize(scanResultData);
             Log.d(Constants.DEBUG_TAG, scanResults.size() + " scans received");
             saveScansInDb(scanResults);
+            Toast.makeText(this, "Scan results received", Toast.LENGTH_SHORT).show();
         }
         catch(Exception e){
             Log.e(Constants.DEBUG_TAG, "Note deserialization failed");
