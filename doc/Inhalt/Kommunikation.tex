@@ -1,1 +1,26 @@
-\section{Kommunikation mit der Smartwatch}
+\section{Kommunikation}
+Wie im Kapitel \ref{sec:architektur} beschrieben, besteht unsere Anwendung aus drei Komponenten, die untereinander kommunizieren müssen. Das Smartphone spricht auf der einen Seite mit dem Web-Service zur Berechnung des Models, auf dem die Lokalisierung beruht. Auf der anderen Seite sendet es Daten, wie z.B. eine Notiz, und Steuerbefehle an die Smartwatch, um z.B. Bluetooth-Scans zu starten oder zu stoppen. Umgekehrt sendet die Smartwatch Daten an das Smartphone, z.B. die Ergebnisse eines Scans. Die verschiedenen Kommunikationswege und ihre Nutzung werden im Folgenden näher beschrieben.
+
+\subsection{Zwischen Smartphone und Web-Service}
+@Fabian
+-via http
+-serialisierte Scanergebnisse (aufgeteilt in Blöcke?)
+
+
+\subsection{Zwischen Smartphone und Smartwatch}
+Die Kommunikation zwischen dem Smartphone und der Smartwatch muss bidirektional sein, um die benötigten Funktionalitäten erfüllen zu können. Die folgenden Schnittstellendefinitionen beschreiben diese.
+
+XXX Interfaces Abbildungen XXX
+
+
+- GoogleAPI
+	- DataItems getestet -> Synchronisiert  unplanbar
+	- Messages mit serialisierten Daten im Byte[]
+
+-Beispiel messen
+
+\subsection{Zwischen Service und Activity}
+-Service muss Infos weiterreichen
+-Service muss Activity starten
+-Beispiel Note
+
