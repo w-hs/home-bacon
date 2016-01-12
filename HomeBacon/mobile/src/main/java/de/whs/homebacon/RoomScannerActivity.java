@@ -171,6 +171,8 @@ public class RoomScannerActivity extends AppCompatActivity {
                 }
                 else {
                     mTimer.cancel();
+                    mTimer.purge();
+                    initializeTimer();
                     mWatchConnector.stopScan();
                 }
             }
