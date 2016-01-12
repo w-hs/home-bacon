@@ -12,28 +12,58 @@ beschränken wir die Genauigkeit der Positionsbestimmung auf
 Raumebene.
 
 Im Folgenden wird beschrieben, wie wir die Messung der Beacons
-durchgeführt haben. 
-
-\subsection{Idee}
-
-Wie wollen wir die Raumlösung umsetzen?
-- Verwendung von stationären Beacons
-- Vermessen von Räumen
-- Keine Information über Räume (Karten)
-- Keine Information, wo sich die Beacons befinden
+durchgeführt haben. Auf Basis der ersten Messwerte analysieren
+wir, ob diese Informationen ausreichen, um eine Raumzuordnung
+zu ermöglichen. Nachdem die Machbarkeit nachgewiesen wurde,
+entwickeln wir einen Lösungsansatz für das Problem.
+Abschließend stellen wir unsere konkrete Implementierung vor.
 
 \subsection{Messung}
 
-Was ist eine Messung?
-- Vektor von (normalisierten) RSSI-Werten
-Wie haben wir die Messung durchgeführt?
-- RSSI-Werte von Beacons gemessen
-- Problem 1: Werte kommen ca. jede Sekunde aber zu unterschiedlichen Zeitpunkten
-  Was bedeutet gleichzeitige Messung von mehreren Beacons?
-- Problem 2: Was tun, wenn ein Beacon nur kurz nicht gemessen wurde und deshalb
-  in der letzten Sekunde nicht gemessen wurde?
-- Lösung: Modell zur Messung mehrere Beacons und Definition des Begriffs der
-  pseudogleichzeitigen Messung.
+Eine \textbf{Einzelmessung} bezieht sich auf die Signalstärke eines Beacons.
+Die Signalstärke wird in der Einheit RSSI (Received Signal Strength Indication)
+gemessen. Da diese von der Implementierung des Empfängers abhängig ist,
+normalisieren wir die Werte auf das Intervall $[0, 1] \subset \mathbb{R}$, wobei
+$0$ kein Signal und $1$ maximale Signalstärke bedeutet.
+
+Unter einer \textbf{Messung} verstehen wir einen Vektor von Einzelmessungen,
+welche gleichzeitig aufgenommen wurden.
+
+In der Realität ergeben sich zwei Probleme, bei der Messung nach obigem
+Schema:
+\begin{enumerate}
+	\item Einzelmessungen werden vom Bluetooth-Empfänger der betrachteten
+	  Geräte ca. jede Sekunde durchgeführt. Dabei kommen Einzelmessungen nicht
+	  gleichzeitig für alle Beacons in Reichweite an, sondern verteilt über
+	  den Zeitraum von einer Sekunde. Es stellt sich also die Frage, was
+	  gleichzeitig, bei der Definition einer Messung bedeutet.
+	\item Es kann vorkommen, dass ein Beacon in Reichweite ist, aber in der
+	  letzten Sekunde nicht wahrgenommen wurde. Das würde bedeuten, dass ein
+	  einziger Aussetzer den Beacon als nicht erreichbar in der Einzelmessung
+	  darstellt.
+\end{enumerate}
+
+Um beide Probleme zu lösen, führen den Begriff der \textbf{Pseudogleichzeitigkeit} ein.
+Einzelmessungen sind pseudogleichzeitig erfolgt, wenn diese nicht länger als 
+$t_g$ zurückliegen. Dabei wird $t_g > t_m$ gewählt, um einzelne Aussetzer von Beacons
+auszugleichen.
+
+\begin{figure}[tbh]
+\centering
+\includegraphics[width=1.0\linewidth]{Bilder/Lok-Messung}
+\caption{Pseudogleichzeitigkeit bei Messungen}
+\label{fig:Lok-Messung}
+\end{figure}
+
+Abbildung \ref{fig:Lok-Messung} zeigt ein Zeitintervall für drei Messungen. Die
+Punkte auf dem Zeitstrahl deuten eine Einzelmessung für ein bestimmtes Beacon
+an.
+Man sieht, dass in der zweiten Messung kein Signal für Beacon B empfangen wurde.
+Da jedoch die letzte Messung dieses Beacon weniger als $t_g$ zurückliegt, tragen
+wir in der Messung den Wert aus der letzten Messung ein.
+In unserem Projekt haben wir $t_g = 2 \cdot t_m$ gewählt, so dass ein nicht mehr
+erreichbarer Beacon spätestens nach zwei Messintervallen als nicht vorhanden
+erkannt wird.
 
 \subsection{Machbarkeitsanalyse}
 
