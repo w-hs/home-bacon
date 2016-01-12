@@ -1,5 +1,57 @@
 \section{Raumerkennung}
 
+\subsection{Idee}
+
+Wie wollen wir die Raumlösung umsetzen?
+- Verwendung von stationären Beacons
+- Vermessen von Räumen
+- Keine Information über Räume (Karten)
+- Keine Information, wo sich die Beacons befinden
+
+\subsection{Messung}
+
+Was ist eine Messung?
+- Vektor von (normalisierten) RSSI-Werten
+Wie haben wir die Messung durchgeführt?
+- RSSI-Werte von Beacons gemessen
+- Problem 1: Werte kommen ca. jede Sekunde aber zu unterschiedlichen Zeitpunkten
+  Was bedeutet gleichzeitige Messung von mehreren Beacons?
+- Problem 2: Was tun, wenn ein Beacon nur kurz nicht gemessen wurde und deshalb
+  in der letzten Sekunde nicht gemessen wurde?
+- Lösung: Modell zur Messung mehrere Beacons und Definition des Begriffs der
+  pseudogleichzeitigen Messung.
+
+\subsection{Machbarkeitsanalyse}
+
+Analyse: Ist es überhaupt möglich Räume anhand von Messwerten zu unterscheiden?
+Erste Messung:
+- Messungen in Form von Mittelwert + Stddev vorstellen
+- Messungen in Grafikform vorstellen
+- Ergebnis: Räume sind unterscheidbar
+
+\subsection{Lösungsansatz}
+
+Gezeigt: Es ist machbar. Jetzt klären wie?
+Zwei Probleme:
+- Problem 1: Um eine Messung einem Raum zuzuordnen, brauchen wir ein Vorhersagemodell,
+  das aus dem Messvektor den wahrscheinlichsten Raum berechnet.
+- Problem 2: Eine Messung allein reicht nicht aus, um eine korrekte Aussage über
+  den aktuellen Raum zu machen. Wir brauchen zusätzlich ein Zuordnungsmodell,
+  das aus mehreren aufeinanderfolgenden Vorhersagen den aktuellen Raum sicher
+  bestimmt.
+  
+\subsection{Implementierung}
+
+Vorhersagemodell:
+- Webservice in Python
+- Verwendung von TensorFlow
+- Machine-Learning für Bestimmen der Parameter
+Zuordnungsmodell:
+- Mehrfache Messung + Vorhersage
+- LimitedQueue mit alten Vorhersagen
+- Mehrheit in dieser Queue bestimmt, welcher Raum zugeordnet wird
+- Effekt: Hysterese
+
 \subsection{Erstes Szenario}
 
 Da uns zu Beginn des Projekts nur zwei G-Tags zur Verfügung standen, betrachten
