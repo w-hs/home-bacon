@@ -1,5 +1,19 @@
 \section{Raumerkennung}
 
+Die Raumerkennung ist der wichtigste Aspekt unserer Anwendung.
+Die zugrundeliegende Idee ist, dass stationäre Beacons in den
+relevanten Räumen platziert werden. Anschließend werden diese
+Räume einmalig vermessen, um ein Modell zur Erkennung der
+Räume zu erstellen.
+Dabei ist zu beachten, dass wir im Gegensatz zu anderen Projekten
+im Bereich In-Door-Lokalisation keine Informationen über die
+Räume oder die Position der Beacons besitzen. Aus diesem Grund
+beschränken wir die Genauigkeit der Positionsbestimmung auf
+Raumebene.
+
+Im Folgenden wird beschrieben, wie wir die Messung der Beacons
+durchgeführt haben. 
+
 \subsection{Idee}
 
 Wie wollen wir die Raumlösung umsetzen?
