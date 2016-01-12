@@ -90,9 +90,9 @@ public class MyDisplayActivity extends Activity {
         int newRoomIdx = Preferences.getCurrentRoom(this);
         //Toast.makeText(this, "Room changed from: " + oldRoomIdx + " to: " + newRoomIdx, Toast.LENGTH_SHORT).show();
         Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        long[] vibrationPattern = {0, 500, 50, 300};
+        long[] vibrationPattern = {0, 200, 500,200,500,200,500};
         //-1 - don't repeat
-        final int indexInPatternToRepeat = 3;
+        final int indexInPatternToRepeat = -1;
         vibrator.vibrate(vibrationPattern, indexInPatternToRepeat);
 
         try{
