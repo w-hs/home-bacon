@@ -72,6 +72,22 @@ public class MessageListenerService extends WearableListenerService implements P
             case Constants.HOME_BACON_SEND_MODEL:
                 onSendModel(messageEvent.getData());
                 break;
+
+            case  Constants.HOME_BACON_CLEAR_MODEL:
+                onClearModel();
+                break;
+        }
+    }
+
+    private void onClearModel() {
+        try{
+            PredictionModel model = null;
+            //model.saveToPreferences(this.getApplicationContext());
+            mRoomDetector.setModel(model);
+        }
+        catch(Exception e){
+            Log.e(Constants.DEBUG_TAG, "PredictionModel deserialization failed");
+            Log.e(Constants.DEBUG_TAG, e.getMessage());
         }
     }
 

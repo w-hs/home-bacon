@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
                 note.setTitle(noteTitleEditText.getText().toString());
                 note.setText(noteTextEditText.getText().toString());
 
-                switch (spinner.getSelectedItemPosition()){
+                switch (spinner.getSelectedItemPosition()) {
                     case 0:
                         note.setEventType(EventType.NONE);
                         break;
@@ -58,9 +58,24 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 watchConnector.sendNote(note);
+                clearFields();
             }
         });
 
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.eventTypes, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+    }
+
+    private void clearFields() {
+        EditText noteTitleEditText = (EditText) findViewById(R.id.notizTitel);
+        EditText noteTextEditText = (EditText)findViewById(R.id.notizText);
+        Spinner spinner = (Spinner) findViewById(R.id.eventSpinner);
+
+        noteTextEditText.setText("");
+        noteTitleEditText.setText("");
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.eventTypes, android.R.layout.simple_spinner_item);

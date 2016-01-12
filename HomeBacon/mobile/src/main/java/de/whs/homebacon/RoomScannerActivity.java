@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.io.File;
@@ -27,14 +28,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import de.whs.homebaconcore.BeaconScan;
-import de.whs.homebaconcore.Constants;
 import de.whs.homebaconcore.DatabaseHelper;
 import de.whs.homebaconcore.PredictionModel;
 import de.whs.homebaconcore.Room;
@@ -75,12 +73,12 @@ public class RoomScannerActivity extends AppCompatActivity {
 
     private void initializeTimer() {
         mTask = new TimerTask() {
-            private int time = 0;
+            private int time = 1;
             @Override
             public void run() {
                 handler.post(new Runnable() {
                     public void run() {
-                        String result = String.format("%02d:%02d", time / 100, time % 100);
+                        String result = String.format("%02d:%02d", time / 60, time % 60);
                         mProbView.setText(result);
                         time++;
                     }
@@ -146,6 +144,8 @@ public class RoomScannerActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mDbHelper.deleteScannedTagsAndScans(mDb, getSelectedRoom().getId());
+                mWatchConnector.clearModel();
+                Toast.makeText(getApplicationContext(), "room " + getSelectedRoom().getId() + " scans successfully deleted", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -166,11 +166,13 @@ public class RoomScannerActivity extends AppCompatActivity {
         scanToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    mTimer.schedule(mTask, 1000);
+                    mTimer.schedule(mTask,1000, 1000);
                     mWatchConnector.startScan(getSelectedRoom().getId());
                 }
                 else {
                     mTimer.cancel();
+                    mTimer.purge();
+                    initializeTimer();
                     mWatchConnector.stopScan();
                 }
             }

@@ -9,4 +9,5 @@ public interface WatchConnector {
     void startScan(long roomId);
     void stopScan();
     void sendModel(PredictionModel model);
+    void clearModel();
 }
