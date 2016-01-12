@@ -73,12 +73,12 @@ public class RoomScannerActivity extends AppCompatActivity {
 
     private void initializeTimer() {
         mTask = new TimerTask() {
-            private int time = 0;
+            private int time = 1;
             @Override
             public void run() {
                 handler.post(new Runnable() {
                     public void run() {
-                        String result = String.format("%02d:%02d", time / 100, time % 100);
+                        String result = String.format("%02d:%02d", time / 60, time % 60);
                         mProbView.setText(result);
                         time++;
                     }
@@ -166,7 +166,7 @@ public class RoomScannerActivity extends AppCompatActivity {
         scanToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    mTimer.schedule(mTask, 1000);
+                    mTimer.schedule(mTask,1000, 1000);
                     mWatchConnector.startScan(getSelectedRoom().getId());
                 }
                 else {

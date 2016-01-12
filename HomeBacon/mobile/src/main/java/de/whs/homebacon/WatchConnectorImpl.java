@@ -199,7 +199,7 @@ public class WatchConnectorImpl implements WatchConnector{
                                                 Log.d(Constants.DEBUG_TAG, "model sent successfully");
                                             }
                                         }
-                                        
+
 
                                     });
                         }
