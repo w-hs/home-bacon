@@ -13,14 +13,12 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import de.whs.homebaconcore.EventType;
-import de.whs.homebaconcore.NavigationService;
 import de.whs.homebaconcore.Note;
 import de.whs.homebaconcore.WatchConnector;
 
 public class MainActivity extends AppCompatActivity {
 
     private WatchConnector watchConnector;
-    private NavigationService mNavService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

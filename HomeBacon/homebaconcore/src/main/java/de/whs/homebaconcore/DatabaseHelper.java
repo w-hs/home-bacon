@@ -228,6 +228,52 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return notes;
     }
 
+    public List<Note> getAllNotes(SQLiteDatabase db, long roomId, String event){
+        List<Note> notes = new ArrayList<>();
+
+        String[] projection = {
+                DatabaseHelper.COLUMN_NOTES_NAME_NOTE_ID,
+                DatabaseHelper.COLUMN_NOTES_NAME_TITLE,
+                DatabaseHelper.COLUMN_NOTES_NAME_TEXT,
+                DatabaseHelper.COLUMN_NOTES_NAME_TIMESTAMP,
+                DatabaseHelper.COLUMN_NOTES_NAME_EVENT,
+                DatabaseHelper.COLUMN_NOTES_NAME_ROOM_ID
+        };
+
+        String sortOrder = DatabaseHelper.COLUMN_NOTES_NAME_TIMESTAMP + " DESC";
+        String selection = DatabaseHelper.COLUMN_NOTES_NAME_ROOM_ID + " = " + roomId + " AND " +
+                DatabaseHelper.COLUMN_NOTES_NAME_EVENT + " = '" + event + "'";
+
+        Cursor cursor = db.query(
+                DatabaseHelper.TABLE_NOTES_NAME,
+                projection,
+                selection,
+                null,
+                null,
+                null,
+                sortOrder
+        );
+
+        if (cursor.moveToFirst()) {
+
+            while (!cursor.isAfterLast()) {
+                int noteID = cursor.getInt(0);
+                String title = cursor.getString(1);
+                String text = cursor.getString(2);
+                long timestamp = cursor.getLong(3);
+                EventType eventType = EventType.valueOf(cursor.getString(4));
+
+                notes.add(new Note(noteID, title, text, eventType, timestamp));
+
+                cursor.moveToNext();
+            }
+        }
+
+        cursor.close();
+
+        return notes;
+    }
+
 
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_NOTES);

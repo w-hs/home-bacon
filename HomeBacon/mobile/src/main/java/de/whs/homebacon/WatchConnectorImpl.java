@@ -122,7 +122,8 @@ public class WatchConnectorImpl implements WatchConnector{
                     }
                 }
                 catch (Exception e){
-
+                    Log.e(Constants.DEBUG_TAG, "Error while sending start scan command");
+                    e.printStackTrace();
                 }
                 finally {
                     mGoogleApiClient.disconnect();
@@ -162,7 +163,8 @@ public class WatchConnectorImpl implements WatchConnector{
                     }
                 }
                 catch (Exception e){
-
+                    Log.e(Constants.DEBUG_TAG, "Error while sending stop scan command");
+                    e.printStackTrace();
                 }
                 finally {
                     mGoogleApiClient.disconnect();
@@ -190,10 +192,10 @@ public class WatchConnectorImpl implements WatchConnector{
                                         public void onResult(Result result) {
                                             if (!result.getStatus().isSuccess()) {
                                                 // Failed to send message
-                                                Toast("Failed to stop scan", Toast.LENGTH_LONG);
+                                                Toast("Failed to send model", Toast.LENGTH_LONG);
                                                 Log.e(Constants.DEBUG_TAG, "Stop scan failed");
                                             } else
-                                                Toast("Scan stopped successfully", Toast.LENGTH_SHORT);
+                                                Toast("Model sent successfully", Toast.LENGTH_SHORT);
                                             Log.d(Constants.DEBUG_TAG, "scan stopped successfully");
                                         }
                                     });
