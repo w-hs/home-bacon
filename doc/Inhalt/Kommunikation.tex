@@ -13,12 +13,18 @@ TODO: Beispiel für CSV \\
 TODO: Beispiel für Modell
 
 
-\subsubsection{Probleme}
-Übertragung als UTF-8 in Android problematisch.
-Nur bis 64kB möglich.
-Siehe DataOutputStream: \url{https://developer.android.com/reference/java/io/DataOutputStream.html}
-TODO: Ausformulieren
-
+\subsubsection{UTF-8}
+Bei der Übertragung der UTF-8 Daten aus Android heraus gab es unerwartete Probleme.
+Die ersten Tests waren erfolgreich, bis wir ein größeres Datenvolumen erreicht haben.
+Da der Web-Service UTF-8 kodierte Daten erwartet, haben wir die Methode \texttt{writeUTF}
+der Klasse \texttt{DataOutputStream}
+\footnote{\url{https://developer.android.com/reference/java/io/DataOutputStream.html}} 
+verwendet. Diese Methode hat allerdings ein Beschränkung auf 64 KB an kodierten Daten.
+Also haben wir versucht die Daten in Blöcken von maximal 64 KB zu übertragen. Allerdings
+fügt die Methode bei jedem Aufruf einen BOM (Byte-Order-Marker) ein, was dazu führt,
+dass die gesendeten Daten kein korrektes UTF-8 mehr enthalten.
+Um das Problem zu lösen, mussten wir die UTF-8-Konvertierung selbst durchführen
+und Bytes über den Stream senden.
 
 \subsection{Zwischen Smartphone und Smartwatch}
 Die Kommunikation zwischen dem Smartphone und der Smartwatch muss bidirektional sein, um die benötigten Funktionalitäten erfüllen zu können. Die folgenden Schnittstellendefinitionen beschreiben diese.
