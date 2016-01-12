@@ -2,9 +2,22 @@
 Wie im Kapitel \ref{sec:architektur} beschrieben, besteht unsere Anwendung aus drei Komponenten, die untereinander kommunizieren müssen. Das Smartphone spricht auf der einen Seite mit dem Web-Service zur Berechnung des Models, auf dem die Lokalisierung beruht. Auf der anderen Seite sendet es Daten, wie z.B. eine Notiz, und Steuerbefehle an die Smartwatch, um z.B. Bluetooth-Scans zu starten oder zu stoppen. Umgekehrt sendet die Smartwatch Daten an das Smartphone, z.B. die Ergebnisse eines Scans. Die verschiedenen Kommunikationswege und ihre Nutzung werden im Folgenden näher beschrieben.
 
 \subsection{Zwischen Smartphone und Web-Service}
-@Fabian
--via http
--serialisierte Scanergebnisse (aufgeteilt in Blöcke?)
+
+Zur Kommunikation mit dem Web-Service wird eine einfache HTTP-Schnittstelle verwendet.
+Der Web-Service erstellt aus den Messungen ein Modell zur Raumerkennung. Dazu
+werden die Messungen im CSV-Format gesendet. Das Modell wird als JSON-Objekt
+übertragen.
+
+\subsubsection{Datenformate}
+TODO: Beispiel für CSV \\
+TODO: Beispiel für Modell
+
+
+\subsubsection{Probleme}
+Übertragung als UTF-8 in Android problematisch.
+Nur bis 64kB möglich.
+Siehe DataOutputStream: \url{https://developer.android.com/reference/java/io/DataOutputStream.html}
+TODO: Ausformulieren
 
 
 \subsection{Zwischen Smartphone und Smartwatch}
