@@ -24,4 +24,5 @@ public class Constants {
     public static final String HOME_BACON_ROOM_CHANGED = "HOME_BACON_ROOM_CHANGED";
     public static final String HOME_BACON_OLD_ROOM = "HOME_BACON_OLD_ROOM";
     public static final String HOME_BACON_NEW_ROOM = "HOME_BACON_NEW_ROOM";
+    public static final String HOME_BACON_CLEAR_MODEL ="HOME_BACON_CLEAR_MODEL" ;
 }

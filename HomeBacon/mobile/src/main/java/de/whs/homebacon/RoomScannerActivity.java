@@ -1,11 +1,13 @@
 package de.whs.homebacon;
 
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,6 +18,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.io.File;
@@ -25,12 +28,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.whs.homebaconcore.BeaconScan;
-import de.whs.homebaconcore.Constants;
 import de.whs.homebaconcore.DatabaseHelper;
 import de.whs.homebaconcore.PredictionModel;
 import de.whs.homebaconcore.Room;
@@ -45,23 +47,45 @@ public class RoomScannerActivity extends AppCompatActivity {
     private WatchConnector mWatchConnector;
     private PredictionModel mModel;
 
+    private Handler handler = new Handler();
+    TimerTask mTask;
+    Timer mTimer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_room_scanner);
         mModel = PredictionModel.loadFromPreferences(this);
-
+        mProbView = (TextView) findViewById(R.id.probabilityText);
         mWatchConnector = new WatchConnectorImpl(this);
         mDbHelper = new DatabaseHelper(getApplicationContext());
         mDb = mDbHelper.getWritableDatabase();
 
+        initializeTimer();
         initializeBackToHomeToolbar();
         initializeRoomsSpinner();
         initializeScanToggleButton();
         initializeDeleteButton();
         initializeCalculateButton();
 
-        mProbView = (TextView) findViewById(R.id.probabilityText);
+
+    }
+
+    private void initializeTimer() {
+        mTask = new TimerTask() {
+            private int time = 1;
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {
+                        String result = String.format("%02d:%02d", time / 60, time % 60);
+                        mProbView.setText(result);
+                        time++;
+                    }
+                });
+            }
+        };
+        mTimer = new Timer();
     }
 
     private void initializeCalculateButton() {
@@ -120,6 +144,8 @@ public class RoomScannerActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mDbHelper.deleteScannedTagsAndScans(mDb, getSelectedRoom().getId());
+                mWatchConnector.clearModel();
+                Toast.makeText(getApplicationContext(), "room " + getSelectedRoom().getId() + " scans successfully deleted", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -139,10 +165,14 @@ public class RoomScannerActivity extends AppCompatActivity {
         ToggleButton scanToggleButton = (ToggleButton) findViewById(R.id.scanToggleButton);
         scanToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked)
+                if (isChecked) {
+                    mTimer.schedule(mTask,1000, 1000);
                     mWatchConnector.startScan(getSelectedRoom().getId());
-                else
+                }
+                else {
+                    mTimer.cancel();
                     mWatchConnector.stopScan();
+                }
             }
         });
     }
