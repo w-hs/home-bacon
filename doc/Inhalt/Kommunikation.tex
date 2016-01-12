@@ -2,10 +2,29 @@
 Wie im Kapitel \ref{sec:architektur} beschrieben, besteht unsere Anwendung aus drei Komponenten, die untereinander kommunizieren müssen. Das Smartphone spricht auf der einen Seite mit dem Web-Service zur Berechnung des Models, auf dem die Lokalisierung beruht. Auf der anderen Seite sendet es Daten, wie z.B. eine Notiz, und Steuerbefehle an die Smartwatch, um z.B. Bluetooth-Scans zu starten oder zu stoppen. Umgekehrt sendet die Smartwatch Daten an das Smartphone, z.B. die Ergebnisse eines Scans. Die verschiedenen Kommunikationswege und ihre Nutzung werden im Folgenden näher beschrieben.
 
 \subsection{Zwischen Smartphone und Web-Service}
-@Fabian
--via http
--serialisierte Scanergebnisse (aufgeteilt in Blöcke?)
 
+Zur Kommunikation mit dem Web-Service wird eine einfache HTTP-Schnittstelle verwendet.
+Der Web-Service erstellt aus den Messungen ein Modell zur Raumerkennung. Dazu
+werden die Messungen im CSV-Format gesendet. Das Modell wird als JSON-Objekt
+übertragen.
+
+\subsubsection{Datenformate}
+TODO: Beispiel für CSV \\
+TODO: Beispiel für Modell
+
+
+\subsubsection{UTF-8}
+Bei der Übertragung der UTF-8 Daten aus Android heraus gab es unerwartete Probleme.
+Die ersten Tests waren erfolgreich, bis wir ein größeres Datenvolumen erreicht haben.
+Da der Web-Service UTF-8 kodierte Daten erwartet, haben wir die Methode \texttt{writeUTF}
+der Klasse \texttt{DataOutputStream}
+\footnote{\url{https://developer.android.com/reference/java/io/DataOutputStream.html}} 
+verwendet. Diese Methode hat allerdings ein Beschränkung auf 64 KB an kodierten Daten.
+Also haben wir versucht die Daten in Blöcken von maximal 64 KB zu übertragen. Allerdings
+fügt die Methode bei jedem Aufruf einen BOM (Byte-Order-Marker) ein, was dazu führt,
+dass die gesendeten Daten kein korrektes UTF-8 mehr enthalten.
+Um das Problem zu lösen, mussten wir die UTF-8-Konvertierung selbst durchführen
+und Bytes über den Stream senden.
 
 \subsection{Zwischen Smartphone und Smartwatch}
 Die Kommunikation zwischen dem Smartphone und der Smartwatch muss bidirektional sein, um die benötigten Funktionalitäten erfüllen zu können. Die folgenden Schnittstellendefinitionen beschreiben diese.
