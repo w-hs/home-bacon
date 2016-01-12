@@ -193,10 +193,53 @@ public class WatchConnectorImpl implements WatchConnector{
                                             if (!result.getStatus().isSuccess()) {
                                                 // Failed to send message
                                                 Toast("Failed to send model", Toast.LENGTH_LONG);
-                                                Log.e(Constants.DEBUG_TAG, "Stop scan failed");
-                                            } else
+                                                Log.e(Constants.DEBUG_TAG, "Sent model failed");
+                                            } else {
                                                 Toast("Model sent successfully", Toast.LENGTH_SHORT);
-                                            Log.d(Constants.DEBUG_TAG, "scan stopped successfully");
+                                                Log.d(Constants.DEBUG_TAG, "model sent successfully");
+                                            }
+                                        }
+                                        
+
+                                    });
+                        }
+                    } else {
+                        Toast("No watch connected", Toast.LENGTH_SHORT);
+                    }
+                }
+                catch (Exception e){
+                    Log.e(Constants.DEBUG_TAG, e.getMessage());
+                }
+                finally {
+                    mGoogleApiClient.disconnect();
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    public void clearModel() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mGoogleApiClient.blockingConnect(Constants.CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
+                    NodeApi.GetConnectedNodesResult nodesResult = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+                    List<Node> nodes = nodesResult.getNodes();
+                    if (nodes != null && nodes.size() > 0) {
+                        for (Node node : nodes) {
+                            Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(),
+                                    Constants.HOME_BACON_CLEAR_MODEL, null).setResultCallback(
+                                    new ResultCallback() {
+                                        @Override
+                                        public void onResult(Result result) {
+                                            if (!result.getStatus().isSuccess()) {
+                                                // Failed to send message
+                                                Toast("Failed to clear model", Toast.LENGTH_LONG);
+                                                Log.e(Constants.DEBUG_TAG, "clear model failed");
+                                            } else
+                                                Toast("Model cleared successfully", Toast.LENGTH_SHORT);
+                                            Log.d(Constants.DEBUG_TAG, "model cleared successfully");
                                         }
                                     });
                         }
@@ -205,7 +248,7 @@ public class WatchConnectorImpl implements WatchConnector{
                     }
                 }
                 catch (Exception e){
-
+                    Log.e(Constants.DEBUG_TAG, e.getMessage());
                 }
                 finally {
                     mGoogleApiClient.disconnect();

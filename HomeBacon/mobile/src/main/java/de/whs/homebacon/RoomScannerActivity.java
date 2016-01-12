@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.io.File;
@@ -25,12 +26,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import de.whs.homebaconcore.BeaconScan;
-import de.whs.homebaconcore.Constants;
 import de.whs.homebaconcore.DatabaseHelper;
 import de.whs.homebaconcore.PredictionModel;
 import de.whs.homebaconcore.Room;
@@ -120,6 +118,8 @@ public class RoomScannerActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mDbHelper.deleteScannedTagsAndScans(mDb, getSelectedRoom().getId());
+                mWatchConnector.clearModel();
+                Toast.makeText(getApplicationContext(), "room " + getSelectedRoom().getId() + " scans successfully deleted", Toast.LENGTH_SHORT).show();
             }
         });
     }

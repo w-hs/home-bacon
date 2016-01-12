@@ -41,7 +41,7 @@ public class MessageListenerService extends WearableListenerService implements W
             List<BeaconScan> scanResults = (List<BeaconScan>) Serializer.deserialize(scanResultData);
             Log.d(Constants.DEBUG_TAG, scanResults.size() + " scans received");
             saveScansInDb(scanResults);
-            Toast.makeText(this, "Scan results received", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Scan results received", Toast.LENGTH_SHORT).show();
         }
         catch(Exception e){
             Log.e(Constants.DEBUG_TAG, "Note deserialization failed");
