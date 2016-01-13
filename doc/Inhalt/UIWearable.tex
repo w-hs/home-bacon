@@ -1,8 +1,10 @@
 \section{Besonderheiten bei der Entwicklung einer Android-Wear-App}
 In diesem Kapitel gehen wir auf Besonderheiten, die bei der Entwicklung einer Anwendung für die Smartwatch bestehen, ein. Zunächst erklären wir kurz was die grundsätzlichen Probleme bzw. Herausforderungen sind. Anschließend gehen wir ganz konkret auf unsere Applikation und ihre Besonderheiten ein.
 
-\subsection{Grundsätzliches}
-Grundsätzlich dient die Smartwatch sozusagen als verlängertes Display des Smartphones. Damit verfügt die Smartwatch über nur wenige Eingabemöglichkeiten. Die meisten Anforderungen werden sind über spezielle Wischgestiken realisiert. Eine Tastatur gibt es nicht. Bestimmte Aktionen werden in der Regel über "`Action Buttons"' (s. http://developer.android.com/design/wear/patterns.html) realisiert. Hinzukommt, dass manche Uhren eckig und manche Uhren rund sind. Hierfür bietet Android Wear eine spezielle Komponente das "`BoxInsetLayout"' (s. http://developer.android.com/training/wearables/ui/layouts.html), diese Komponente sorgt dafür, dass auch auf runden Display immer ein größtmöglicher ekciger Bereich zu Verfügung steht.
+\subsection{Einschränkungen durch die Smartwatch}
+Grundsätzlich verfügen Smartwatches über die gleichen Eingabemöglichkeiten wie Smartphones. Durch das kleine Display entfällt jedoch die Möglichkeit einer vollständigen Tastatur, so dass Benutzerinteraktionen häufig über Wischgestiken oder sogenannte "`Action Buttons"'\footnote{Action Buttons sind vom System bereitgestellte Buttons mit einem Icon und einen beschreibenden Text. Sie werden im Vollbild angezeigt und dienen der Annahme von Benutzerinteraktionen.} realisiert werden. 
+
+Eine weitere Besonderheit ist neben der Größe auch die Form des Displays. Damit die Applikation auf Uhren mit eckigen und rundem Display jeweils gleich angezeigt werden bietet Android-Wear ein spezielles "`BoxInsetLayout"', dass auch auf einem runden Display immer den größtmöglichen eckigen Bereich zur Anzeige nutzt.
 
 \subsection{Home-Bacon-Wear-App}
 
