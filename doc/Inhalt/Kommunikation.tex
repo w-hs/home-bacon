@@ -77,3 +77,4 @@ Am Beispiel der Erstellung einer neuen Notiz wird in Abbildung \ref{fig:Sequenzd
 \label{fig:SequenzdigrammNewNote}
 \end{figure}
 
+Eine in der Smartphone-App erstellte Notiz wird an die Smartwatch gesendet und im Smartwatch-Service empfangen. Dieser speichert die neue Notiz in der lokalen Datenbank und startet im Anschluss die Activity bzw. gibt den Aktualisierungsanstoß. Das Starten bzw. Aktualisieren stellt das zweite Szenario da und ist wie beschrieben implementiert. Die Activity lädt nach dem Start bzw. dem Aktualisierungsbefehl alle Notizen für den aktuellen Raum , um sie anzuzeigen. 
