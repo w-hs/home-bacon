@@ -27,31 +27,53 @@ Um das Problem zu lösen, mussten wir die UTF-8-Konvertierung selbst durchführe
 und Bytes über den Stream senden.
 
 \subsection{Zwischen Smartphone und Smartwatch}
-Die Kommunikation zwischen dem Smartphone und der Smartwatch muss bidirektional sein, um die benötigten Funktionalitäten erfüllen zu können. Die Schnittstelle PhoneConnector (Abb. \ref{fig:Klassendiagramme}) beschreibt die Richtung von der Smartwatch zum Smartphone, während die Schnittstelle WatchConnector (Abb. \ref{fig:Klassendiagramme}) die umgekehrte Richtung darstellt.
+Die Kommunikation zwischen dem Smartphone und der Smartwatch muss bidirektional sein, um die benötigten Funktionalitäten erfüllen zu können. Die Schnittstelle PhoneConnector (Abb. \ref{fig:KlassendiagrammePhone}) beschreibt die Richtung von der Smartwatch zum Smartphone, während die Schnittstelle WatchConnector (Abb. \ref{fig:KlassendiagrammeWatch}) die umgekehrte Richtung darstellt.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.5\linewidth]{../Bilder/Klassendiagramme}
-\caption{Schnittstellendefinitionen zur Kommunikation zwischen Smartphone und Smartwatch}
-\label{fig:Klassendiagramme}
+\includegraphics[width=0.5\linewidth]{../Bilder/KlassendiagrammePhone}
+\caption{Schnittstellendefinitionen zwischen Smartwatch und Smartphone}
+\label{fig:KlassendiagrammePhone}
 \end{figure}
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\linewidth]{../Bilder/KlassendiagrammeWatch}
+\caption{Schnittstellendefinitionen zwischen Smartphone und Smartwatch}
+\label{fig:KlassendiagrammeWatch}
+\end{figure}
 
-Kommunikation zwischen einem Android Smartphone und einem Android Wear Gerät findet grundsätzlich über die Wearable Data Layer API\footnote{\url{http://developer.android.com/training/wearables/data-layer/index.html}} statt, die Teil der Google Play Services ist. Die API bietet verschiedene Möglichkeiten der Kommunikation. Wir haben uns in einem ersten Anlauf mit der Synchronisation von sogenannten DataItems beschäftigt. Da diese Synchronisation allerdings nicht sofort nach einer Aktualisierung der Daten stattfindet und somit die Daten nicht sofort bei dem Kommunikationspartner verfügbar sind, implementierten wir die Kommunikation im weiteren Verlauf des Projekts mithilfe von Messages und der dafür vorgesehenen MessageAPI \footnote{\url{http://developer.android.com/training/wearables/data-layer/messages.html}}. Messages stellen eine unidirektionale Kommunikationsmöglichkeit dar. Sie sind definiert über eine Pfadangabe und können beliebige Daten in Form eines Byte-Arrays transportieren. Zum Empfang der Daten dient eine Implementierung des Wearable Listener Services\footnote{\url{https://developers.google.com/android/reference/com/google/android/gms/wearable/WearableListenerService}}.
+Kommunikation zwischen einem Android Smartphone und einem Android Wear Gerät findet grundsätzlich über die Wearable Data Layer API\footnote{\url{http://developer.android.com/training/wearables/data-layer/index.html}} statt, die Teil der Google Play Services ist. Die API bietet verschiedene Möglichkeiten der Kommunikation. Wir haben uns in einem ersten Anlauf mit der Synchronisation von sogenannten DataItems beschäftigt. Da diese Synchronisation allerdings nicht sofort nach einer Aktualisierung der Daten stattfindet und somit die Daten nicht sofort bei dem Kommunikationspartner verfügbar sind, implementierten wir die Kommunikation im weiteren Verlauf des Projekts mithilfe von Messages und der dafür vorgesehenen MessageAPI \footnote{\url{http://developer.android.com/training/wearables/data-layer/messages.html}}. Messages stellen eine unidirektionale Kommunikationsmöglichkeit dar. Sie sind definiert über eine Pfadangabe und können beliebige Daten in Form eines Byte-Arrays transportieren. Zum Empfang der Daten dient eine Implementierung des Wearable-Listener- Services\footnote{\url{https://developers.google.com/android/reference/com/google/android/gms/wearable/WearableListenerService}}.
 
-Um die angesprochen bidirektionale Kommunikation herzustellen, haben wir entsprechend auf jeder Seite der Kommunikationen einen Listener Service implementiert sowie die Möglichkeit geschaffen Messages zu versenden. Am Beispiel der Vermessung zur initialen Erstellung des Models wird die Kommunikation mit Messages im folgenden Sequenzdiagramm (Abb. \ref{fig:SequenzdiagrammScan}) dargestellt.
+Um die angesprochen bidirektionale Kommunikation herzustellen, haben wir entsprechend auf jeder Seite der Kommunikationen einen Listener-Service implementiert sowie die Möglichkeit geschaffen Messages zu versenden. Am Beispiel der Vermessung zur initialen Erstellung des Models wird die Kommunikation mit Messages im folgenden Sequenzdiagramm (Abb. \ref{fig:SequenzdiagrammScan}) dargestellt.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\linewidth]{../Bilder/SequenzdiagrammScan}
+\includegraphics[width=1\linewidth]{../Bilder/SequenzdiagrammScan}
 \caption{Sequenzdiagramm der Vermessung zur initialen Erstellung des Models}
 \label{fig:SequenzdiagrammScan}
 \end{figure}
 
-Der Benutzer startet den Ablauf durch die Aktion \textit{Starte Scan} in der Smartphone Activity. Der Smartwatch Service empfängt den Befehl, startet den Scan und speichert die gescannten Werte in der Datenbank. Der Service scannt solange bis der Benutzer mithilfe der Smartphone Activity den \textit{Stoppe Scan} Befehl absetzt. Nachdem der Service das Scannen beendet hat, lädt dieser alle gescannten Werte aus der Datenbank, versendet sie und löscht die Werte aus der Datenbank, um bei Folgescans bei null zu starten. Die versendeten Werte empfängt der Smartphone Service, der diese in der Datenbank des Smartphone speichert und den Benutzer mittels der Smartphone Activity über den abgeschlossenen Scanvorgang informiert. Hat der Benutzer alle Räume vermessen, kann er die Berechnungen des Models anstoßen. Die Smartphone Activity lädt daraufhin alle Scandaten aus der Datenbank und schickt diese zur Berechnung des Models an den Web-Service. Der Web-Service liefert das berechnete Model zurück, welches die Smartphone Activity an den Smartwatch Service versendet, der fortan damit arbeiten kann.
+Der Benutzer startet den Ablauf durch die Aktion \textit{Starte Scan} in der Smartphone-Activity. Der Smartwatch-Service empfängt den Befehl, startet den Scan und speichert die gescannten Werte in der Datenbank. Der Service scannt solange bis der Benutzer mithilfe der Smartphone-Activity den \textit{Stoppe Scan} Befehl absetzt. Nachdem der Service das Scannen beendet hat, lädt dieser alle gescannten Werte aus der Datenbank, versendet sie und löscht die Werte aus der Datenbank, um bei Folgescans bei null zu starten. Die versendeten Werte empfängt der Smartphone Service, der diese in der Datenbank des Smartphone speichert und den Benutzer mittels der Smartphone-Activity über den abgeschlossenen Scanvorgang informiert. Hat der Benutzer alle Räume vermessen, kann er die Berechnungen des Models anstoßen. Die Smartphone-Activity lädt daraufhin alle Scandaten aus der Datenbank und schickt diese zur Berechnung des Models an den Web-Service. Der Web-Service liefert das berechnete Model zurück, welches die Smartphone-Activity an den Smartwatch-Service versendet, der fortan damit arbeiten kann.
 
 \subsection{Zwischen Service und Activity}
--Service muss Infos weiterreichen
--Service muss Activity starten
--Beispiel Note
+Ein Android-Service läuft dauerhaft im Hintergrund und weist keine aktive Verbindung zu einer Activity mit UI auf. Um dennoch Informationen aus unseren Services in unsere Activities zu leiten, gibt es verschiedene Ansätze mit entsprechend leicht unterschiedlichen Ergebnissen. 
+Im Wesentlichen nutzen wir dazu Broadcasts und Startmöglichkeiten einer Activity mit Übergabeparametern. 
+Wir decken drei verschiedene Szenarien ab.
+\begin{enumerate}
+\item{Es wird immer eine neue Instanz der Activity erzeugt. Beispiel: Im Falle eines Raumwechsels gibt es Notizen, die mit Ereignissen wie Betreten oder Verlassen des Raumes verknüpft sind. Tritt eines der Ereignisse auf und es sind Notizen mit diesem verknüpft, so werden diese in einer neuen Instanz der Activity dargestellt. Das heißt, es kann mehrere Instanzen geben, die verschiedene Notizen anzeigen.}
+\item{Wenn die Activity inaktiv ist, soll sie gestartet werden und wenn sie aktiv ist, soll diese aktive Instanz aktualisiert werden. Beispiel: Die Smartwatch empfängt eine neu angelegte Notiz. Sie öffnet oder aktualisiert die Activity.}
+\item{Wenn die Activity inaktiv ist, soll sie nicht starten. Lediglich eine aktive Instanz soll aktualisiert werden. Beispiel: Ein Raumwechsel findet statt. Die Activity aktualisiert die Notizen entsprechend des neuen Raums. Die Anwendung wird jedoch nicht gestartet, wenn diese inaktiv ist.}
+\end{enumerate}
+
+Eine neue Activity-Istanz wie im ersten Szenario beschrieben starten wir mithilfe der Methode \texttt{startActivity} des vorhandenen Service-Contexts und des \textit{NEW\_TASK}-Flags. Das zweite Szenario erfüllen wir ähnlich. Neben dem \textit{NEW\_TASK}-Flag verwenden wir auch das \textit{SINGLE\_TOP}-Flag, das dafür sorgt, dass bei einer bestehenden Instanz keine neue erstellt wird, und das \textit{PREVIOUS\_IS\_TOP}-Flag, welches die vorhandene Instanz in den Vordergrund ruft. Das dritte Szenario nutzt Broadcasts, die nur von aktiven Anwendungen empfangen werden können. Bei allen beschriebenen Lösungen werden die zu übergebenen Informationen in Intents gekapselt.
+
+Am Beispiel der Erstellung einer neuen Notiz wird in Abbildung \ref{fig:SequenzdigrammNewNote} die Kommunikation zwischen Service und Activity dargestellt.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\linewidth]{../Bilder/SequenzdigrammNewNote}
+\caption{Sequenzdiagramm einer Erstellung einer neuen Notiz}
+\label{fig:SequenzdigrammNewNote}
+\end{figure}
 
