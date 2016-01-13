@@ -6,14 +6,31 @@ Grundsätzlich verfügen Smartwatches über die gleichen Eingabemöglichkeiten w
 
 Eine weitere Besonderheit ist neben der Größe auch die Form des Displays. Damit die Applikation auf Uhren mit eckigen und rundem Display jeweils gleich angezeigt werden bietet Android-Wear ein spezielles "`BoxInsetLayout"', dass auch auf einem runden Display immer den größtmöglichen eckigen Bereich zur Anzeige nutzt.
 
-\subsection{Home-Bacon-Wear-App}
+Darüber hinaus besitzen nicht alle Smartwatches die Möglichkeit sich mit einem WLAN zu verbinden. Daher ist ein direkter Zugriff auf das Internet aus der Smartwatch-App nicht immer möglich.
+
+\subsection{HomeBacon-App}
 
 
 Konkreter
 	- Lange überlegt wie wir Notizen richtig zur Anzeige bringen
-		- Inkl. der Möglichkeit zum Löschen
+	- Verschiedene Controls probiert...
+	
 	- Soviele UIs bietet Android-Wear gar nicht, Cards / Fragments / 2D Picker...
-	- 
+		- Cards: 
+		- Pages: 
+		- Actions on Cards
+		- Anordnung von Cards...
+	
+		- Inkl. der Möglichkeit zum Löschen
+	
+	- unkomfortabel, viel Komplexität, große Hürde
+	- Unsere Implementierung des 2D-Pickers...
+		Komplette Matrix war nötig
+		Keine Möglichkeit null zurückzugeben
+		Ursprüungliche Idee Einstellungskarte zu machen
+		Dann Entscheidung alle Eingaben aufs Smartphone zu legen
+		So dass Uhr nur zur Anzeige bzw. Löschen von Notizen geht
+		Smartphone angenehmere Bedienung, Internetverbindung... Uhr WLAN mal kein WLAN?
 
 - Lange auf der Suche nach dem Richtigen Layout / Controls / Widgets
 - Offenbar keine Eingabemöglichkeiten außer Touchen und Wischen
