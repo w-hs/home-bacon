@@ -86,7 +86,7 @@ wir diese Beacons im folgenden nur mit diesem Teil der Adresse, d. h.
 
 \subsubsection{Statistische Aufbereitung}
 
-Als erstes Betrachten wir den Minimal-, Maximal, Mittelwert und Standardabweichung für jeden
+Als erstes betrachten wir den Minimal-, Maximal, Mittelwert und die Standardabweichung für jeden
 Beacon in jedem Raum. Diese bestimmen wir per SQL aus der SQLite-Datenbank der Messwerte.
 Da die Messwerte in der Datenbank nicht normalisiert abgelegt wurden, sind die Werte
 in Tabelle \ref{tab:sql-analyze} nicht normalisiert.
@@ -108,7 +108,7 @@ in Tabelle \ref{tab:sql-analyze} nicht normalisiert.
 
 \vspace{0.4cm}
 Wie erwartet, gibt es relativ große Schwankungen bei den einzelnen Messwerten.
-Allerdings lässt sich an den Durchsnittswerten ablesen, dass die beiden Räume
+Allerdings lässt sich an den Mittelwerten ablesen, dass die beiden Räume
 prinzipiell auseinander gehalten werden können.
 
 \subsubsection{Grafische Aufbereitung}
@@ -151,7 +151,7 @@ Das Modell hat zwei Aufgaben:
 		einer sicheren Vorhersage zusammengefasst werden
 \end{enumerate}
 
-\subsubsection{Bestimmung des wahrscheinlichsten Raums bei einer Messung}
+\subsubsection{Bestimmung des wahrscheinlichsten Raums aus einer Messung}
 \label{sec:lok-wahrscheinlich}
 
 In Abschnitt \ref{sec:lok-grafische-aufbereitung} haben wir gesehen, dass die
@@ -166,8 +166,8 @@ Daher wählen wir die etwas mächtigere Softmax-Regression, welche wir an unsere
 konkreten Aufgabenstellung vorstellen wollen.
 Zunächst definieren wir folgende Symbole:
 \begin{itemize}
-	\item Anzahl an gemessenen Beacons: $n \in \mathbb{N}$
-	\item Anzahl an vermessenen Räumen: $m \in \mathbb{N}$
+	\item Anzahl von gemessenen Beacons: $n \in \mathbb{N}$
+	\item Anzahl von vermessenen Räumen: $m \in \mathbb{N}$
 	\item Messung als Vektor von Einzelmessungen: $ \vec{x} \in [0, 1]^n \subset \mathbb{R}^n $
 	\item Einzelmessung für Beacon $i \in [0, n - 1] \subset \mathbb{N}$: $x_i \in [0, 1] \subset \mathbb{R}$
 	\item Wahrscheinlichkeitsvektor für alle Räume: $ \vec{y} \in [0, 1]^m \subset \mathbb{R}^m$
@@ -194,7 +194,7 @@ $$ \vec{z} = W \vec{x} + \vec{b} $$
 
 Die neu eingeführten Symbole haben folgende Bedeutung:
 \begin{itemize}
-	\item $W \in \mathbb{R}^{m \times n}$: Gewichtsmatrix mit $m$ Spalten und $n$ Zeilen
+	\item $W \in \mathbb{R}^{m \times n}$: Gewichtsmatrix mit $m$ Zeilen und $n$ Spalten
 	\item $\vec{b} \in \mathbb{R}^m$: Bias-Vektor mit $m$ Komponenten
 	\item $\vec{z} \in \mathbb{R}^m$: Nicht normalisierter Ausgabevektor mit $m$ Komponenten
 \end{itemize}
@@ -208,7 +208,7 @@ $$ y_j = \frac{\exp(z_j)}{\sum_{k=0}^{m-1} \exp(z_k) } $$
 Die Gewichtsmatrix $W$ und der Bias-Vektor $\vec{b}$ stellen Parameter der Regression dar,
 die durch eine Vermessung der Räume ermittelt werden müssen. Dabei sind die Parameter so
 zu wählen, dass möglichst wenig Messungen falsch eingeordnet werden. Dazu definieren wir
-eine Verlustfunktion, die ein Maß für die Abweichung von korrekter Zuordnung darstellt.
+eine Verlustfunktion, die ein Maß für die Abweichung von der korrekten Zuordnung darstellt.
 Ein Machine-Learning-Algorithmus kann diese Verlustfunktion minimieren, um
 gute Parameterwerte zu bestimmen.
 
@@ -238,7 +238,7 @@ Da eine Messung keine absolut korrekte Raumerkennung leisten kann, kombinieren w
 die Ergebnisse von mehreren aufeinanderfolgenden Messungen.
 
 Dabei betrachten wir die letzten $N$ Messungen und wählen den Raum, der in diesen
-$N$ Messungen am meisten als wahrscheinlichster Raum gewählt wurde.
+$N$ Messungen am meisten als wahrscheinlichster Raum bestimmt wurde.
 Dies hat den Vorteil, dass einzelne Fehlmessungen nicht zu einem spontanem Raumwechsel
 führen. Allerdings führt dieses Vorgehen auch eine gewisse Latenz ein, bis ein Wechsel
 erkannt werden kann. Deshalb sollte $N$ weder zu klein, noch zu groß gewählt werden.
@@ -254,14 +254,14 @@ Bei der Implementierung unseres Lösungsansatzes sind folgende Rahmenbedingungen
 		den Vermessungsdaten ist rechenintensiv und soll deshalb in einen Web-Service
 		ausgelagert werden.
 	\item Die Vermessung von Räumen und die Erstellung eines Modells soll nur einmalig
-		erfolgen, da die Smartwatch-App ansonsten auch Offline funktionsfähig sein soll.
+		erfolgen, da die Smartwatch-App ansonsten auch offline funktionsfähig sein soll.
 	\item Die Anwendung des gelernten Modells auf Messungen bei der Raumerkennung muss
-		auf performant sein, da diese Berechnung lokal auf der Smartwatch erfolgt.
+		performant sein, da diese Berechnung lokal auf der Smartwatch erfolgt.
 \end{enumerate}
 
 \subsubsection{Web-Service}
 
-Um den Machine-Learning-Algorithmus zu implementieren, haben haben uns für
+Um den Machine-Learning-Algorithmus zu implementieren, haben wir uns für
 TensorFlow\footnote{\url{https://www.tensorflow.org/}} entschieden.
 Da diese API primär für Python entwickelt wurde, verwenden wir Python auch
 für unseren Web-Service.
@@ -283,7 +283,7 @@ Das Modell enthält folgende Daten:
 Die Normalisierungsinformationen sind wichtig, um bei einer Messung die RSSI-Werte in
 das erforderliche Intervall $[0, 1] \subset \mathbb{R}$ zu überführen.
 Um beliebige Beacon-Adressen auf die korrekten Positionen im Eingabevektor $\vec{x}$
-und die Komponenten im Ausgabevektor wieder auf die betroffenen Raum-IDs
+und die Komponenten im Ausgabevektor $\vec{y}$ wieder auf die betroffenen Raum-IDs
 zu mappen, sind zusätzliche Zuordnungsinformationen im Modell enthalten.
 
 \subsubsection{Offline-Fähigkeit}
