@@ -1,27 +1,24 @@
 \section{Entwurf}
+In diesem Kapitel stellen kurz die Plattformen vor auf die wir uns bei der Entwicklung beschränken wollen. Anschließend unser System mithilfe eines Diagramms grundlegend vor. Im letzten Abschnitt gehen wir auf die wichtigsten Aspekte beim Design der Smartwatch-Anwendung ein.
 
 \subsection{Plattformen}
-Für die Entwicklung der Smartphone-App haben wir uns auf die Android-Plattform festgelegt. Bei der Smartwatch-App beschränken wir uns auf die Entwicklung einer Android-Wear-Anwendung. Bezüglich der Beacons verwenden wir ausschließlich Bluetooth LE Beacons, da diese den Low-Energy-Standard erfüllen und somit gut für die Kommunikation mit der Smartwatch geeignet sind.
+In diesem Projekt geht es im Wesentlichen um zwei Aspekte: Zum einen wollen wir uns mit der Anwendungsentwicklung auf Smartwatches beschäftigen, zum anderen wollen wir einen neuen Ansatz zur Lokalisation in Gebäuden ausprobieren. Aus diesem Grund verzichten wir auf aufwendige hybride Lösungen und beschränken uns auf die Entwicklung zweier nativer Applikationen für die Android- bzw. Android-Wear-Plattform. Für die Lokalisation innerhalb des Gebäudes wollen wir Bluetooth-Beacons einsetzten. Bezüglich der Beacons haben wir uns, vor allem aufgrund des niedrigen Stromverbrauchs, auf den Standard Bluetooth LE festgelegt.
 
-\subsection{Architektur}
-Abbildung \ref{fig:Übersicht} zeigt die wesentlichen Komponenten unseres Systems:
+\subsection{Systemübersicht}
+Abbildung \ref{fig:Übersicht} zeigt eine grundlegende Übersicht unseres Systems:
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.95\linewidth]{Bilder/Uebersicht}
-\caption{Komponentendiagramm}
+\caption{Systemübersicht}
 \label{fig:Übersicht}
 \end{figure}
 
-- Wichtiger Aspekt: Offline-Fähigkeit
-Grafik: Komponentendiagramm
-Beschreibung des Diagramms und Schnittstellen (ganz grob)
+Im ersten Schritt, noch vor Inbetriebnahme unseres Systems, müssen die Räume des Gebäudes mit Bluetooth-Beacons bestückt werden. Diese senden kontinuierlich ein Signal, dass durch die Smartwatch-App empfangen wird. Bei der Inbetriebnahme des Systems muss zunächst jeder Raum des Gebäudes ausgemessen werden. Ein entsprechender Scan lässt sich über die Smartphone-App durchführen. Nachdem das Gebäude vollständig vermessen wurde, muss im nächsten Schritt das mathematische Modell, dass zur Erkennung des aktuellen Raumes benötigt wird, berechnet werden. Da diese Berechnung in einen Webservice ausgelagert ist, wird an dieser Stelle einmalig eine Internetverbindung vorausgesetzt. Nach erfolgreicher Berechnung ist das System betriebsbereit und erkennt von nun an automatisch dass Betreten bzw. Verlassen eines Raumes.
 
-\subsection{Design}
+Nachdem das System initial eingerichtet wurde, benötigt der Anwender sein Smartphone nur noch, um Notizen im aktuellen Raum zu hinterlegen. Über die Smartphone-App lassen sich Notizen zusätzlich mit den Ereignissen Verlassen oder Betreten des Raumes verknüpfen. Die Daten werden nach der Eingabe an die Smartwatch geschickt und dort gespeichert. Damit wird das Smartphone für den aktiven Systembetrieb nicht mehr benötigt.
 
-- Usability: Welche Aspekte kann man hier beachten? Keine Eingabe...
-\\- Smart Watch hat sehr kleines Display und wenig Eingabemöglichkeiten und unterschiedliche Formen...
+%\subsection{Design}
+% Hier auf Usability und Design der Smartwatch-App einzugehen macht keinen Sinn, da wir dafür ein eigenes Kapitel haben!
 
-Rund und eckig
 
-Kurz ansprechen und auf Details im Folgekapitel verweisen
