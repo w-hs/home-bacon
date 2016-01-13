@@ -194,9 +194,40 @@ $$ \vec{z} = W \vec{x} + \vec{b} $$
 Die neu eingeführten Symbole haben folgende Bedeutung:
 \begin{itemize}
 	\item $W \in \mathbb{R}^{m \times n}$: Gewichtsmatrix mit $m$ Zeilen und $n$ Spalten
-	\item $b \in \mathbb{R}^m$: Bias-Vektor mit $m$ Komponenten
+	\item $\vec{b} \in \mathbb{R}^m$: Bias-Vektor mit $m$ Komponenten
 	\item $\vec{z} \in \mathbb{R}^m$: Nicht normalisierter Ausgabevektor mit $m$ Komponenten
 \end{itemize}
+
+Der nicht normalisierte Vektor $\vec{z}$ kann jetzt über die Softmax-Funktion normalisiert
+werden\footnote{\url{http://www.gatsby.ucl.ac.uk/~chuwei/paper/smc.pdf}}:
+
+$$ \vec{y} = \text{softmax}(\vec{z}) $$
+$$ y_j = \frac{\exp(z_j)}{\sum_{k=0}^{m-1} \exp(z_k) } $$
+
+Die Gewichtsmatrix $W$ und der Bias-Vektor $\vec{b}$ stellen Parameter der Regression dar,
+die durch eine Vermessung der Räume ermittelt werden müssen. Dabei sind die Parameter so
+zu wählen, dass möglichst wenig Messungen falsch eingeordnet werden. Dazu definieren wir
+eine Verlustfunktion, die ein Maß für die Abweichung von korrekter Zuordnung darstellt.
+Ein Machine-Learning-Algorithmus kann diese Verlustfunktion minimieren, um
+gute Parameterwerte zu bestimmen.
+
+Wir haben als Verlustfunktion die Kreuzenthropie gewählt. Dabei werden die vom Modell vorhergesagten
+Wahrscheinlichkeiten mit den korrekten Räumen aus der Vermessung kombiniert.
+Sei $\vec{y'} \in \mathbb{R}^m$ der erwartete Ausgabevektor für den Raum $r$, dann gilt:
+\[
+y_j' = 
+\begin{cases}
+	1 & \text{wenn } j = r  \\ 
+	0 & \text{sonst}
+\end{cases}
+\]
+Die Verlustfunktion kann dann wie folgt definiert werden:
+$$ \text{Loss}(\vec{y}, \vec{y'}) = - \sum_{j=0}^{m-1} y_j' \cdot \log(y_j) $$
+
+Zu beachten ist, dass die so bestimmten Werte zwar alle mathematischen
+Eigenschaften für Wahrscheinlichkeiten erfüllen. Da die konkreten Werte von der
+Größe der Parameter $W$ und $\vec{b}$ abhängen, können wir den Ausgabevektor
+allerdings nur zur Bestimmung des Raums mit der größten Wahrscheinlichkeit nutzen.
 
 \subsubsection{Zusammenfassung von Messungen}
 Gezeigt: Es ist machbar. Jetzt klären wie?
