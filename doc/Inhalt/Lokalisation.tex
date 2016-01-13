@@ -67,11 +67,72 @@ erkannt wird.
 
 \subsection{Machbarkeitsanalyse}
 
-Analyse: Ist es überhaupt möglich Räume anhand von Messwerten zu unterscheiden?
-Erste Messung:
-- Messungen in Form von Mittelwert + Stddev vorstellen
-- Messungen in Grafikform vorstellen
-- Ergebnis: Räume sind unterscheidbar
+Nachdem wir unseren Messvorgang definiert haben, analysieren wir anhand
+einer einfachen Raumerkennung mit zwei Räumen und zwei Beacons, ob eine
+Unterscheidung der Räume anhand der Messungen möglich ist.
+Dazu werden wir die Verteilung der Messwerte sowohl statistisch als
+auch grafisch aufbereiten.
+
+In dieser Analyse haben wir zwei Räume gescannt, die im Folgenden als
+Küche und Flur bezeichnet wurden. In jedem Raum wurde ein Beacon platziert.
+Die Beacons hatten folgende Bluetooth-Adressen:
+\begin{itemize}
+	\item 7C:2F:80:8D:E2:3B (platziert in Küche)
+	\item 7C:2F:80:8D:E2:45 (platziert in Flur)
+\end{itemize}
+Da sich die Adressen nur in der letzten Stelle unterscheiden, referenzieren
+wir diese Beacons im folgenden nur mit diesem Teil der Adresse, d. h.
+3B und 45.
+
+\subsubsection{Statistische Aufbereitung}
+
+Als erstes Betrachten wir den Minimal-, Maximal, Mittelwert und Standardabweichung für jeden
+Beacon in jedem Raum. Diese bestimmen wir per SQL aus der SQLite-Datenbank der Messwerte.
+Da die Messwerte in der Datenbank nicht normalisiert abgelegt wurden, sind die Werte
+in Tabelle \ref{tab:sql-analyze} nicht normalisiert.
+
+\begin{table}[h]
+	\caption{SQL-Analyse der ersten Messung}
+	\label{tab:sql-analyze}
+	\begin{tabular}{|c|c|c|c|c|c|}
+		\hline \textbf{Raum} & \textbf{Tag} & \textbf{min(RSSI)} & \textbf{max(RSSI)} & \textbf{avg(RSSI)} & \textbf{stddev(RSSI)} \\
+		\hline 
+		\hline Küche  & 3B & -82 & -40 & -60,36 & 12,46 \\ 
+		\hline Küche & 45 & -88 & -69 & -78,61 & 9,29 \\ 
+		\hline Flur & 3B & -94 & -64 & -78,67 & 9,95 \\ 
+		\hline Flur & 45 & -83 & -49 & -67,38 & 7,53 \\ 
+		\hline 
+	\end{tabular}
+\end{table}
+
+
+\vspace{0.4cm}
+Wie erwartet, gibt es relativ große Schwankungen bei den einzelnen Messwerten.
+Allerdings lässt sich an den Durchsnittswerten ablesen, dass die beiden Räume
+prinzipiell auseinander gehalten werden können.
+
+\subsubsection{Grafische Aufbereitung}
+
+Da man sich unter einer Liste von Messwerten häufig wenig vorstellen kann,
+wollen wir zunächst die Messung in einer Grafik visualisieren.
+Abbildung \ref{fig:KuecheFlur_1} zeigt die Messungen in beiden Räumen.
+Da eine Messung die Einzelmessungen für beide Beacons enthält, stellt diese
+einen Punkt im zweidimensionalen Raum dar. Die Signalstärke ist in diesem
+Diagramm bereits normalisiert. Die Farbe der Punkte zeigt, in welchem Raum
+die Messung durchgeführt wurde (blau: Flur, gelb: Küche).
+
+Aus der Grafik lässt sich entnehmen, dass die Messungen für beide Räume
+annähernd linear separierbar sind. Es gibt gerade im Übergang zwischen den beiden
+Clustern allerdings ein paar Messungen, die für eine korrekte Zuordnung 
+problematisch sein können. Wir schließen daraus, das eine Messung nicht ausreicht,
+um den Raum sicher zu bestimmen.
+
+\begin{figure}[tbh]
+	\centering
+	\includegraphics[width=1.0\linewidth]{Bilder/Messungen/KuecheFlur_1}
+	\caption{Messung von Küche und Flur mit zwei Beacons}
+	\label{fig:KuecheFlur_1}
+\end{figure}
 
 \subsection{Lösungsansatz}
 
@@ -128,32 +189,3 @@ weshalb wir ein Zeitfenster von $\Delta t_g = 2s$ in dem Messungen unterschiedli
 Beacons als gleichzeitig angesehen werden. Dadurch werden Beacons, die in der letzten Sekunde aus irgendeinem Grund nicht gemessen werden konnten, nicht direkt als nicht vorhanden eingestuft.
 Erst wenn ein Beacon in zwei aufeinanderfolgenden Messungen nicht registriert wurde, wird dessen Signalstärke als nicht vorhanden angesehen.
 
-\subsubsection{Ergebnis}
-
-Als erstes Betrachten wir den Minimal-, Maximal, Mittelwert und Standardabweichung für jeden
-Beacon in jedem Raum. Diese bestimmen wir per SQL aus der SQLite-Datenbank der Messwerte.
-
-\begin{tabular}{|c|c|c|c|c|c|}
-	\hline \textbf{Raum} & \textbf{Tag} & \textbf{min(RSSI)} & \textbf{max(RSSI)} & \textbf{avg(RSSI)} & \textbf{stddev(RSSI)} \\ 
-	\hline Küche  & 7C:2F:80:8D:E2:3B & -82 & -40 & -60,36 & 12,46 \\ 
-	\hline Küche & 7C:2F:80:8D:E2:45 & -88 & -69 & -78,61 & 9,29 \\ 
-	\hline Flur & 7C:2F:80:8D:E2:3B & -94 & -64 & -78,67 & 9,95 \\ 
-	\hline Flur & 7C:2F:80:8D:E2:45 & -83 & -49 & -67,38 & 7,53 \\ 
-	\hline 
-\end{tabular}
-
-\vspace{0.4cm}
-Wie erwartet, gibt es relativ große Schwankungen bei den einzelnen Messwerten.
-Allerdings lässt sich an den Durchsnittswerten ablesen, dass die beiden Räume
-prinzipiell auseinander gehalten werden können.
-
-\subsubsection{Visualisierung}
-Da man sich unter einer Liste von Messwerten häufig wenig vorstellen kann,
-wollen wir zunächst die Messung in einer Grafik visualisieren.
-
-\begin{figure}[tbh]
-\centering
-\includegraphics[width=1.0\linewidth]{Bilder/Messungen/KuecheFlur_1}
-\caption{Messung von Küche und Flur mit zwei Beacons}
-\label{fig:KuecheFlur_1}
-\end{figure}
