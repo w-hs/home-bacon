@@ -151,7 +151,7 @@ Das Modell hat zwei Aufgaben:
 		einer sicheren Vorhersage zusammengefasst werden
 \end{enumerate}
 
-\subsubsection{Bestimmung von Wahrscheinlichkeiten}
+\subsubsection{Bestimmung des wahrscheinlichsten Raums bei einer Messung}
 
 In Abschnitt \ref{sec:lok-grafische-aufbereitung} haben wir gesehen, dass die
 Messungen für unterschiedliche Räume zum großen Teil linear separierbar sind.
@@ -230,13 +230,19 @@ Größe der Parameter $W$ und $\vec{b}$ abhängen, können wir den Ausgabevektor
 allerdings nur zur Bestimmung des Raums mit der größten Wahrscheinlichkeit nutzen.
 
 \subsubsection{Zusammenfassung von Messungen}
-Gezeigt: Es ist machbar. Jetzt klären wie?
-Zwei Probleme:
-- Problem 1: 
-- Problem 2: Eine Messung allein reicht nicht aus, um eine korrekte Aussage über
-  den aktuellen Raum zu machen. Wir brauchen zusätzlich ein Zuordnungsmodell,
-  das aus mehreren aufeinanderfolgenden Vorhersagen den aktuellen Raum sicher
-  bestimmt.
+
+Im vorherigen Abschnitt haben wir den wahrscheinlichsten Raum für eine Messung bestimmt.
+Da eine Messung keine absolut korrekte Raumerkennung leisten kann, kombinieren wir
+die Ergebnisse von mehreren aufeinanderfolgenden Messungen.
+
+Dabei betrachten wir die letzten $N$ Messungen und wählen den Raum, der in diesen
+$N$ Messungen am meisten als wahrscheinlichster Raum gewählt wurde.
+Dies hat den Vorteil, dass einzelne Fehlmessungen nicht zu einem spontanem Raumwechsel
+führen. Allerdings führt dieses Vorgehen auch eine gewisse Latenz ein, bis ein Wechsel
+erkannt werden kann. Deshalb sollte $N$ weder zu klein, noch zu groß gewählt werden.
+Ein weiterer Vorteil ist, dass durch diesen Ansatz ein Hysterese-Effekt entsteht.
+Befindet sich der Anwender gerade im Übergang zwischen zwei Räumen, wird nicht ständig
+ein Raumwechsel gemeldet, sondern erst nach einer kurzen Verzögerung.
   
 \subsection{Implementierung}
 
