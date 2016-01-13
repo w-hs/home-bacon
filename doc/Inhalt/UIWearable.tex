@@ -11,18 +11,10 @@ Darüber hinaus besitzen nicht alle Smartwatches die Möglichkeit sich mit einem
 \subsection{HomeBacon-App}
 Ziel unserer Smartwatch-App ist es eine bestimmte Menge von Notizen zur Anzeige zu bringen. Daher haben wir uns im ersten Schritt die von Android-Wear bereitgestellten UI-Elemente angesehen. Unter den verschiedenen Möglichkeiten Notizen, bestehend aus Titel und einem Text, darzustellen, erschien uns die Darstellung in Form von Cards\footnote{Eine Übersicht der Android-Wear-UI-Patterns befindet sich unter \url{http://developer.android.com/design/wear/patterns.html}} am geeignetsten.
 
-Um die Anzeige mehrerer Notizen auf dem kleinem Display der Smartwatch zu realisieren, haben wir uns überlegt die Cards horizontal anzuordnen. Eine solche Anordnung lässt sich als "`2D Picker"' mithilfe eines GridViewPagers realisieren. 
+Um die Anzeige mehrerer Notizen auf dem kleinem Display der Smartwatch zu realisieren, haben wir uns überlegt die Cards horizontal anzuordnen. Eine solche Anordnung lässt sich als "`2D Picker"' mithilfe eines GridViewPagers realisieren. Wie unter Android üblich mussten wir dazu unterschiedliche Klassen ableiten, Methoden überschreiben und aus programmieren. Über einen Button, der in Form eines Mülleimers dargestellt wird, lassen sich bestehende Notizen löschen. Ein Screenshot der prototypischen Anwendung findet sich unterhalb des Ergebnisses. TODO!
+
+Ursprünglich hatten wir geplant, dass es möglich sein sollte eine Messung über die Uhr durchzuführen. Den entsprechenden Dialog hatten wir als weitere Card geplant, die über eine vertikale Wischgeste aufrufbar sein sollte. Das Problem war allerdings diese Funktionalität im Rahmen des 2D Pickers zu realisieren, da jede weitere Zeile gleich viele Elemente enthalten muss. In unserem Fall hätten wir dazu pro Notiz einen neuen Einstellungsdialog instantiieren müssen. Daher haben wir uns dazu entschieden diese Funktionalität auf dem Smartphone zu implementieren.
 
 
-Im nächsten Schritt benötigten wir eine Möglichkeit mehrere Notizen, also mehrere Cards anzuzeigen. Wir waren uns von Beginn an einig, dass die NAvigation durch die Cards über Wischgestiken realisiert werden sollen. Auch das Löschen von Cards hatten wir uns ursprünglich als Wischgestik vorgestellt. Dabei schwebte uns vor, dass man über Rechts- bzw. Links wischen durch eine Reihe von Notizen durch wischen kann und über einen Wischgestik nach unten oder oben die Notiz wieder entfernen kann.
 
-Auf der Suche nach einer Möglichkeit mehrere Karten in einer Reihe anzuzeigen fanden wir lediglich den sogenannten "`2D-Picker"', dieser bietet die Möglichkeit verschiedene Karten als Matrix anzuordnen.
 
-	- unkomfortabel, viel Komplexität, große Hürde
-	- Unsere Implementierung des 2D-Pickers... 
-		Komplette Matrix war nötig
-		Keine Möglichkeit null zurückzugeben
-		Ursprüngliche Idee Einstellungskarte zu machen
-		Dann Entscheidung alle Eingaben aufs Smartphone zu legen
-		So dass Uhr nur zur Anzeige bzw. Löschen von Notizen geht
-		Smartphone angenehmere Bedienung, Internetverbindung... Uhr WLAN mal kein WLAN?
