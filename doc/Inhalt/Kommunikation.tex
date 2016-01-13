@@ -9,9 +9,71 @@ werden die Messungen im CSV-Format gesendet. Das Modell wird als JSON-Objekt
 übertragen.
 
 \subsubsection{Datenformate}
-TODO: Beispiel für CSV \\
-TODO: Beispiel für Modell
 
+Das CSV-Format zur Eingabe der Messungen enthält in jeder Zeile eine Einzelmessung.
+\begin{description}
+	\item[scan\_id:] Zuordnung der Einzelmessung zur übergeordneten Messung
+	\item[room\_id:] ID des Raums, der vermessen wurde
+	\item[tag:] Adresse des Bluetooth-Beacons
+	\item[rssi:] Gemessene Signalstärke des Beacons
+\end{description}
+
+Das folgende Listing enthält ein Beispiel für die Eingabedaten:
+\begin{lstlisting}
+scan_id,room_id,tag,rssi
+7,3,7C:2F:80:99:DE:CD,-96
+7,3,7C:2F:80:99:DE:25,-92
+7,3,7C:2F:80:99:DE:B1,-77
+8,3,7C:2F:80:99:DE:CD,-97
+8,3,7C:2F:80:99:DE:25,-96
+8,3,7C:2F:80:99:DE:B1,-77
+9,3,7C:2F:80:99:DE:CD,-98
+9,3,7C:2F:80:99:DE:25,-88
+9,3,7C:2F:80:99:DE:B1,-90
+\end{lstlisting}
+
+Die Ausgabe enthält ein JSON-Objekt mit folgenden Eigenschaften:
+\begin{description}
+	\item[W:] Gewichtsmatrix mit $m$ Spalten und $n$ Zeilen. Zu beachten ist, das wir eine
+		spaltenweise Anordnung (Column-major) verwenden.
+	\item[b:] Bias-Vektor mit $m$ Komponenten
+	\item[acc:] Anteil der Vermessungsdaten, die vom Modell korrekt zugeordnet werden.
+	\item[max\_rssi] Maximale Signalstärke in RSSI (für die Normalisierung)
+	\item[min\_rssi] Minimale Signalstärke in RSSI (für die Normalisierung)
+	\item[rooms:] Eine Zuordnung von Raum-IDs auf die entsprechenden Komponenten im
+		Ausgabevektor $\vec{y}$
+	\item[tags:] Eine Zuordnung von Beacon-Adressen auf die entsprechenden Komponenten
+		im Eingabevektor $´\vec{x}$
+\end{description}
+
+Eine Beispielausgabe ist in dem folgenden Listing abgebildet:
+\begin{lstlisting}
+{
+	"W": [
+		[ 5.284488201141357, -1.217451095581054, -4.067033290863037],
+		[-4.282089710235596, -2.423469066619873,  6.705572128295898],
+		[ 5.202191829681396, -3.159849166870117, -2.042347431182861],
+		[-3.018973350524902, -2.721389532089233,  5.740373134613037],
+		[-5.422317504882812,  6.621939659118652, -1.199626445770263],
+	],
+	"b": [1.49265122413635, 2.96597456932067, -4.4586167335510],
+	"acc": 0.8888888955116272,
+	"max_rssi": -61,
+	"min_rssi": -106,
+	"rooms": {
+		"1": 2,
+		"2": 1,
+		"3": 0
+	},
+	"tags": {
+		"7C:2F:80:99:DE:25": 2,
+		"7C:2F:80:99:DE:70": 3,
+		"7C:2F:80:99:DE:88": 4,
+		"7C:2F:80:99:DE:B1": 0,
+		"7C:2F:80:99:DE:CD": 1
+	}
+}
+\end{lstlisting}
 
 \subsubsection{UTF-8}
 Bei der Übertragung der UTF-8 Daten aus Android heraus gab es unerwartete Probleme.
