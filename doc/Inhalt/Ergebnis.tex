@@ -1,1 +1,55 @@
 \section{Ergebnis}
+
+\subsection{Prototyp}
+\label{sec:prototyp}
+Unser Prototyp umfasst wie hinlänglich beschrieben drei Komponenten, den Web-Service, eine Smartphone- sowie eine Smartwatch-Anwendung. 
+
+Entsprechend unserer definierten Anwendungsfälle (s. Kapitel \ref{sec:useCases}) kann man mit unserer Anwendung
+\begin{itemize}
+\item{die eigene Position auf einen Raum genau bestimmen,}
+\item{Notizen in einem Raum anbringen und anzeigen,}
+\item{Notizen mit Ereignissen verknüpfen und bei diesem zur Anzeige bringen und}
+\item{angebrachte Notizen wieder löschen.} 
+\end{itemize}
+
+Bei unseren Anwendungsfällen war ursprünglichen angedacht ebenfalls ein Gegenstandstracking zu implementieren, mit dem es möglich sein sollte Gegenstände auf einen Raum genau zu lokalisieren. Uns fehlte an dieser Stelle leider die Zeit, um das Feature fertig zu stellen. Wir sind aber äußerst optimistisch, dass das Gegenstandstracking gut funktioniert hätte.
+
+Die folgenden Screenshots zeigen die wesentlichen Ansichten unserer Anwendungen.
+
+\subsubsection{Smartwatch}
+Die Smartwatch-Anwendung besteht aus einer Ansicht, die ggf. mehrfach instantiiert wird. Diese unterscheidet sich leicht durch die Displayform der jeweiligen Uhr. Die Abbildungen \ref{fig:ScreenshotWatchEckig} und \ref{fig:ScreenshotWatchRund} zeigen wie die Notizendarstellung unseres Prototyps ausschaut.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.3\linewidth]{../Bilder/ScreenshotWatchEckig}
+\caption{Screenshot unserer Uhr mit eckigem Display}
+\label{fig:ScreenshotWatchEckig}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.3\linewidth]{../Bilder/ScreenshotWatchRund}
+\caption{Screenshot unserer Uhr mit rundem Display}
+\label{fig:ScreenshotWatchRund}
+\end{figure}
+
+\subsubsection{Smartphone}
+Unsere Smartphone-Anwendung besteht aus zwei Ansichten. Die Hauptansicht erlaubt es Notizen zu erstellen und zur Smartwatch zu schicken (s. Abb. \ref{fig:ScreenshotPhoneMainActivity}), während eine weitere Ansicht zur Steuerung des Messvorgang (s. Abb. \ref{fig:ScreenshotPhoneRoomScanner}) dient.
+ 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\linewidth]{../Bilder/ScreenshotPhoneMainActivity}
+\caption{Screenshot der Ansicht zum erstellen von Notizen}
+\label{fig:ScreenshotPhoneMainActivity}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\linewidth]{../Bilder/ScreenshotPhoneRoomScanner}
+\caption{Screenshot der Ansicht zum Vermessen von Räumen und erstellen}
+\label{fig:ScreenshotPhoneRoomScanner}
+\end{figure}
+
+
+
+\input{Inhalt/Fazit}
