@@ -39,13 +39,13 @@ Die Kommunikation zwischen dem Smartphone und der Smartwatch muss bidirektional 
 
 Kommunikation zwischen einem Android Smartphone und einem Android Wear Gerät findet grundsätzlich über die Wearable Data Layer API\footnote{\url{http://developer.android.com/training/wearables/data-layer/index.html}} statt, die Teil der Google Play Services ist. Die API bietet verschiedene Möglichkeiten der Kommunikation. Wir haben uns in einem ersten Anlauf mit der Synchronisation von sogenannten DataItems beschäftigt. Da diese Synchronisation allerdings nicht sofort nach einer Aktualisierung der Daten stattfindet und somit die Daten nicht sofort bei dem Kommunikationspartner verfügbar sind, implementierten wir die Kommunikation im weiteren Verlauf des Projekts mithilfe von Messages und der dafür vorgesehenen MessageAPI \footnote{\url{http://developer.android.com/training/wearables/data-layer/messages.html}}. Messages stellen eine unidirektionale Kommunikationsmöglichkeit dar. Sie sind definiert über eine Pfadangabe und können beliebige Daten in Form eines Byte-Arrays transportieren. Zum Empfang der Daten dient eine Implementierung des Wearable Listener Services\footnote{\url{https://developers.google.com/android/reference/com/google/android/gms/wearable/WearableListenerService}}.
 
-Um die angesprochen bidirektionale Kommunikation herzustellen, haben wir entsprechend auf jeder Seite der Kommunikationen einen Listener Service implementiert sowie die Möglichkeit geschaffen Messages zu versenden. Am Beispiel der Vermessung zur initialen Erstellung des Models wird die Kommunikation mit Messages im folgenden Sequenzdiagramm (Abb. \ref{}) dargestellt.
+Um die angesprochen bidirektionale Kommunikation herzustellen, haben wir entsprechend auf jeder Seite der Kommunikationen einen Listener Service implementiert sowie die Möglichkeit geschaffen Messages zu versenden. Am Beispiel der Vermessung zur initialen Erstellung des Models wird die Kommunikation mit Messages im folgenden Sequenzdiagramm (Abb. \ref{fig:SequenzdiagrammScan}) dargestellt.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\linewidth]{../Bilder/SequensdiagrammScan}
+\includegraphics[width=0.9\linewidth]{../Bilder/SequenzdiagrammScan}
 \caption{}
-\label{fig:SequensdiagrammScan}
+\label{fig:SequenzdiagrammScan}
 \end{figure}
 
 Sequenzdiagramm erläutern
