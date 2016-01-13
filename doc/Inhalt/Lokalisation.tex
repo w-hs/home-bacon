@@ -152,6 +152,7 @@ Das Modell hat zwei Aufgaben:
 \end{enumerate}
 
 \subsubsection{Bestimmung des wahrscheinlichsten Raums bei einer Messung}
+\label{sec:lok-wahrscheinlich}
 
 In Abschnitt \ref{sec:lok-grafische-aufbereitung} haben wir gesehen, dass die
 Messungen für unterschiedliche Räume zum großen Teil linear separierbar sind.
@@ -230,6 +231,7 @@ Größe der Parameter $W$ und $\vec{b}$ abhängen, können wir den Ausgabevektor
 allerdings nur zur Bestimmung des Raums mit der größten Wahrscheinlichkeit nutzen.
 
 \subsubsection{Zusammenfassung von Messungen}
+\label{sec:lok-zusammenfassung-messungen}
 
 Im vorherigen Abschnitt haben wir den wahrscheinlichsten Raum für eine Messung bestimmt.
 Da eine Messung keine absolut korrekte Raumerkennung leisten kann, kombinieren wir
@@ -246,45 +248,62 @@ ein Raumwechsel gemeldet, sondern erst nach einer kurzen Verzögerung.
   
 \subsection{Implementierung}
 
-Vorhersagemodell:
-- Webservice in Python
-- Verwendung von TensorFlow
-- Machine-Learning für Bestimmen der Parameter
-Zuordnungsmodell:
-- Mehrfache Messung + Vorhersage
-- LimitedQueue mit alten Vorhersagen
-- Mehrheit in dieser Queue bestimmt, welcher Raum zugeordnet wird
-- Effekt: Hysterese
+Bei der Implementierung unseres Lösungsansatzes sind folgende Rahmenbedingungen zu beachten:
+\begin{enumerate}
+	\item Der Machine-Learning-Algorithmus zur Bestimmung der Parameter des Modells aus
+		den Vermessungsdaten ist rechenintensiv und soll deshalb in einen Web-Service
+		ausgelagert werden.
+	\item Die Vermessung von Räumen und die Erstellung eines Modells soll nur einmalig
+		erfolgen, da die Smartwatch-App ansonsten auch Offline funktionsfähig sein soll.
+	\item Die Anwendung des gelernten Modells auf Messungen bei der Raumerkennung muss
+		auf performant sein, da diese Berechnung lokal auf der Smartwatch erfolgt.
+\end{enumerate}
 
-\subsection{Erstes Szenario}
+\subsubsection{Web-Service}
 
-Da uns zu Beginn des Projekts nur zwei G-Tags zur Verfügung standen, betrachten
-wir zunächst ein vereinfachtes Szenario:
+Um den Machine-Learning-Algorithmus zu implementieren, haben haben uns für
+TensorFlow\footnote{\url{https://www.tensorflow.org/}} entschieden.
+Da diese API primär für Python entwickelt wurde, verwenden wir Python auch
+für unseren Web-Service.
+
+Der Web-Service wird als einfaches CGI-Skript in einem Apache-Server ausgeführt.
+Als Eingabe werden UTF-8-kodierte Vermessungsdaten im CSV-Format erwartet.
+Nachdem die Daten normalisiert und aufbereitet wurden, erstellen wir das
+zuvor entwickelte Berechnungsmodell (siehe \ref{sec:lok-wahrscheinlich}) in
+TensorFlow. Anschließend wird der Machine-Learning-Algorithmus auf die
+Vermessungsdaten angewendet.
+Das berechnete Modell wird im JSON-Format an den Client gesendet.
+
+Das Modell enthält folgende Daten:
 \begin{itemize}
-	\item Es gibt zwei Räume: Küche, Flur
-	\item In jedem Raum ist ein G-Tag platziert
+	\item Gelernte Parameter: $W$, $\vec{b}$
+	\item Normalisierungsinformationen: $max_{RSSI}, min_{RSSI}$
+	\item Zuordnung der Beacon-Adressen und Raum-IDs zu Indizes in den Vektoren
 \end{itemize}
+Die Normalisierungsinformationen sind wichtig, um bei einer Messung die RSSI-Werte in
+das erforderliche Intervall $[0, 1] \subset \mathbb{R}$ zu überführen.
+Um beliebige Beacon-Adressen auf die korrekten Positionen im Eingabevektor $\vec{x}$
+und die Komponenten im Ausgabevektor wieder auf die betroffenen Raum-IDs
+zu mappen, sind zusätzliche Zuordnungsinformationen im Modell enthalten.
 
-\subsubsection{Messung}
+\subsubsection{Offline-Fähigkeit}
 
-Mithilfe eines rudimentären Bluetooth-Scanners vermessen wir die einzelnen Räume.
-Dabei werden mehrere Scans durchgeführt. Ein Scan enthält die Signalstärke 
-jedes Beacons in der Einheit RSSI (Received Signal Strength Indication).
-Die wahrgenommene Signalstärke hängt von vielen Faktoren ab:
-\begin{itemize}
-	\item Wie stark sendet der Beacon?
-	\item Wie gut ist die Antenne im Smartphone bzw. der Smartwatch?
-	\item Wie weit sind Sender und Empfänger entfernt?
-	\item Welche Störungen (Reflektionen, Abdeckungen) gibt es?
-	\item Wie hat der Hersteller des Empfängers die Übersetzung von Feldstärke in RSSI-Wert implementiert?
-\end{itemize}
-Eine direkte Positionsbestimmung über z.B. Triangulation ist also schwierig.
-In unserem Problem kommt noch dazu, dass wir über keine Karte der Räume
-verfügen.
+Die Berechnung des Modells erfolgt im besten Fall einmalig nach Vermessen aller Räume.
+Das so erstellte Modell soll auch ohne Verbindung zum Smartphone oder Internet von
+der Smartwatch angewendet werden. Deshalb speichern wir das Modell als serialisiertes
+Java-Objekt in den Einstellungen der Smartwatch-App über der Preferences-API
+\footnote{\url{https://developer.android.com/reference/android/preference/Preference.html}}.
+Da die Daten nicht relational sind, haben wir uns gegen das Ablegen in der Datenbank
+entschieden.
 
-Die Signalstärken der Beacons werden ca. jede Sekunde gemessen ($\delta t_m \approx 1s$).
-Die Messung der einzelnen Beacons erfolgt allerdings zu unterschiedlichen Zeiten,
-weshalb wir ein Zeitfenster von $\Delta t_g = 2s$ in dem Messungen unterschiedlicher
-Beacons als gleichzeitig angesehen werden. Dadurch werden Beacons, die in der letzten Sekunde aus irgendeinem Grund nicht gemessen werden konnten, nicht direkt als nicht vorhanden eingestuft.
-Erst wenn ein Beacon in zwei aufeinanderfolgenden Messungen nicht registriert wurde, wird dessen Signalstärke als nicht vorhanden angesehen.
+\subsubsection{Anwendung des Modells}
+
+Da das Modell performant auf die eingehenden Messdaten angewendet werden soll,
+implementieren wir die Vektoren und Matrizen als ein- bzw. zweidimensionale
+Floating-Point-Arrays. Alle Berechnungen sind in der Klasse PredictionModel
+implementiert.
+
+Die Zusammenfassung von mehreren Messungen auf eine Raumvorhersage
+(siehe \ref{sec:lok-zusammenfassung-messungen}) erfolgt durch die Implementierung
+einer beschränkten Queue, wobei wir als maximale Länge $N = 10$ gewählt haben.
 
