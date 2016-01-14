@@ -1,6 +1,6 @@
 \section{Prototyp}
 \label{sec:prototyp}
-Unser Prototyp umfasst wie hinlänglich beschrieben drei Komponenten, den Web-Service, eine Smartphone- sowie eine Smartwatch-Anwendung. 
+Unser Prototyp umfasst wie beschrieben drei Komponenten, den Web-Service, eine Smartphone- sowie eine Smartwatch-Anwendung. 
 
 Entsprechend unserer definierten Anwendungsfälle (s. Kapitel \ref{sec:useCases}) kann man mit unserer Anwendung
 \begin{itemize}
@@ -10,18 +10,21 @@ Entsprechend unserer definierten Anwendungsfälle (s. Kapitel \ref{sec:useCases}
 \item{angebrachte Notizen wieder löschen.} 
 \end{itemize}
 
-Bei unserer Projektplanung war ursprünglichen angedacht ebenfalls ein Gegenstandstracking zu implementieren, mit dem es möglich sein sollte Gegenstände auf einen Raum genau zu lokalisieren. Uns fehlte an dieser Stelle leider die Zeit, um das Feature fertig zu stellen. Wir sind aber äußerst optimistisch, dass das Gegenstandstracking gut funktioniert hätte.
+Bei unserer Projektplanung war ursprünglichen angedacht ebenfalls ein Gegenstands\-tracking zu implementieren, mit dem es möglich sein sollte Gegenstände auf einen Raum genau zu lokalisieren. Uns fehlte an dieser Stelle leider die Zeit, um das Feature fertig zu stellen. Wir sind aber äußerst optimistisch, dass das Gegenstandstracking gut funktioniert hätte.
+\todo{Soll das ins Fazit?}
 
-\subsection{HomeBacon-UI}
+\subsection{Smartwatch}
 
-\subsubsection{Smartwatch}
-Aufgrund der bereits beschriebenen Einschränkungen einer Smartwatch (s. Kap. \ref{sec:einschraenkungen}) haben wir uns im ersten Schritt die von Android-Wear bereitgestellten UI-Elemente intensiv angesehen. Unter den verschiedenen Möglichkeiten unsere gewünschten Notizen, bestehend aus Titel und einem Text, darzustellen, erschien uns die Darstellung in Form von Cards\footnote{Eine Übersicht der Android-Wear-UI-Patterns befindet sich unter \url{http://developer.android.com/design/wear/patterns.html}} am geeignetsten.
+Aufgrund der bereits beschriebenen Einschränkungen einer Smartwatch (s. Kap. \ref{sec:einschraenkungen}) haben wir uns im ersten Schritt die von Android-Wear bereitgestellten UI-Elemente intensiv angesehen. Unter den verschiedenen Möglichkeiten unsere gewünschten Notizen, bestehend aus Titel und Text, darzustellen, erschien uns die Darstellung in Form von Cards\footnote{Eine Übersicht der Android-Wear-UI-Patterns befindet sich unter \url{http://developer.android.com/design/wear/patterns.html}} am geeignetsten.
 
 Um die Anzeige mehrerer Notizen auf dem kleinem Display der Smartwatch zu realisieren, haben wir uns überlegt die Cards horizontal in einer Art Liste anzuordnen. Eine solche Anordnung lässt sich als 2D-Picker mithilfe eines GridViewPagers realisieren. Des Weiteren lassen sich bestehende Notizen über einen Button löschen, der in Form eines Mülleimers dargestellt wird. 
 
-Ursprünglich hatten wir geplant, dass es möglich sein sollte, eine Vermessung der Räume direkt über die Uhr durchzuführen. Den entsprechenden Dialog hatten wir als weitere Card umgesetzt, die über eine vertikale Wischgeste aufrufbar sein sollte. Das Problem war allerdings diese Funktionalität im Rahmen des 2D-Pickers zu realisieren. Der 2D-Picker bildet immer ganze Matrizen ab, in der jede weitere Zeile gleich viele Elemente enthalten muss. In unserem Fall hätten wir dazu pro Notiz einen neuen Einstellungsdialog instantiieren müssen. \todo{Bild erzeugen und hierhin!} Des Weiteren haben wir festgestellt, dass es Usus ist, dass komplexere Dialoge im Wearable-Umfeld auf das Smartphone ausgelagert sind. Daher haben auch wir uns dazu entschieden diese Funktionalität auf dem Smartphone zu implementieren.
+Ursprünglich hatten wir geplant, dass es möglich sein sollte, eine Vermessung der Räume direkt über die Uhr durchzuführen. Den entsprechenden Dialog hatten wir als weitere Card umgesetzt, die über eine vertikale Wischgeste aufrufbar sein sollte. Das Problem war allerdings diese Funktionalität im Rahmen des 2D-Pickers
+zu realisieren. Der 2D-Picker bildet immer ganze Matrizen ab, in der jede weitere Zeile gleich viele Elemente enthalten muss. In unserem Fall hätten wir dazu pro Notiz einen neuen Einstellungsdialog instantiieren müssen. \todo{Bild erzeugen und hierhin! + Argument gleiche Dialoge} Des Weiteren haben wir festgestellt, dass es Usus ist, dass komplexere Dialoge im Wearable-Umfeld auf das Smartphone ausgelagert sind. Daher haben auch wir uns dazu entschieden, diese Funktionalität auf dem Smartphone zu implementieren.
+\todo{2D-Pickers Link einfügen}
 
-Die Abbildungen \ref{fig:ScreenshotWatchEckig} und \ref{fig:ScreenshotWatchRund} zeigen wie die Notizendarstellung unseres Prototyps ausschaut. Die Smartwatch-Anwendung besteht aus der abgebildeten Ansicht, die ggf. mehrfach instantiiert wird.
+Die Abbildungen \ref{fig:ScreenshotWatchEckig} und \ref{fig:ScreenshotWatchRund} zeigen
+die Notizendarstellung unseres Prototyps. Die Smartwatch-Anwendung besteht aus der abgebildeten Ansicht, die ggf. mehrfach instantiiert wird.
 
 \begin{figure}[H]
 \centering
