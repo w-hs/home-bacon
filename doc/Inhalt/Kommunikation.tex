@@ -123,7 +123,7 @@ Ein Android-Service läuft dauerhaft im Hintergrund und weist keine aktive Verbi
 Im Wesentlichen nutzen wir dazu Broadcasts und Startmöglichkeiten einer Activity mit Übergabeparametern. 
 Wir decken drei verschiedene Szenarien ab.
 \begin{enumerate}
-\item{Es wird immer eine neue Instanz der Activity erzeugt. Beispiel: Im Falle eines Raumwechsels gibt es Notizen, die mit Ereignissen wie Betreten oder Verlassen des Raumes verknüpft sind. Tritt eines der Ereignisse auf und es sind Notizen mit diesem verknüpft, so werden diese in einer neuen Instanz der Activity dargestellt. Das heißt, es kann mehrere Instanzen geben, die verschiedene Notizen anzeigen.}
+\item{Es wird immer eine neue Instanz der Activity erzeugt. Beispiel: Im Falle eines Raumwechsels gibt es Notizen, die mit Ereignissen wie Betreten oder Verlassen des Raums verknüpft sind. Tritt eines der Ereignisse auf und es sind Notizen mit diesem verknüpft, so werden diese in einer neuen Instanz der Activity dargestellt. Das heißt, es kann mehrere Instanzen geben, die verschiedene Notizen anzeigen.}
 \item{Wenn die Activity inaktiv ist, soll sie gestartet werden und wenn sie aktiv ist, soll diese aktive Instanz aktualisiert werden. Beispiel: Die Smartwatch empfängt eine neu angelegte Notiz. Sie öffnet oder aktualisiert die Activity.}
 \item{Wenn die Activity inaktiv ist, soll sie nicht starten. Lediglich eine aktive Instanz soll aktualisiert werden. Beispiel: Ein Raumwechsel findet statt. Die Activity aktualisiert die Notizen entsprechend des neuen Raums. Die Anwendung wird jedoch nicht gestartet, wenn diese inaktiv ist.}
 \end{enumerate}
