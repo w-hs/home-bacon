@@ -29,6 +29,8 @@ $0$ kein Signal und $1$ maximale Signalstärke bedeutet.
 Unter einer \textbf{Messung} verstehen wir einen Vektor von Einzelmessungen,
 welche gleichzeitig aufgenommen wurden.
 
+\todo{Messintervall t\_m erklären}
+
 In der Realität ergeben sich zwei Probleme, bei der Messung nach obigem
 Schema:
 \begin{enumerate}
@@ -36,7 +38,7 @@ Schema:
 	  Geräte ca. jede Sekunde durchgeführt. Dabei kommen Einzelmessungen nicht
 	  gleichzeitig für alle Beacons in Reichweite an, sondern verteilt über
 	  den Zeitraum von einer Sekunde. Es stellt sich also die Frage, was
-	  gleichzeitig, bei der Definition einer Messung bedeutet.
+	  gleichzeitig bei der Definition einer Messung bedeutet.
 	\item Es kann vorkommen, dass ein Beacon in Reichweite ist, aber in der
 	  letzten Sekunde nicht wahrgenommen wurde. Das würde bedeuten, dass ein
 	  einziger Aussetzer den Beacon als nicht erreichbar in der Einzelmessung
@@ -74,22 +76,22 @@ Dazu werden wir die Verteilung der Messwerte sowohl statistisch als
 auch grafisch aufbereiten.
 
 In dieser Analyse haben wir zwei Räume gescannt, die im Folgenden als
-Küche und Flur bezeichnet wurden. In jedem Raum wurde ein Beacon platziert.
+Küche und Flur bezeichnet werden. In jedem Raum wurde ein Beacon platziert.
 Die Beacons hatten folgende Bluetooth-Adressen:
 \begin{itemize}
 	\item 7C:2F:80:8D:E2:3B (platziert in Küche)
 	\item 7C:2F:80:8D:E2:45 (platziert in Flur)
 \end{itemize}
 Da sich die Adressen nur in der letzten Stelle unterscheiden, referenzieren
-wir diese Beacons im folgenden nur mit diesem Teil der Adresse, d. h.
+wir diese Beacons im Folgenden nur mit diesem Teil der Adresse, d. h.
 3B und 45.
 
 \subsubsection{Statistische Aufbereitung}
 
-Als erstes betrachten wir den Minimal-, Maximal, Mittelwert und die Standardabweichung für jeden
+Zunächst betrachten wir den Minimal-, Maximal, Mittelwert und die Standardabweichung für jeden
 Beacon in jedem Raum. Diese bestimmen wir per SQL aus der SQLite-Datenbank der Messwerte.
-Da die Messwerte in der Datenbank nicht normalisiert abgelegt wurden, sind die Werte
-in Tabelle \ref{tab:sql-analyze} nicht normalisiert.
+Da die Messwerte in der Datenbank nicht normalisiert abgelegt wurden, sondern erst später
+normalisiert werden, sind die Werte in Tabelle \ref{tab:sql-analyze} nicht normalisiert.
 
 \begin{table}[h]
 	\caption{SQL-Analyse der ersten Messung}
