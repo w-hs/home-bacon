@@ -117,7 +117,7 @@ prinzipiell auseinander gehalten werden können.
 \label{sec:lok-grafische-aufbereitung}
 
 Da man sich unter einer Liste von Messwerten häufig wenig vorstellen kann,
-wollen wir zunächst die Messung in einer Grafik visualisieren.
+wollen wir als Nächstes die Messung in einer Grafik visualisieren.
 Abbildung \ref{fig:KuecheFlur_1} zeigt die Messungen in beiden Räumen.
 Da eine Messung die Einzelmessungen für beide Beacons enthält, stellt diese
 einen Punkt im zweidimensionalen Raum dar. Die Signalstärke ist in diesem
@@ -127,8 +127,7 @@ die Messung durchgeführt wurde (blau: Flur, gelb: Küche).
 Aus der Grafik lässt sich entnehmen, dass die Messungen für beide Räume
 annähernd linear separierbar sind. Es gibt gerade im Übergang zwischen den beiden
 Clustern allerdings ein paar Messungen, die für eine korrekte Zuordnung 
-problematisch sein können. Wir schließen daraus, das eine Messung nicht ausreicht,
-um den Raum sicher zu bestimmen.
+problematisch sein können. Wir schließen daraus, dass eine zuverlässige Raumerkennung mehrere Messungen erfordert.
 
 \begin{figure}[tbh]
 	\centering
@@ -147,10 +146,10 @@ einer Reihe von Messungen den aktuellen Raum möglichst genau bestimmt.
 Das Modell hat zwei Aufgaben:
 \begin{enumerate}
 	\item Um eine Messung einem Raum zuzuordnen, soll aus dem Messvektor der
-		wahrscheinlichste Raum berechnet.
+		wahrscheinlichste Raum berechnet werden.
 	\item Eine Messung allein reicht nicht aus, um eine korrekte Aussage über
 		den aktuellen Raum zu machen. Deshalb sollen mehrere Messungen zu
-		einer sicheren Vorhersage zusammengefasst werden
+		einer sicheren Vorhersage zusammengefasst werden.
 \end{enumerate}
 
 \subsubsection{Bestimmung des wahrscheinlichsten Raums aus einer Messung}
@@ -185,7 +184,7 @@ zu eins addieren:
 $$ \sum_{j=0}^{m-1} y_j = 1 $$
 
 Um aus dem Eingabevektor die gewünschte Ausgabe zu erzeugen, sind zwei Schritte notwendig.
-Zuerst werden die Komponenten des Eingabevektors gewichtet summiert und mit einem Bias
+Zuerst werden die Komponenten des Eingabevektors gewichtet summiert und mit einem Bias\footnote{Ein Bias ist ein auftretender systematischer Effekt mit einer Grundtendenz.}
 versehen:
 
 $$ z_j = \sum_{i=0}^{n-1} W_{j,i} \cdot x_i + b_j $$
