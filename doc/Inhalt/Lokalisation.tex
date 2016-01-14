@@ -6,7 +6,7 @@ relevanten Räumen platziert werden. Anschließend werden diese
 Räume einmalig vermessen, um ein Modell zur Erkennung der
 Räume zu erstellen.
 Dabei ist zu beachten, dass wir im Gegensatz zu anderen Projekten
-im Bereich In-Door-Lokalisation keine Informationen über die
+im Bereich Indoor-Lokalisation keine Informationen über die
 Räume oder die Position der Beacons besitzen. Aus diesem Grund
 beschränken wir die Genauigkeit der Positionsbestimmung auf
 Raumebene.
@@ -90,8 +90,7 @@ wir diese Beacons im Folgenden nur mit diesem Teil der Adresse, d. h.
 
 Zunächst betrachten wir den Minimal-, Maximal, Mittelwert und die Standardabweichung für jeden
 Beacon in jedem Raum. Diese bestimmen wir per SQL aus der SQLite-Datenbank der Messwerte.
-Da die Messwerte in der Datenbank nicht normalisiert abgelegt wurden, sondern erst später
-normalisiert werden, sind die Werte in Tabelle \ref{tab:sql-analyze} nicht normalisiert.
+Da die Messwerte in der Datenbank als RSSI-Werte abgelegt und erst später normalisiert werden, sind die Werte in Tabelle \ref{tab:sql-analyze} nicht normalisiert.
 
 \begin{table}[h]
 	\caption{SQL-Analyse der ersten Messung}
@@ -175,6 +174,7 @@ Zunächst definieren wir folgende Symbole:
 	\item Wahrscheinlichkeit für den Raum $j \in [0, m - 1] \subset \mathbb{N}$:
 		$ y_j \in [0, 1] \subset \mathbb{R} $ 
 \end{itemize}
+\todo{Schnittmengen}
 
 Der Messvektor $\vec{x}$ enthält die normalisierten Signalstärken für die wahrgenommenen
 Bluetooth-Beacon. Er stellt die Eingabe für die Vorhersage dar. 
@@ -227,9 +227,9 @@ Die Verlustfunktion kann dann wie folgt definiert werden:
 $$ \text{Loss}(\vec{y}, \vec{y'}) = - \sum_{j=0}^{m-1} y_j' \cdot \log(y_j) $$
 
 Zu beachten ist, dass die so bestimmten Werte zwar alle mathematischen
-Eigenschaften für Wahrscheinlichkeiten erfüllen. Da die konkreten Werte von der
-Größe der Parameter $W$ und $\vec{b}$ abhängen, können wir den Ausgabevektor
-allerdings nur zur Bestimmung des Raums mit der größten Wahrscheinlichkeit nutzen.
+Eigenschaften für Wahrscheinlichkeiten erfüllen. Allerdings können wir den Ausgabevektor
+nur zur Bestimmung des Raums mit der größten Wahrscheinlichkeit nutzen,
+da die konkreten Werte von der Größe der Parameter $W$ und $\vec{b}$ abhängen.
 
 \subsubsection{Zusammenfassung von Messungen}
 \label{sec:lok-zusammenfassung-messungen}
@@ -239,7 +239,7 @@ Da eine Messung keine absolut korrekte Raumerkennung leisten kann, kombinieren w
 die Ergebnisse von mehreren aufeinanderfolgenden Messungen.
 
 Dabei betrachten wir die letzten $N$ Messungen und wählen den Raum, der in diesen
-$N$ Messungen am meisten als wahrscheinlichster Raum bestimmt wurde.
+$N$ Messungen am häufigsten als wahrscheinlichster Raum bestimmt wurde.
 Dies hat den Vorteil, dass einzelne Fehlmessungen nicht zu einem spontanem Raumwechsel
 führen. Allerdings führt dieses Vorgehen auch eine gewisse Latenz ein, bis ein Wechsel
 erkannt werden kann. Deshalb sollte $N$ weder zu klein, noch zu groß gewählt werden.
@@ -255,7 +255,7 @@ Bei der Implementierung unseres Lösungsansatzes sind folgende Rahmenbedingungen
 		den Vermessungsdaten ist rechenintensiv und soll deshalb in einen Web-Service
 		ausgelagert werden.
 	\item Die Vermessung von Räumen und die Erstellung eines Modells soll nur einmalig
-		erfolgen, da die Smartwatch-App ansonsten auch offline funktionsfähig sein soll.
+		erfolgen, da die Smartwatch-App offline funktionsfähig sein soll.
 	\item Die Anwendung des gelernten Modells auf Messungen bei der Raumerkennung muss
 		performant sein, da diese Berechnung lokal auf der Smartwatch erfolgt.
 \end{enumerate}
@@ -292,8 +292,8 @@ zu mappen, sind zusätzliche Zuordnungsinformationen im Modell enthalten.
 Die Berechnung des Modells erfolgt im besten Fall einmalig nach Vermessen aller Räume.
 Das so erstellte Modell soll auch ohne Verbindung zum Smartphone oder Internet von
 der Smartwatch angewendet werden. Deshalb speichern wir das Modell als serialisiertes
-Java-Objekt in den Einstellungen der Smartwatch-App über der Preferences-API
-\footnote{\url{https://developer.android.com/reference/android/preference/Preference.html}}.
+Java-Objekt in den Einstellungen der Smartwatch-App über die
+Preferences-API\footnote{\url{https://developer.android.com/reference/android/preference/Preference.html}}.
 Da die Daten nicht relational sind, haben wir uns gegen das Ablegen in der Datenbank
 entschieden.
 
