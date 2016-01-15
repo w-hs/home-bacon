@@ -10,11 +10,8 @@ Entsprechend unserer definierten Anwendungsfälle (s. Kapitel \ref{sec:useCases}
 \item{angebrachte Notizen wieder löschen.} 
 \end{itemize}
 
-Bei unserer Projektplanung war ursprünglichen angedacht ebenfalls ein Gegenstands\-tracking zu implementieren, mit dem es möglich sein sollte Gegenstände auf einen Raum genau zu lokalisieren. Uns fehlte an dieser Stelle leider die Zeit, um das Feature fertig zu stellen. Wir sind aber äußerst optimistisch, dass das Gegenstandstracking gut funktioniert hätte.
-\todo{Soll das ins Fazit?}
 
 \subsection{Smartwatch}
-
 Aufgrund der bereits beschriebenen Einschränkungen einer Smartwatch (s. Kap. \ref{sec:einschraenkungen}) haben wir uns im ersten Schritt die von Android-Wear bereitgestellten UI-Elemente intensiv angesehen. Unter den verschiedenen Möglichkeiten unsere gewünschten Notizen, bestehend aus Titel und Text, darzustellen, erschien uns die Darstellung in Form von Cards\footnote{Eine Übersicht der Android-Wear-UI-Patterns befindet sich unter \url{http://developer.android.com/design/wear/patterns.html}} am geeignetsten.
 
 Um die Anzeige mehrerer Notizen auf dem kleinem Display der Smartwatch zu realisieren, haben wir uns überlegt die Cards horizontal in einer Art Liste anzuordnen. Eine solche Anordnung lässt sich als 2D-Picker\todo{einleitenden Text in Footnote? Wenn ja, dann bei allen Footnotes}\footnote{Eine Erklärung des 2D-Pickers befindet sich unter  \url{http://developer.android.com/training/wearables/ui/2d-picker.html}} mithilfe eines GridViewPagers realisieren. Des Weiteren lassen sich bestehende Notizen über einen Button löschen, der in Form eines Mülleimers dargestellt wird. 
