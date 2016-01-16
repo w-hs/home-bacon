@@ -1,5 +1,5 @@
 \section{Kommunikation}
-Wie im Kapitel \ref{sec:systemuebersicht} beschrieben, besteht unsere Anwendung aus drei Komponenten, die untereinander kommunizieren müssen. Das Smartphone spricht auf der einen Seite mit dem Web-Service zur Berechnung des Models, auf dem die Lokalisation beruht. Auf der anderen Seite sendet es Daten, wie z.B. eine Notiz, und Steuerbefehle an die Smartwatch, um z.B. Bluetooth-Scans zu starten oder zu stoppen. Umgekehrt sendet die Smartwatch Daten an das Smartphone, z.B. die Ergebnisse eines Scans. Die verschiedenen Kommunikationswege und ihre Nutzung werden im Folgenden näher beschrieben.
+Wie im Kapitel \ref{sec:systemuebersicht} beschrieben, besteht unsere Anwendung aus drei Komponenten, die untereinander kommunizieren müssen. Das Smartphone spricht auf der einen Seite mit dem Web-Service zur Berechnung des Modells, auf dem die Lokalisation beruht. Auf der anderen Seite sendet es Daten, wie z.B. eine Notiz, und Steuerbefehle an die Smartwatch, um z.B. Bluetooth-Scans zu starten oder zu stoppen. Umgekehrt sendet die Smartwatch Daten an das Smartphone, z.B. die Ergebnisse eines Scans. Die verschiedenen Kommunikationswege und ihre Nutzung werden im Folgenden näher beschrieben.
 
 \subsection{Zwischen Smartphone und Web-Service}
 
@@ -110,16 +110,16 @@ Messages stellen eine unidirektionale Kommunikationsmöglichkeit dar. Sie sind d
 Wearable-Listener-Services\footnote{\url{https://developers.google.com/android/reference/com/google/android/gms/wearable/WearableListenerService}}.
 
 Um die angesprochene bidirektionale Kommunikation herzustellen, haben wir entsprechend
-bei jedem Kommunikationspartner einen Listener-Service implementiert sowie die Möglichkeit geschaffen Messages zu versenden. Am Beispiel der Vermessung zur initialen Erstellung des Models wird die Kommunikation mit Messages im folgenden Sequenzdiagramm (Abb. \ref{fig:SequenzdiagrammScan}) dargestellt.
+bei jedem Kommunikationspartner einen Listener-Service implementiert sowie die Möglichkeit geschaffen Messages zu versenden. Am Beispiel der Vermessung zur initialen Erstellung des Modells wird die Kommunikation mit Messages im folgenden Sequenzdiagramm (Abb. \ref{fig:SequenzdiagrammScan}) dargestellt.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\linewidth]{../Bilder/SequenzdiagrammScan}
-\caption{Sequenzdiagramm der Vermessung zur initialen Erstellung des Models}
+\caption{Sequenzdiagramm der Vermessung zur initialen Erstellung des Modells}
 \label{fig:SequenzdiagrammScan}
 \end{figure}
 
-Der Benutzer startet den Ablauf durch die Aktion \textit{Starte Scan} in der Smartphone-Activity. Der Smartwatch-Service empfängt den Befehl, startet den Scan und speichert die gescannten Werte in der Datenbank. Der Service scannt solange bis der Benutzer mithilfe der Smartphone-Activity den \textit{Stoppe Scan} Befehl absetzt. Nachdem der Service das Scannen beendet hat, lädt dieser alle gescannten Werte aus der Datenbank, versendet sie und löscht die Werte aus der Datenbank, um bei Folgescans bei null zu starten. Die versendeten Werte empfängt der Smartphone-Service, der diese in der Datenbank des Smartphones speichert und den Benutzer mittels der Smartphone-Activity über den abgeschlossenen Scanvorgang informiert. Hat der Benutzer alle Räume vermessen, kann er die Berechnungen des Models anstoßen. Die Smartphone-Activity lädt daraufhin alle Scandaten aus der Datenbank und schickt diese zur Berechnung des Models an den Web-Service. Der Web-Service liefert das berechnete Model zurück, welches die Smartphone-Activity an den Smartwatch-Service versendet, der fortan damit arbeiten kann.
+Der Benutzer startet den Ablauf durch die Aktion \textit{Starte Scan} in der Smartphone-Activity. Der Smartwatch-Service empfängt den Befehl, startet den Scan und speichert die gescannten Werte in der Datenbank. Der Service scannt solange bis der Benutzer mithilfe der Smartphone-Activity den \textit{Stoppe Scan} Befehl absetzt. Nachdem der Service das Scannen beendet hat, lädt dieser alle gescannten Werte aus der Datenbank, versendet sie und löscht die Werte aus der Datenbank, um bei Folgescans von Beginn an zu starten. Die versendeten Werte empfängt der Smartphone-Service, der diese in der Datenbank des Smartphones speichert und den Benutzer mittels der Smartphone-Activity über den abgeschlossenen Scanvorgang informiert. Hat der Benutzer alle Räume vermessen, kann er die Berechnungen des Modells anstoßen. Die Smartphone-Activity lädt daraufhin alle Scandaten aus der Datenbank und schickt diese zur Berechnung des Modells an den Web-Service. Der Web-Service liefert das berechnete Modell zurück, welches die Smartphone-Activity an den Smartwatch-Service versendet, der fortan autark damit arbeiten kann.
 
 \subsection{Zwischen Service und Activity}
 Ein Android-Service läuft dauerhaft im Hintergrund und weist keine aktive Verbindung zu einer Activity mit UI auf. Um dennoch Informationen aus unseren Services in unsere Activities zu leiten, gibt es verschiedene Ansätze mit entsprechend leicht unterschiedlichen Ergebnissen. 
@@ -131,15 +131,15 @@ Wir decken drei verschiedene Szenarien ab.
 \item{Wenn die Activity inaktiv ist, soll sie nicht starten. Lediglich eine aktive Instanz soll aktualisiert werden. Beispiel: Ein Raumwechsel findet statt. Die Activity aktualisiert die Notizen entsprechend des neuen Raums. Die Anwendung wird jedoch nicht gestartet, wenn diese inaktiv ist.}
 \end{enumerate}
 
-Eine neue Activity-Istanz wie im ersten Szenario beschrieben starten wir mithilfe der Methode \texttt{startActivity} des vorhandenen Service-Contexts und des \textit{NEW\_TASK}-Flags. Das zweite Szenario erfüllen wir ähnlich. Neben dem \textit{NEW\_TASK}-Flag verwenden wir auch das \textit{SINGLE\_TOP}-Flag, das dafür sorgt, dass bei einer bestehenden Instanz keine neue erstellt wird, und das \textit{PREVIOUS\_IS\_TOP}-Flag, welches die vorhandene Instanz in den Vordergrund ruft. Das dritte Szenario nutzt Broadcasts, die nur von aktiven Anwendungen empfangen werden können. Bei allen beschriebenen Lösungen werden die zu übergebenen Informationen in Intents gekapselt.
+Eine neue Activity-Istanz, wie im ersten Szenario beschrieben, starten wir mithilfe der Methode \texttt{startActivity} des vorhandenen Service-Contexts und des \textit{NEW\_TASK}-Flags. Das zweite Szenario erfüllen wir ähnlich. Neben dem \textit{NEW\_TASK}-Flag verwenden wir auch das \textit{SINGLE\_TOP}-Flag, das dafür sorgt, dass bei einer bestehenden Instanz keine neue erstellt wird, und das \textit{PREVIOUS\_IS\_TOP}-Flag, welches die vorhandene Instanz in den Vordergrund ruft. Das dritte Szenario nutzt Broadcasts, die nur von aktiven Anwendungen empfangen werden können. Bei allen beschriebenen Lösungen werden die zu übergebenen Informationen in Intents gekapselt.
 
 Am Beispiel der Erstellung einer neuen Notiz wird in Abbildung \ref{fig:SequenzdigrammNewNote} die Kommunikation zwischen Service und Activity dargestellt.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\linewidth]{../Bilder/SequenzdigrammNewNote}
-\caption{Sequenzdiagramm einer Erstellung einer neuen Notiz}
+\caption{Sequenzdiagramm der Erstellung einer neuen Notiz}
 \label{fig:SequenzdigrammNewNote}
 \end{figure}
 
-Eine in der Smartphone-App erstellte Notiz wird an die Smartwatch gesendet und im Smartwatch-Service empfangen. Dieser speichert die neue Notiz in der lokalen Datenbank und startet im Anschluss die Activity bzw. gibt den Aktualisierungsanstoß. Das Starten bzw. Aktualisieren stellt das zweite Szenario da und ist wie beschrieben implementiert. Die Activity lädt nach dem Start bzw. dem Aktualisierungsbefehl alle Notizen für den aktuellen Raum , um sie anzuzeigen. 
+Eine in der Smartphone-App erstellte Notiz wird an die Smartwatch gesendet und im Smartwatch-Service empfangen. Dieser speichert die neue Notiz in der lokalen Datenbank und startet im Anschluss die Activity bzw. gibt den Aktualisierungsanstoß. Das Starten bzw. Aktualisieren stellt das zweite Szenario da und ist wie beschrieben implementiert. Die Activity lädt nach dem Start bzw. dem Aktualisierungsbefehl alle Notizen für den aktuellen Raum, um sie anzuzeigen. 
