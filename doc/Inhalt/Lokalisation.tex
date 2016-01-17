@@ -27,9 +27,8 @@ normalisieren wir die Werte auf das Intervall $[0, 1] \subset \mathbb{R}$, wobei
 $0$ kein Signal und $1$ maximale Signalstärke bedeutet.
 
 Unter einer \textbf{Messung} verstehen wir einen Vektor von Einzelmessungen,
-welche gleichzeitig aufgenommen wurden.
-
-\todo{Messintervall t\_m erklären}
+welche gleichzeitig aufgenommen wurden. Messungen werden im Intevall $t_m$ durchgeführt.
+In unserem Projekt messen wir jede Sekunde ($t_m = 1s$).
 
 In der Realität ergeben sich zwei Probleme, bei der Messung nach obigem
 Schema:
@@ -168,13 +167,12 @@ Zunächst definieren wir folgende Symbole:
 \begin{itemize}
 	\item Anzahl von gemessenen Beacons: $n \in \mathbb{N}$
 	\item Anzahl von vermessenen Räumen: $m \in \mathbb{N}$
-	\item Messung als Vektor von Einzelmessungen: $ \vec{x} \in [0, 1]^n \subset \mathbb{R}^n $
-	\item Einzelmessung für Beacon $i \in [0, n - 1] \subset \mathbb{N}$: $x_i \in [0, 1] \subset \mathbb{R}$
+	\item Messung als Vektor von Einzelmessungen: $ \vec{x} \in [0, 1]^n$
+	\item Einzelmessung für Beacon $i \in [0, n - 1] \cap \mathbb{Z}$: $x_i \in [0, 1]$
 	\item Wahrscheinlichkeitsvektor für alle Räume: $ \vec{y} \in [0, 1]^m \subset \mathbb{R}^m$
-	\item Wahrscheinlichkeit für den Raum $j \in [0, m - 1] \subset \mathbb{N}$:
-		$ y_j \in [0, 1] \subset \mathbb{R} $ 
+	\item Wahrscheinlichkeit für den Raum $j \in [0, m - 1] \cap \mathbb{Z}$:
+		$ y_j \in [0, 1]$ 
 \end{itemize}
-\todo{Schnittmengen}
 
 Der Messvektor $\vec{x}$ enthält die normalisierten Signalstärken für die wahrgenommenen
 Bluetooth-Beacon. Er stellt die Eingabe für die Vorhersage dar. 
@@ -213,7 +211,9 @@ eine Verlustfunktion, die ein Maß für die Abweichung von der korrekten Zuordnu
 Ein Machine-Learning-Algorithmus kann diese Verlustfunktion minimieren, um
 gute Parameterwerte zu bestimmen.
 
-Wir haben als Verlustfunktion die Kreuzenthropie gewählt. Dabei werden die vom Modell vorhergesagten
+Wir haben als Verlustfunktion die 
+Kreuzenthropie\footnote{Für Klassifizierung ist Kreuzentrophie oft besser als andere Verlustfunktionen: \href{https://www-i6.informatik.rwth-aachen.de/publications/download/861/GolikPavelDoetschPatrickNeyHermann--Cross-Entropyvs.SquaredErrorTrainingaTheoreticalExperimentalComparison--2013.pdf}{Cross-Entropy vs. Squared Error Training}}
+gewählt. Dabei werden die vom Modell vorhergesagten
 Wahrscheinlichkeiten mit den korrekten Räumen aus der Vermessung kombiniert.
 Sei $\vec{y'} \in \mathbb{R}^m$ der erwartete Ausgabevektor für den Raum $r$, dann gilt:
 \[
