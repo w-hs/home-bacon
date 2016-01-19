@@ -9,7 +9,7 @@ werden die Messungen im CSV-Format gesendet. Der Web-Service liefert das Modell
 als JSON-Objekt zurück.
 
 \subsubsection{Datenformate}
-
+\vspace{-1pt}
 Das CSV-Format zur Eingabe der Messungen enthält in jeder Zeile eine Einzelmessung.
 \begin{description}
 	\item[scan\_id:] Zuordnung der Einzelmessung zur übergeordneten Messung
@@ -60,11 +60,7 @@ Eine Beispielausgabe ist in dem folgenden Listing abgebildet:
 	"acc": 0.8888888955116272,
 	"max_rssi": -61,
 	"min_rssi": -106,
-	"rooms": {
-		"1": 2,
-		"2": 1,
-		"3": 0
-	},
+	"rooms": {"1": 2, "2": 1, "3": 0},
 	"tags": {
 		"7C:2F:80:99:DE:25": 2,
 		"7C:2F:80:99:DE:70": 3,
@@ -114,7 +110,7 @@ bei jedem Kommunikationspartner einen Listener-Service implementiert sowie die M
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=1\linewidth]{../Bilder/SequenzdiagrammScan}
+\includegraphics[width=0.99\linewidth]{../Bilder/SequenzdiagrammScan}
 \caption{Sequenzdiagramm der Vermessung zur initialen Erstellung des Modells}
 \label{fig:SequenzdiagrammScan}
 \end{figure}
