@@ -1,7 +1,7 @@
 \section{Raumerkennung}
 
 Die Raumerkennung ist der wichtigste Aspekt unserer Anwendung.
-Die zugrundeliegende Idee ist, dass stationäre Beacons in den
+Die zugrunde liegende Idee ist, dass stationäre Beacons in den
 relevanten Räumen platziert werden. Anschließend werden diese
 Räume einmalig vermessen, um ein Modell zur Erkennung der
 Räume zu erstellen.
@@ -27,10 +27,10 @@ normalisieren wir die Werte auf das Intervall $[0, 1] \subset \mathbb{R}$, wobei
 $0$ kein Signal und $1$ maximale Signalstärke bedeutet.
 
 Unter einer \textbf{Messung} verstehen wir einen Vektor von Einzelmessungen,
-welche gleichzeitig aufgenommen wurden. Messungen werden im Intevall $t_m$ durchgeführt.
+welche gleichzeitig aufgenommen wurden. Messungen werden im Intervall $t_m$ durchgeführt.
 In unserem Projekt messen wir jede Sekunde ($t_m = 1s$).
 
-In der Realität ergeben sich zwei Probleme, bei der Messung nach obigem
+In der Realität ergeben sich zwei Probleme bei der Messung nach obigem
 Schema:
 \begin{enumerate}
 	\item Einzelmessungen werden vom Bluetooth-Empfänger der betrachteten
@@ -62,7 +62,7 @@ an.
 Man sieht, dass in der zweiten Messung kein Signal für Beacon B empfangen wurde.
 Da jedoch die letzte Messung dieses Beacon weniger als $t_g$ zurückliegt, tragen
 wir in der Messung den Wert aus der letzten Messung ein.
-In unserem Projekt haben wir $t_g = 2 \cdot t_m$ gewählt, so dass ein nicht mehr
+In unserem Projekt haben wir $t_g = 2 \cdot t_m$ gewählt, sodass ein nicht mehr
 erreichbarer Beacon spätestens nach zwei Messintervallen als nicht vorhanden
 erkannt wird.
 
@@ -87,7 +87,7 @@ wir diese Beacons im Folgenden nur mit diesem Teil der Adresse, d. h.
 
 \subsubsection{Statistische Aufbereitung}
 
-Zunächst betrachten wir den Minimal-, Maximal, Mittelwert und die Standardabweichung für jeden
+Zunächst betrachten wir den Minimal-, Maximal-, Mittelwert und die Standardabweichung für jeden
 Beacon in jedem Raum. Diese bestimmen wir per SQL aus der SQLite-Datenbank der Messwerte.
 Da die Messwerte in der Datenbank als RSSI-Werte abgelegt und erst später normalisiert werden, sind die Werte in Tabelle \ref{tab:sql-analyze} nicht normalisiert.
 
@@ -109,7 +109,7 @@ Da die Messwerte in der Datenbank als RSSI-Werte abgelegt und erst später norma
 \vspace{0.4cm}
 Wie erwartet, gibt es relativ große Schwankungen bei den einzelnen Messwerten.
 Allerdings lässt sich an den Mittelwerten ablesen, dass die beiden Räume
-prinzipiell auseinander gehalten werden können.
+prinzipiell auseinandergehalten werden können.
 
 \subsubsection{Grafische Aufbereitung}
 \label{sec:lok-grafische-aufbereitung}
@@ -138,7 +138,7 @@ problematisch sein können. Wir schließen daraus, dass eine zuverlässige Raume
 
 Da die Machbarkeitsanalyse mit einem positiven Ergebnis abgeschlossen wurde,
 entwickeln wir in diesem Abschnitt einen konkreten Lösungsansatz für die
-Raumerkennung auf Basis von Messungen. Dazu erstellen wir ein Modell, dass aus
+Raumerkennung auf Basis von Messungen. Dazu erstellen wir ein Modell, das aus
 einer Reihe von Messungen den aktuellen Raum möglichst genau bestimmt.
 
 Das Modell hat zwei Aufgaben:
@@ -240,7 +240,7 @@ die Ergebnisse von mehreren aufeinanderfolgenden Messungen.
 
 Dabei betrachten wir die letzten $N$ Messungen und wählen den Raum, der in diesen
 $N$ Messungen am häufigsten als wahrscheinlichster Raum bestimmt wurde.
-Dies hat den Vorteil, dass einzelne Fehlmessungen nicht zu einem spontanem Raumwechsel
+Dies hat den Vorteil, dass einzelne Fehlmessungen nicht zu einem spontanen Raumwechsel
 führen. Allerdings führt dieses Vorgehen auch eine gewisse Latenz ein, bis ein Wechsel
 erkannt werden kann. Deshalb sollte $N$ weder zu klein, noch zu groß gewählt werden.
 Ein weiterer Vorteil ist, dass durch diesen Ansatz ein Hysterese-Effekt entsteht.
@@ -254,7 +254,7 @@ Bei der Implementierung unseres Lösungsansatzes sind folgende Rahmenbedingungen
 	\item Der Machine-Learning-Algorithmus zur Bestimmung der Parameter des Modells aus
 		den Vermessungsdaten ist rechenintensiv und soll deshalb in einen Web-Service
 		ausgelagert werden.
-	\item Die Vermessung von Räumen und die Erstellung eines Modells soll nur einmalig
+	\item Die Vermessung von Räumen und die Erstellung eines Modells sollen nur einmalig
 		erfolgen, da die Smartwatch-App offline funktionsfähig sein soll.
 	\item Die Anwendung des gelernten Modells auf Messungen bei der Raumerkennung muss
 		performant sein, da diese Berechnung lokal auf der Smartwatch erfolgt.
